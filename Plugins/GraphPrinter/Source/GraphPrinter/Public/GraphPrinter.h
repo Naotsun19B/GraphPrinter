@@ -8,8 +8,10 @@
 class FGraphPrinterModule : public IModuleInterface
 {
 public:
-
-	/** IModuleInterface implementation */
+	// IModuleInterface interface.
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	// End of IModuleInterface interface.
 };
+
+DECLARE_LOG_CATEGORY_EXTERN(LogGraphPrinter, Log, All);
