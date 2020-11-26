@@ -2,16 +2,20 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Modules/ModuleManager.h"
+/* Boilerplate.
+*****************************************************************************/
 
-class FGraphPrinterModule : public IModuleInterface
-{
-public:
-	// IModuleInterface interface.
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-	// End of IModuleInterface interface.
-};
+#include "Misc/MonolithicHeaderBoilerplate.h"
+MONOLITHIC_HEADER_BOILERPLATE()
 
-DECLARE_LOG_CATEGORY_EXTERN(LogGraphPrinter, Log, All);
+/* Public Dependencies.
+*****************************************************************************/
+
+#include "Core.h"
+
+/* Public includes.
+*****************************************************************************/
+
+#include "GraphPrinterGlobals.h"
+#include "GraphPrinterCommands.h"
+#include "GraphPrinterUtils.h"

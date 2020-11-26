@@ -4,9 +4,9 @@
 #include "GraphPrinter.h"
 #include "Widgets/SWidget.h"
 
-namespace GraphPrinterInternals
+// Cast function for classes that inherit from SWidget.
+namespace CastSlateWidgetImpl
 {
-	// Cast function for classes that inherit from SWidget.
 	template<typename To, typename From>
 	TSharedPtr<To> CastSlateWidget(TSharedPtr<From> Src, const FName& DestClassName)
 	{
@@ -24,7 +24,12 @@ namespace GraphPrinterInternals
 		return nullptr;
 	}
 }
-#define CAST_SLATE_WIDGET(To, From) GraphPrinterInternals::CastSlateWidget<To>(From, #To)
+#define CAST_SLATE_WIDGET(To, From) CastSlateWidgetImpl::CastSlateWidget<To>(From, #To)
+
+namespace GraphPrinterInternals
+{
+
+}
 
 void UGraphPrinterUtils::PrintGraph()
 {
