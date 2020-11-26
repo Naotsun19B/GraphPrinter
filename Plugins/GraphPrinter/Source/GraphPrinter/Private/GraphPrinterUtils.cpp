@@ -1,37 +1,37 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GraphPrinterUtils.h"
-#include "GraphPrinter.h"
-#include "Widgets/SWidget.h"
-
-// Cast function for classes that inherit from SWidget.
-namespace CastSlateWidgetImpl
-{
-	template<typename To, typename From>
-	TSharedPtr<To> CastSlateWidget(TSharedPtr<From> Src, const FName& DestClassName)
-	{
-		static_assert(TIsDerivedFrom<From, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
-		static_assert(TIsDerivedFrom<To, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
-
-		if (Src.IsValid())
-		{
-			if (Src->GetType() == DestClassName)
-			{
-				return StaticCastSharedPtr<To>(Src);
-			}
-		}
-
-		return nullptr;
-	}
-}
-#define CAST_SLATE_WIDGET(To, From) CastSlateWidgetImpl::CastSlateWidget<To>(From, #To)
-
-namespace GraphPrinterInternals
-{
-
-}
+#include "GraphPrinterGlobals.h"
+#include "GraphPrinterCore.h"
+#include "Misc/Paths.h"
 
 void UGraphPrinterUtils::PrintGraph()
 {
 	UE_LOG(LogGraphPrinter, Log, TEXT("Called UGraphPrinterUtils::PrintGraph"));
+
+	TSharedPtr<SWindow> ActiveWindow = FSlateApplication::Get().GetActiveTopLevelWindow();
+	TSharedPtr<SGraphEditor> GraphEditor = GraphPrinterCore::FindGraphEditor(ActiveWindow);
+	
+	FVector2D DrawSize;
+	if (!GraphPrinterCore::CalculateGraphSize(GraphEditor, DrawSize, false))
+	{
+		return;
+	}
+	
+	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, false, TF_Default);
+	
+	FImageWriteOptions Options;
+	Options.Format = EDesiredImageFormat::PNG;
+	Options.NativeOnComplete = [](bool bIsSucceed)
+	{
+		if (bIsSucceed)
+		{
+			UE_LOG(LogGraphPrinter, Log, TEXT("PrintGraph Succeed !!!"));
+		}
+		else
+		{
+			UE_LOG(LogGraphPrinter, Error, TEXT("PrintGraph Failed..."));
+		}
+	};
+	GraphPrinterCore::ExportRenderTargetToDisk(RenderTarget, FPaths::ProjectSavedDir(), Options);
 }
