@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImageWriteBlueprintLibrary.h"
+#include "Misc/Paths.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 /**
  * Categories used for log output with this plugin.

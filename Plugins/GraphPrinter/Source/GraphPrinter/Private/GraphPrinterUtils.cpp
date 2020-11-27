@@ -2,35 +2,54 @@
 
 #include "GraphPrinterUtils.h"
 #include "GraphPrinterGlobals.h"
+#include "GraphPrinterSettings.h"
 #include "GraphPrinterCore.h"
-#include "Misc/Paths.h"
+#include "ImageWriteBlueprintLibrary.h"
 
 void UGraphPrinterUtils::PrintGraph()
 {
-	UE_LOG(LogGraphPrinter, Log, TEXT("Called UGraphPrinterUtils::PrintGraph"));
+	auto* Settings = GetDefault<UGraphPrinterSettings>();
+	if (!IsValid(Settings))
+	{
+		return;
+	}
 
+	// Get the currently active topmost window.
 	TSharedPtr<SWindow> ActiveWindow = FSlateApplication::Get().GetActiveTopLevelWindow();
 	TSharedPtr<SGraphEditor> GraphEditor = GraphPrinterCore::FindGraphEditor(ActiveWindow);
 	
-	FVector2D DrawSize;
-	if (!GraphPrinterCore::CalculateGraphSize(GraphEditor, DrawSize, false))
+	// If don't have an active graph editor, end here.
+	if (!GraphEditor.IsValid())
 	{
 		const FText& Message = FText::FromString(TEXT("The graph editor isn't currently open."));
 		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
 		return;
 	}
 	
+	// Calculate the drawing size from the position of the node and draw on the render target.
+	const FVector2D& DrawSize = GraphPrinterCore::CalculateGraphSize(GraphEditor, false);
 	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, false, TF_Default);
 	
-	const FString& Filename = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Test"));
-	if (GraphPrinterCore::ExportRenderTargetToDisk(RenderTarget, Filename, EDesiredImageFormat::PNG))
+	// Create output options and file path and output as image file.
+	FImageWriteOptions Options;
+	Options.bAsync = true;
+	Options.Format = Settings->Format;
+	Options.bOverwriteFile = Settings->bCanOverwriteFileWhenExport;
+	Options.CompressionQuality = Settings->CompressionQuality;
+	Options.NativeOnComplete = [](bool bIsSucceeded)
 	{
-		const FText& Message = FText::FromString(TEXT("Successed !!!"));
-		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Success);
-	}
-	else
-	{
-		const FText& Message = FText::FromString(TEXT("Failed ..."));
-		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
-	}
+		if (bIsSucceeded)
+		{
+			const FText& Message = FText::FromString(TEXT("Succeeded !!!"));
+			GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Success);
+		}
+		else
+		{
+			const FText& Message = FText::FromString(TEXT("Failed ..."));
+			GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
+		}
+	};
+
+	const FString& Filename = FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterCore::GetGraphTitle(GraphEditor));
+	GraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options);
 }

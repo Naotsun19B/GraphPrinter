@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 
 class SWidget;
-class UTexture2D;
+class SGraphEditor;
+class UTexture;
 class UTextureRenderTarget2D;
+struct FImageWriteOptions;
 enum class EDesiredImageFormat : uint8;
 
 /**
@@ -35,10 +37,13 @@ public:
 	static UTextureRenderTarget2D* DrawWidgetToRenderTarget(TSharedPtr<SWidget> WidgetToRender, FVector2D DrawSize, bool bUseGamma, TextureFilter Filter);
 
 	// Saves the render target in the specified format.
-	static bool ExportRenderTargetToDisk(UTextureRenderTarget2D* RenderTarget, const FString& Filename, EDesiredImageFormat ImageFormat);
+	static void SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options);
+
+	// Get the title of the graph being edited in the graph editor.
+	static FString GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor);
 
 	// Calculates the size when drawing the graph editor.
-	static bool CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, FVector2D& GraphSize, bool bSelectedNodeOnly);
+	static FVector2D CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, bool bSelectedNodeOnly);
 
 	// Get the extension by the format of the image file.
 	static FString GetImageFileExtension(EDesiredImageFormat ImageFormat);

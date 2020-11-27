@@ -4,6 +4,7 @@
 #include "Modules/ModuleManager.h"
 #include "GraphPrinterGlobals.h"
 #include "GraphPrinterCommands.h"
+#include "GraphPrinterSettings.h"
 
 DEFINE_LOG_CATEGORY(LogGraphPrinter);
 
@@ -20,6 +21,8 @@ public:
 
 void FGraphPrinterModule::StartupModule()
 {
+	UGraphPrinterSettings::Register();
+
 	GraphPrinterCommands::Register();
 	GraphPrinterCommands::Bind();
 }
@@ -27,6 +30,8 @@ void FGraphPrinterModule::StartupModule()
 void FGraphPrinterModule::ShutdownModule()
 {
 	GraphPrinterCommands::Unregister();
+
+	UGraphPrinterSettings::Unregister();
 }
 
 #undef LOCTEXT_NAMESPACE

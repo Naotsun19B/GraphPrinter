@@ -12,6 +12,7 @@ MONOLITHIC_HEADER_BOILERPLATE()
 *****************************************************************************/
 
 #include "Core.h"
+#include "ImageWriteBlueprintLibrary.h"
 
 /* Public includes.
 *****************************************************************************/

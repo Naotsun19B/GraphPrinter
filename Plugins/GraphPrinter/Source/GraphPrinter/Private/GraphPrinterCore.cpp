@@ -2,13 +2,12 @@
 
 #include "GraphPrinterCore.h"
 #include "GraphPrinterGlobals.h"
+#include "GraphPrinterSettings.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "Engine/TextureRenderTarget2D.h"
+#include "ImageWriteBlueprintLibrary.h"
 #include "Slate/WidgetRenderer.h"
 #include "GraphEditor.h"
-#include "Misc/Paths.h"
-#include "Misc/FileHelper.h"
 #include "ImageUtils.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
@@ -93,46 +92,38 @@ UTextureRenderTarget2D* GraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SW
 	return RenderTarget;
 }
 
-bool GraphPrinterCore::ExportRenderTargetToDisk(UTextureRenderTarget2D* RenderTarget, const FString& Filename, EDesiredImageFormat ImageFormat)
+void GraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options)
 {
-	if (!IsValid(RenderTarget))
-	{
-		return false;
-	}
 	FText ValidatePathErrorText;
 	if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
 	{
 		ShowNotification(ValidatePathErrorText, CS_Fail);
-		return false;
+		return;
 	}
 
-	FTextureRenderTargetResource* Resource = RenderTarget->GameThread_GetRenderTargetResource();
-	if (Resource == nullptr)
-	{
-		return false;
-	}
-	FReadSurfaceDataFlags ReadPixelFlags(RCM_UNorm);
-
-	TArray<FColor> OutBMP;
-	OutBMP.AddUninitialized(RenderTarget->GetSurfaceWidth() * RenderTarget->GetSurfaceHeight());
-	Resource->ReadPixels(OutBMP, ReadPixelFlags);
-	for (auto& Pixel : OutBMP)
-	{
-		Pixel.A = 255;
-	}
-
-	FIntPoint ImageSize(RenderTarget->GetSurfaceWidth(), RenderTarget->GetSurfaceHeight());
-	TArray<uint8> CompressedBitmap;
-	FImageUtils::CompressImageArray(ImageSize.X, ImageSize.Y, OutBMP, CompressedBitmap);
-
-	const FString& FilenameWithExtension = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false) + GetImageFileExtension(ImageFormat));
-	return FFileHelper::SaveArrayToFile(CompressedBitmap, *FilenameWithExtension);
+	const FString& FilenameWithExtension = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false) + GetImageFileExtension(Options.Format));
+	UImageWriteBlueprintLibrary::ExportToDisk(Texture, FilenameWithExtension, Options);
 }
 
-bool GraphPrinterCore::CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, FVector2D& GraphSize, bool bSelectedNodeOnly)
+FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 {
-	GraphSize = FVector2D(1920, 1080);
-	return GraphEditor.IsValid();
+	if (GraphEditor.IsValid())
+	{
+		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
+		{
+			if (UObject* Outer = Graph->GetOuter())
+			{
+				return FString::Printf(TEXT("%s_%s"), *Outer->GetName(), *Graph->GetName());
+			}
+		}
+	}
+
+	return TEXT("Invalid GraphEditor");
+}
+
+FVector2D GraphPrinterCore::CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, bool bSelectedNodeOnly)
+{
+	return FVector2D(1920, 1080);
 }
 
 FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
