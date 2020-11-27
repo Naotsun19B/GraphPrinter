@@ -16,7 +16,7 @@ public:
 	// End of IModuleInterface interface.
 };
 
-#define LOCTEXT_NAMESPACE "FGraphPrinterModule"
+#define LOCTEXT_NAMESPACE "GraphPrinter"
 
 void FGraphPrinterModule::StartupModule()
 {

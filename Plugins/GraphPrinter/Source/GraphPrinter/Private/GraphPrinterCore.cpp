@@ -2,9 +2,40 @@
 
 #include "GraphPrinterCore.h"
 #include "GraphPrinterGlobals.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Slate/WidgetRenderer.h"
 #include "GraphEditor.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "ImageUtils.h"
+
+#define LOCTEXT_NAMESPACE "GraphPrinter"
+
+const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
+const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
+const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
+
+bool GraphPrinterCore::ShowNotification(const FText NotificationText, TCompletionState CompletionState, const float ExpireDuration)
+{
+	FNotificationInfo NotificationInfo(NotificationText);
+	NotificationInfo.bFireAndForget = true;
+	NotificationInfo.ExpireDuration = ExpireDuration;
+	NotificationInfo.bUseLargeFont = true;
+	//NotificationInfo.Image = &Brush;
+
+	TSharedPtr<SNotificationItem> NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
+	if (NotificationItem.IsValid())
+	{
+		auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
+		NotificationItem->SetCompletionState(StateEnum);
+
+		return true;
+	}
+	
+	return false;
+}
 
 void GraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
 {
@@ -62,23 +93,40 @@ UTextureRenderTarget2D* GraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SW
 	return RenderTarget;
 }
 
-void GraphPrinterCore::ExportRenderTargetToDisk(UTextureRenderTarget2D* RenderTarget, const FString& Filename, const FImageWriteOptions& Options)
+bool GraphPrinterCore::ExportRenderTargetToDisk(UTextureRenderTarget2D* RenderTarget, const FString& Filename, EDesiredImageFormat ImageFormat)
 {
-	// TODO : The following method will result in an error, so look for another method.
-
-	UTexture2D* TextureToExport = UTexture2D::CreateTransient(RenderTarget->SizeX, RenderTarget->SizeY, RenderTarget->GetFormat());
-	if (IsValid(RenderTarget))
+	if (!IsValid(RenderTarget))
 	{
-		UTexture2D* NewTexture = RenderTarget->ConstructTexture2D(TextureToExport->GetOuter(), TextureToExport->GetName(), RenderTarget->GetMaskedFlags() | RF_Public | RF_Standalone, CTF_Default, NULL);
-		if (IsValid(NewTexture))
-		{
-			NewTexture->Modify();
-			NewTexture->MarkPackageDirty();
-			NewTexture->PostEditChange();
-			NewTexture->UpdateResource();
-		}
+		return false;
 	}
-	UImageWriteBlueprintLibrary::ExportToDisk(TextureToExport, Filename, Options);
+	FText ValidatePathErrorText;
+	if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
+	{
+		ShowNotification(ValidatePathErrorText, CS_Fail);
+		return false;
+	}
+
+	FTextureRenderTargetResource* Resource = RenderTarget->GameThread_GetRenderTargetResource();
+	if (Resource == nullptr)
+	{
+		return false;
+	}
+	FReadSurfaceDataFlags ReadPixelFlags(RCM_UNorm);
+
+	TArray<FColor> OutBMP;
+	OutBMP.AddUninitialized(RenderTarget->GetSurfaceWidth() * RenderTarget->GetSurfaceHeight());
+	Resource->ReadPixels(OutBMP, ReadPixelFlags);
+	for (auto& Pixel : OutBMP)
+	{
+		Pixel.A = 255;
+	}
+
+	FIntPoint ImageSize(RenderTarget->GetSurfaceWidth(), RenderTarget->GetSurfaceHeight());
+	TArray<uint8> CompressedBitmap;
+	FImageUtils::CompressImageArray(ImageSize.X, ImageSize.Y, OutBMP, CompressedBitmap);
+
+	const FString& FilenameWithExtension = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false) + GetImageFileExtension(ImageFormat));
+	return FFileHelper::SaveArrayToFile(CompressedBitmap, *FilenameWithExtension);
 }
 
 bool GraphPrinterCore::CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, FVector2D& GraphSize, bool bSelectedNodeOnly)
@@ -86,3 +134,19 @@ bool GraphPrinterCore::CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, 
 	GraphSize = FVector2D(1920, 1080);
 	return GraphEditor.IsValid();
 }
+
+FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
+{
+	switch (ImageFormat)
+	{
+	case EDesiredImageFormat::PNG: return TEXT(".png");
+	case EDesiredImageFormat::JPG: return TEXT(".jpg");
+	case EDesiredImageFormat::BMP: return TEXT(".bmp");
+	case EDesiredImageFormat::EXR: return TEXT(".exr");
+	default: break;
+	}
+
+	return TEXT("");
+}
+
+#undef LOCTEXT_NAMESPACE

@@ -15,23 +15,22 @@ void UGraphPrinterUtils::PrintGraph()
 	FVector2D DrawSize;
 	if (!GraphPrinterCore::CalculateGraphSize(GraphEditor, DrawSize, false))
 	{
+		const FText& Message = FText::FromString(TEXT("The graph editor isn't currently open."));
+		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
 		return;
 	}
 	
 	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, false, TF_Default);
 	
-	FImageWriteOptions Options;
-	Options.Format = EDesiredImageFormat::PNG;
-	Options.NativeOnComplete = [](bool bIsSucceed)
+	const FString& Filename = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Test"));
+	if (GraphPrinterCore::ExportRenderTargetToDisk(RenderTarget, Filename, EDesiredImageFormat::PNG))
 	{
-		if (bIsSucceed)
-		{
-			UE_LOG(LogGraphPrinter, Log, TEXT("PrintGraph Succeed !!!"));
-		}
-		else
-		{
-			UE_LOG(LogGraphPrinter, Error, TEXT("PrintGraph Failed..."));
-		}
-	};
-	GraphPrinterCore::ExportRenderTargetToDisk(RenderTarget, FPaths::ProjectSavedDir(), Options);
+		const FText& Message = FText::FromString(TEXT("Successed !!!"));
+		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Success);
+	}
+	else
+	{
+		const FText& Message = FText::FromString(TEXT("Failed ..."));
+		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
+	}
 }

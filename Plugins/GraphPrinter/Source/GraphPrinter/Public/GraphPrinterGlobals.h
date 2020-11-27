@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ImageWriteBlueprintLibrary.h"
 
 /**
  * Categories used for log output with this plugin.

@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Widgets/SWidget.h"
-#include "ImageWriteBlueprintLibrary.h"
 
+class SWidget;
 class UTexture2D;
 class UTextureRenderTarget2D;
 enum class EDesiredImageFormat : uint8;
@@ -16,6 +15,16 @@ enum class EDesiredImageFormat : uint8;
 class GRAPHPRINTER_API GraphPrinterCore
 {
 public:
+	// Define notification types so you don't have to include "SNotificationList.h".
+	using TCompletionState = int32;
+	static const TCompletionState CS_Pending;
+	static const TCompletionState CS_Success;
+	static const TCompletionState CS_Fail;
+
+public:
+	// Show notifications at the bottom right of the editor.
+	static bool ShowNotification(const FText NotificationText, TCompletionState CompletionState, const float ExpireDuration = 4.0f);
+
 	// Recursively collect all child widgets of the specified widget.
 	static void CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren);
 
@@ -26,10 +35,13 @@ public:
 	static UTextureRenderTarget2D* DrawWidgetToRenderTarget(TSharedPtr<SWidget> WidgetToRender, FVector2D DrawSize, bool bUseGamma, TextureFilter Filter);
 
 	// Saves the render target in the specified format.
-	static void ExportRenderTargetToDisk(UTextureRenderTarget2D* RenderTarget, const FString& Filename, const FImageWriteOptions& Options);
+	static bool ExportRenderTargetToDisk(UTextureRenderTarget2D* RenderTarget, const FString& Filename, EDesiredImageFormat ImageFormat);
 
 	// Calculates the size when drawing the graph editor.
 	static bool CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, FVector2D& GraphSize, bool bSelectedNodeOnly);
+
+	// Get the extension by the format of the image file.
+	static FString GetImageFileExtension(EDesiredImageFormat ImageFormat);
 };
 
 /**
