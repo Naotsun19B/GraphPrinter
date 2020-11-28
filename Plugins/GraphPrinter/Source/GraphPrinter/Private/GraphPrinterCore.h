@@ -42,8 +42,8 @@ public:
 	// Get the title of the graph being edited in the graph editor.
 	static FString GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor);
 
-	// Calculates the size when drawing the graph editor.
-	static FVector2D CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, bool bSelectedNodeOnly);
+	// Calculate the range and view location to use when drawing the graph editor.
+	static bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding);
 
 	// Get the extension by the format of the image file.
 	static FString GetImageFileExtension(EDesiredImageFormat ImageFormat);

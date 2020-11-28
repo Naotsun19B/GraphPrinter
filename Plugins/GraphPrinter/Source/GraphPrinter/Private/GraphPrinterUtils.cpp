@@ -27,7 +27,18 @@ void UGraphPrinterUtils::PrintGraph()
 	}
 	
 	// Calculate the drawing size from the position of the node and draw on the render target.
-	const FVector2D& DrawSize = GraphPrinterCore::CalculateGraphSize(GraphEditor, false);
+	GraphEditor->SelectAllNodes();
+
+	FVector2D DrawSize;
+	FVector2D ViewLocation;
+	if (!GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, 100.f))
+	{
+		const FText& Message = FText::FromString(TEXT("No node is selected."));
+		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
+		return;
+	}
+	GraphEditor->SetViewLocation(ViewLocation, 1.f);
+
 	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, false, TF_Default);
 	
 	// Create output options and file path and output as image file.

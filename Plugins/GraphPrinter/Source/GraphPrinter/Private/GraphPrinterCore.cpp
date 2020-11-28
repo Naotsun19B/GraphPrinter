@@ -121,23 +121,41 @@ FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 	return TEXT("Invalid GraphEditor");
 }
 
-FVector2D GraphPrinterCore::CalculateGraphSize(TSharedPtr<SGraphEditor> GraphEditor, bool bSelectedNodeOnly)
+bool GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding)
 {
-	return FVector2D(1920, 1080);
+	if (!GraphEditor.IsValid())
+	{
+		return false;
+	}
+
+	if (GraphEditor->GetNumberOfSelectedNodes() == 0)
+	{
+		return false;
+	}
+
+	FSlateRect Bounds;
+	if (!GraphEditor->GetBoundsForSelectedNodes(Bounds, Padding))
+	{
+		return false;
+	}
+	DrawSize = Bounds.GetSize();
+
+	// TODO : From the selection and the size of the viewport, 
+	// need to calculate the position of the viewport and the position 
+	// where the upper right node is at the upper right edge of the screen.
+
+	return true;
 }
 
 FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
 {
-	switch (ImageFormat)
+	if (UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 	{
-	case EDesiredImageFormat::PNG: return TEXT(".png");
-	case EDesiredImageFormat::JPG: return TEXT(".jpg");
-	case EDesiredImageFormat::BMP: return TEXT(".bmp");
-	case EDesiredImageFormat::EXR: return TEXT(".exr");
-	default: break;
+		const FString& Extension = EnumPtr->GetValueAsString(ImageFormat).ToLower();
+		return FString::Printf(TEXT(".%s"), *Extension);
 	}
 
-	return TEXT("");
+	return FString();
 }
 
 #undef LOCTEXT_NAMESPACE
