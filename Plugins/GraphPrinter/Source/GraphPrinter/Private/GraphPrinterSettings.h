@@ -6,7 +6,6 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphPrinterSettings.generated.h"
 
-class ISettingsModule;
 enum class EDesiredImageFormat : uint8;
 
 /**
@@ -17,10 +16,6 @@ class UGraphPrinterSettings : public UObject
 {
 	GENERATED_UCLASS_BODY()
 	
-protected:
-	// Directory name where the image file is output.
-	static const FString OutputDirectoryName;
-
 public:
 	// The desired output image format to write to disk.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
@@ -29,6 +24,14 @@ public:
 	// An image format specific compression setting. Either 0 (Default) or 1 (Uncompressed) for EXRs, or a value between 0 and 100.
 	UPROPERTY(Config, EditAnywhere, Category = "Image", meta = (UIMin = 0, UIMax = 100))
 	int32 CompressionQuality;
+
+	// Texture filtering mode to use when outputting.
+	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	TEnumAsByte<TextureFilter> FilteringMode;
+
+	// Whether to output the drawing result affected by the gamma value.
+	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	bool bUseGamma;
 
 	// Whether to overwrite the image if it already exists when export.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
@@ -44,9 +47,6 @@ public:
 	static void Unregister();
 
 protected:
-	// Get SettingsModule.
-	static ISettingsModule* GetSettingsModule();
-
 	// UObject interface.
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	// End of UObject interface.

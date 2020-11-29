@@ -39,7 +39,7 @@ void UGraphPrinterUtils::PrintGraph()
 	}
 	GraphEditor->SetViewLocation(ViewLocation, 1.f);
 
-	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, false, TF_Default);
+	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Settings->bUseGamma, Settings->FilteringMode);
 	
 	// Create output options and file path and output as image file.
 	FImageWriteOptions Options;
@@ -61,6 +61,6 @@ void UGraphPrinterUtils::PrintGraph()
 		}
 	};
 
-	const FString& Filename = FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterCore::GetGraphTitle(GraphEditor));
+	const FString& Filename = FPaths::Combine(Settings->OutputDirectoryPath, GraphPrinterCore::GetGraphTitle(GraphEditor));
 	GraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options);
 }

@@ -9,6 +9,7 @@
 #include "Slate/WidgetRenderer.h"
 #include "GraphEditor.h"
 #include "ImageUtils.h"
+#include "HAL/FileManager.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
@@ -16,11 +17,14 @@ const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Pending = SNotific
 const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
 const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
 
-bool GraphPrinterCore::ShowNotification(const FText NotificationText, TCompletionState CompletionState, const float ExpireDuration)
+TSharedPtr<SNotificationItem> GraphPrinterCore::ShowNotification(const FText& NotificationText, TCompletionState CompletionState, float ExpireDuration)
 {
 	FNotificationInfo NotificationInfo(NotificationText);
-	NotificationInfo.bFireAndForget = true;
-	NotificationInfo.ExpireDuration = ExpireDuration;
+	NotificationInfo.bFireAndForget = (ExpireDuration > 0.f);
+	if (NotificationInfo.bFireAndForget)
+	{
+		NotificationInfo.ExpireDuration = ExpireDuration;
+	}
 	NotificationInfo.bUseLargeFont = true;
 	//NotificationInfo.Image = &Brush;
 
@@ -29,11 +33,9 @@ bool GraphPrinterCore::ShowNotification(const FText NotificationText, TCompletio
 	{
 		auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
 		NotificationItem->SetCompletionState(StateEnum);
-
-		return true;
 	}
 	
-	return false;
+	return NotificationItem;
 }
 
 void GraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
@@ -84,6 +86,11 @@ UTextureRenderTarget2D* GraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SW
 		UE_LOG(LogGraphPrinter, Error, TEXT("Failed to generate RenderTarget."));
 		return nullptr;
 	}
+	if (bUseGamma)
+	{
+		RenderTarget->bForceLinearGamma = true;
+		RenderTarget->UpdateResourceImmediate(true);
+	}
 
 	WidgetRenderer->DrawWidget(RenderTarget, WidgetToRender.ToSharedRef(), DrawSize, 0.f, false);
 	FlushRenderingCommands();
@@ -101,24 +108,32 @@ void GraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString& 
 		return;
 	}
 
-	const FString& FilenameWithExtension = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false) + GetImageFileExtension(Options.Format));
-	UImageWriteBlueprintLibrary::ExportToDisk(Texture, FilenameWithExtension, Options);
-}
-
-FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
-{
-	if (GraphEditor.IsValid())
+	FString FullFilename = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false));
+	const FString& Extension = GetImageFileExtension(Options.Format);
+	if (!Options.bOverwriteFile)
 	{
-		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
+		if (IFileManager::Get().FileExists(*FString(FullFilename + Extension)))
 		{
-			if (UObject* Outer = Graph->GetOuter())
+			auto CombineFilenameAndIndex = [](const FString& Filename, int32 Index) -> FString
 			{
-				return FString::Printf(TEXT("%s_%s"), *Outer->GetName(), *Graph->GetName());
+				return FString::Printf(TEXT("%s_%d"), *Filename, Index);
+			};
+
+			int32 Index = 0;
+			while (Index < INT32_MAX)
+			{
+				const FString& FilenameWithExtension = CombineFilenameAndIndex(FullFilename, Index) + Extension;
+				if (!IFileManager::Get().FileExists(*FilenameWithExtension))
+				{
+					break;
+				}
+				Index++;
 			}
+			FullFilename = CombineFilenameAndIndex(FullFilename, Index);
 		}
 	}
 
-	return TEXT("Invalid GraphEditor");
+	UImageWriteBlueprintLibrary::ExportToDisk(Texture, FullFilename + Extension, Options);
 }
 
 bool GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding)
@@ -143,16 +158,40 @@ bool GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize
 	// TODO : From the selection and the size of the viewport, 
 	// need to calculate the position of the viewport and the position 
 	// where the upper right node is at the upper right edge of the screen.
+	float ZoomAmount;
+	GraphEditor->GetViewLocation(ViewLocation, ZoomAmount);
 
 	return true;
+}
+
+FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
+{
+	if (GraphEditor.IsValid())
+	{
+		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
+		{
+			if (UObject* Outer = Graph->GetOuter())
+			{
+				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
+			}
+		}
+	}
+
+	return TEXT("Invalid GraphEditor");
 }
 
 FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
 {
 	if (UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 	{
-		const FString& Extension = EnumPtr->GetValueAsString(ImageFormat).ToLower();
-		return FString::Printf(TEXT(".%s"), *Extension);
+		const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
+		FString UnuseString;
+		FString Extension;
+		if (EnumString.Split(TEXT("::"), &UnuseString, &Extension))
+		{
+			Extension = Extension.ToLower();
+			return FString::Printf(TEXT(".%s"), *Extension);
+		}
 	}
 
 	return FString();

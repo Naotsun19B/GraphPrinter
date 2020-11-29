@@ -7,20 +7,30 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
-const FString UGraphPrinterSettings::OutputDirectoryName = TEXT("GraphPrinter");
+namespace GraphPrinterSettingsInternal
+{
+	static const FString OutputDirectoryName = TEXT("GraphPrinter");
+
+	ISettingsModule* GetSettingsModule()
+	{
+		return FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+	}
+}
 
 UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
-	, bCanOverwriteFileWhenExport(true)
-	, OutputDirectoryPath(FPaths::Combine(FPaths::ProjectSavedDir(), OutputDirectoryName))
+	, FilteringMode(TF_Default)
+	, bUseGamma(true)
+	, bCanOverwriteFileWhenExport(false)
+	, OutputDirectoryPath(FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName))
 {
 }
 
 void UGraphPrinterSettings::Register()
 {
-	if (ISettingsModule* SettingsModule = GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinterSettingsInternal::GetSettingsModule())
 	{
 		SettingsModule->RegisterSettings(
 			"Editor",
@@ -35,7 +45,7 @@ void UGraphPrinterSettings::Register()
 
 void UGraphPrinterSettings::Unregister()
 {
-	if (ISettingsModule* SettingsModule = GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinterSettingsInternal::GetSettingsModule())
 	{
 		SettingsModule->UnregisterSettings(
 			"Editor", 
@@ -43,11 +53,6 @@ void UGraphPrinterSettings::Unregister()
 			"GraphPrinterSettings"
 		);
 	}
-}
-
-ISettingsModule* UGraphPrinterSettings::GetSettingsModule()
-{
-	return FModuleManager::GetModulePtr<ISettingsModule>("Settings");
 }
 
 void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
