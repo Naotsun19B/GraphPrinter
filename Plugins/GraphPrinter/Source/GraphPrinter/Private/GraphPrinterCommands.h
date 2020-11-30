@@ -23,6 +23,8 @@ protected:
 	virtual void BindCommands() const;
 
 private:
-	// A command to export the currently active graph editor as an image.
-	TSharedPtr<FUICommandInfo> PrintGraph;
+	// Instances of bound commands.
+	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
+	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
+	TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
 };

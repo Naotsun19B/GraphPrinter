@@ -9,7 +9,11 @@
 
 namespace GraphPrinterSettingsInternal
 {
-	static const FString OutputDirectoryName = TEXT("GraphPrinter");
+	static const FString OutputDirectoryName	= TEXT("GraphPrinter");
+
+	static const FName ContainerName			= TEXT("Editor");
+	static const FName CategoryName				= TEXT("Plugins");
+	static const FName SectionName				= TEXT("GraphPrinterSettings");
 
 	ISettingsModule* GetSettingsModule()
 	{
@@ -19,10 +23,12 @@ namespace GraphPrinterSettingsInternal
 
 UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+	, bIsEnableCommands(true)
 	, Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
 	, FilteringMode(TF_Default)
 	, bUseGamma(true)
+	, Padding(0.f)
 	, bCanOverwriteFileWhenExport(false)
 	, OutputDirectoryPath(FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName))
 {
@@ -33,9 +39,9 @@ void UGraphPrinterSettings::Register()
 	if (ISettingsModule* SettingsModule = GraphPrinterSettingsInternal::GetSettingsModule())
 	{
 		SettingsModule->RegisterSettings(
-			"Editor",
-			"GraphPrinter",
-			"GraphPrinterSettings",
+			GraphPrinterSettingsInternal::ContainerName,
+			GraphPrinterSettingsInternal::CategoryName,
+			GraphPrinterSettingsInternal::SectionName,
 			LOCTEXT("SettingName", "Graph Printer"),
 			LOCTEXT("SettingDescription", "Editor settings for Graph Printer"),
 			GetMutableDefault<UGraphPrinterSettings>()
@@ -48,9 +54,9 @@ void UGraphPrinterSettings::Unregister()
 	if (ISettingsModule* SettingsModule = GraphPrinterSettingsInternal::GetSettingsModule())
 	{
 		SettingsModule->UnregisterSettings(
-			"Editor", 
-			"GraphPrinter",
-			"GraphPrinterSettings"
+			GraphPrinterSettingsInternal::ContainerName,
+			GraphPrinterSettingsInternal::CategoryName,
+			GraphPrinterSettingsInternal::SectionName
 		);
 	}
 }

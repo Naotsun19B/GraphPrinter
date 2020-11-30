@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GraphPrinterTypes.h"
 
 class SWidget;
 class SGraphEditor;
@@ -26,7 +27,14 @@ public:
 
 public:
 	// Show notifications at the bottom right of the editor (When Expire Duration is 0 or less, you need to call the fade process manually.).
-	static TSharedPtr<SNotificationItem> ShowNotification(const FText& NotificationText, TCompletionState CompletionState, float ExpireDuration = 4.0f);
+	static TSharedPtr<SNotificationItem> ShowNotification(
+		const FText& NotificationText, 
+		TCompletionState CompletionState, 
+		float ExpireDuration = 4.f, 
+		ENotificationInteraction InteractionType = ENotificationInteraction::None,
+		const FText& InteractionText = FText(),
+		FSimpleDelegate InteractionCallback = nullptr
+	);
 
 	// Recursively collect all child widgets of the specified widget.
 	static void CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren);
@@ -48,6 +56,9 @@ public:
 
 	// Get the extension by the format of the image file.
 	static FString GetImageFileExtension(EDesiredImageFormat ImageFormat);
+
+	// Open the folder containing the file in Explorer.
+	static void OpenFolderWithExplorer(const FString& FilePath);
 };
 
 /**

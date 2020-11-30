@@ -5,11 +5,11 @@
 #include "GraphPrinterSettings.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "ImageWriteBlueprintLibrary.h"
 #include "Slate/WidgetRenderer.h"
 #include "GraphEditor.h"
-#include "ImageUtils.h"
 #include "HAL/FileManager.h"
+#include "GenericPlatform/GenericPlatformProcess.h"
+#include "ReferenceViewer/EdGraph_ReferenceViewer.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
@@ -17,7 +17,14 @@ const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Pending = SNotific
 const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
 const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
 
-TSharedPtr<SNotificationItem> GraphPrinterCore::ShowNotification(const FText& NotificationText, TCompletionState CompletionState, float ExpireDuration)
+TSharedPtr<SNotificationItem> GraphPrinterCore::ShowNotification(
+	const FText& NotificationText, 
+	TCompletionState CompletionState, 
+	float ExpireDuration /* = 4.f */,
+	ENotificationInteraction InteractionType /* = ENotificationInteraction::None */,
+	const FText& InteractionText /* = FText()*/,
+	FSimpleDelegate InteractionCallback /* = nullptr*/
+)
 {
 	FNotificationInfo NotificationInfo(NotificationText);
 	NotificationInfo.bFireAndForget = (ExpireDuration > 0.f);
@@ -28,10 +35,27 @@ TSharedPtr<SNotificationItem> GraphPrinterCore::ShowNotification(const FText& No
 	NotificationInfo.bUseLargeFont = true;
 	//NotificationInfo.Image = &Brush;
 
+	auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
+	switch (InteractionType)
+	{
+	case ENotificationInteraction::Hyperlink:
+	{
+		NotificationInfo.HyperlinkText = InteractionText;
+		NotificationInfo.Hyperlink = InteractionCallback;
+		break;
+	}
+	case ENotificationInteraction::Button:
+	{
+		FNotificationButtonInfo ButtonInfo(InteractionText, FText(), InteractionCallback, StateEnum);
+		NotificationInfo.ButtonDetails.Add(ButtonInfo);
+		break;
+	}
+	default: break;
+	}
+
 	TSharedPtr<SNotificationItem> NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
 	if (NotificationItem.IsValid())
 	{
-		auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
 		NotificationItem->SetCompletionState(StateEnum);
 	}
 	
@@ -149,7 +173,7 @@ bool GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize
 	}
 
 	FSlateRect Bounds;
-	if (!GraphEditor->GetBoundsForSelectedNodes(Bounds, Padding))
+	if (!GraphEditor->GetBoundsForSelectedNodes(Bounds, Padding + 100.f))
 	{
 		return false;
 	}
@@ -170,7 +194,12 @@ FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 	{
 		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
 		{
-			if (UObject* Outer = Graph->GetOuter())
+			// ReferenceViewer replaces outer name because Outer does not exist.
+			if (Graph->IsA<UEdGraph_ReferenceViewer>())
+			{
+				return TEXT("ReferenceViewer");
+			}
+			else if (UObject* Outer = Graph->GetOuter())
 			{
 				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
 			}
@@ -195,6 +224,20 @@ FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
 	}
 
 	return FString();
+}
+
+void GraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
+{
+	const FString& FullFilePath = FPaths::ConvertRelativePathToFull(FilePath);
+
+	FText ValidatePathErrorText;
+	if (!FPaths::ValidatePath(FullFilePath, &ValidatePathErrorText))
+	{
+		ShowNotification(ValidatePathErrorText, CS_Fail);
+		return;
+	}
+
+	FPlatformProcess::ExploreFolder(*FullFilePath);
 }
 
 #undef LOCTEXT_NAMESPACE

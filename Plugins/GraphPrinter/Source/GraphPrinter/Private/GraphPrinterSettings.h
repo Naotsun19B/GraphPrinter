@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphPrinterSettings.generated.h"
 
+enum TextureFilter;
 enum class EDesiredImageFormat : uint8;
 
 /**
@@ -32,6 +33,10 @@ public:
 	// Whether to output the drawing result affected by the gamma value.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	bool bUseGamma;
+
+	// Wide margin when drawing the graph editor.
+	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0.f, ClampMin = 0.f))
+	float Padding;
 
 	// Whether to overwrite the image if it already exists when export.
 	UPROPERTY(EditAnywhere, Config, Category = "File")

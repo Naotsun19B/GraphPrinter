@@ -8,6 +8,15 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrintCommands"
 
+#define REGISTER_COMMAND(CommandName, InDescription, InDefaultChord) \
+	UI_COMMAND(CommandName, #CommandName, InDescription, EUserInterfaceActionType::None, InDefaultChord);
+
+#define BIND_COMMAND(CommandName) \
+	CommandBindings->MapAction( \
+		GraphPrinterCommands::Get().##CommandName, \
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::##CommandName) \
+	);
+
 GraphPrinterCommands::GraphPrinterCommands()
 	: TCommands<GraphPrinterCommands>
 	(
@@ -21,7 +30,9 @@ GraphPrinterCommands::GraphPrinterCommands()
 
 void GraphPrinterCommands::RegisterCommands()
 {
-	UI_COMMAND(PrintGraph, "Print Graph", "Exports the currently active graph editor as an image.", EUserInterfaceActionType::None, FInputChord(EKeys::F9, EModifierKey::Control));
+	REGISTER_COMMAND(PrintGraphWithAllNodes, "Exports all nodes of the currently active graph editor as images.", FInputChord(EKeys::F9, EModifierKey::Control));
+	REGISTER_COMMAND(PrintGraphWithSelectedNodes, "Exports the selected node of the currently active graph editor as an image.", FInputChord(EKeys::F10, EModifierKey::Control));
+	REGISTER_COMMAND(OpenExportDestinationFolder, "Open the folder containing the images saved by this plugin in Explorer.", FInputChord(EKeys::F12, EModifierKey::Control));
 }
 
 void GraphPrinterCommands::Bind()
@@ -39,10 +50,9 @@ void GraphPrinterCommands::BindCommands() const
 	IMainFrameModule& MainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>("MainFrame");
 	const TSharedRef<FUICommandList>& CommandBindings = MainFrame.GetMainFrameCommandBindings();
 
-	CommandBindings->MapAction(
-		GraphPrinterCommands::Get().PrintGraph,
-		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraph)
-	);
+	BIND_COMMAND(PrintGraphWithAllNodes);
+	BIND_COMMAND(PrintGraphWithSelectedNodes);
+	BIND_COMMAND(OpenExportDestinationFolder);
 }
 
 #undef LOCTEXT_NAMESPACE
