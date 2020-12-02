@@ -13,12 +13,12 @@
 
 #define BIND_COMMAND(CommandName) \
 	CommandBindings->MapAction( \
-		GraphPrinterCommands::Get().##CommandName, \
+		FGraphPrinterCommands::Get().##CommandName, \
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::##CommandName) \
 	);
 
-GraphPrinterCommands::GraphPrinterCommands()
-	: TCommands<GraphPrinterCommands>
+FGraphPrinterCommands::FGraphPrinterCommands()
+	: TCommands<FGraphPrinterCommands>
 	(
 		TEXT("GraphPrinter"),
 		NSLOCTEXT("Contexts", "GraphPrinter", "Graph Printer"),
@@ -28,24 +28,24 @@ GraphPrinterCommands::GraphPrinterCommands()
 {
 }
 
-void GraphPrinterCommands::RegisterCommands()
+void FGraphPrinterCommands::RegisterCommands()
 {
 	REGISTER_COMMAND(PrintGraphWithAllNodes, "Exports all nodes of the currently active graph editor as images.", FInputChord(EKeys::F9, EModifierKey::Control));
 	REGISTER_COMMAND(PrintGraphWithSelectedNodes, "Exports the selected node of the currently active graph editor as an image.", FInputChord(EKeys::F10, EModifierKey::Control));
 	REGISTER_COMMAND(OpenExportDestinationFolder, "Open the folder containing the images saved by this plugin in Explorer.", FInputChord(EKeys::F12, EModifierKey::Control));
 }
 
-void GraphPrinterCommands::Bind()
+void FGraphPrinterCommands::Bind()
 {
-	if (!GraphPrinterCommands::IsRegistered())
+	if (!FGraphPrinterCommands::IsRegistered())
 	{
 		UE_LOG(LogGraphPrinter, Fatal, TEXT("Bound before UI Command was registered.\nPlease be sure to bind after registration."));
 	}
 
-	GraphPrinterCommands::Get().BindCommands();
+	FGraphPrinterCommands::Get().BindCommands();
 }
 
-void GraphPrinterCommands::BindCommands() const
+void FGraphPrinterCommands::BindCommands() const
 {
 	IMainFrameModule& MainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>("MainFrame");
 	const TSharedRef<FUICommandList>& CommandBindings = MainFrame.GetMainFrameCommandBindings();

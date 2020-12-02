@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
 
-class GRAPHPRINTER_API GraphPrinterCommands : public TCommands<GraphPrinterCommands>
+class GRAPHPRINTER_API FGraphPrinterCommands : public TCommands<FGraphPrinterCommands>
 {
 public:
 	// Constructor.
-	GraphPrinterCommands();
+	FGraphPrinterCommands();
 
 	// TCommands interface.
 	virtual void RegisterCommands() override;
