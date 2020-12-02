@@ -23,7 +23,6 @@ namespace GraphPrinterSettingsInternal
 
 UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, bIsEnableCommands(true)
 	, Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
 	, FilteringMode(TF_Default)

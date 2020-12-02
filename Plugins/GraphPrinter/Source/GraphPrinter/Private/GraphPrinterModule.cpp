@@ -23,13 +23,13 @@ void FGraphPrinterModule::StartupModule()
 {
 	UGraphPrinterSettings::Register();
 
-	GraphPrinterCommands::Register();
-	GraphPrinterCommands::Bind();
+	FGraphPrinterCommands::Register();
+	FGraphPrinterCommands::Bind();
 }
 
 void FGraphPrinterModule::ShutdownModule()
 {
-	GraphPrinterCommands::Unregister();
+	FGraphPrinterCommands::Unregister();
 
 	UGraphPrinterSettings::Unregister();
 }
