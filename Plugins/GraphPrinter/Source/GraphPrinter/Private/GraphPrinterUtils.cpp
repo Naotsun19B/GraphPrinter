@@ -46,13 +46,13 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	{
 		ActiveWindow = Options.TargetWindowOverride;
 	}
-	TSharedPtr<SGraphEditor> GraphEditor = GraphPrinterCore::FindGraphEditor(ActiveWindow);
+	TSharedPtr<SGraphEditor> GraphEditor = FGraphPrinterCore::FindGraphEditor(ActiveWindow);
 
 	// If don't have an active graph editor, end here.
 	if (!GraphEditor.IsValid())
 	{
 		const FText& Message = FText::FromString(TEXT("The graph editor isn't currently open."));
-		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
 		return;
 	}
 
@@ -62,45 +62,63 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		GraphEditor->SelectAllNodes();
 	}
 
+	FVector2D PreviousViewLocation;
+	float ZoomAmount;
+	GraphEditor->GetViewLocation(PreviousViewLocation, ZoomAmount);
+
 	FVector2D DrawSize;
 	FVector2D ViewLocation;
-	if (!GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
+	if (!FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
 	{
 		const FText& Message = FText::FromString(TEXT("No node is selected."));
-		GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
 		return;
 	}
 	GraphEditor->SetViewLocation(ViewLocation, 1.f);
 
-	UTextureRenderTarget2D* RenderTarget = GraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
+	float CameraMoveDistance = FVector2D::Distance(PreviousViewLocation, ViewLocation);
 
 	// Create output options and file path and output as image file.
 	const FString& Filename = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(Options.OutputDirectoryPath, GraphPrinterCore::GetGraphTitle(GraphEditor)) + 
-		GraphPrinterCore::GetImageFileExtension(Options.ImageWriteOptions.Format)
+		FPaths::Combine(Options.OutputDirectoryPath, FGraphPrinterCore::GetGraphTitle(GraphEditor)) +
+		FGraphPrinterCore::GetImageFileExtension(Options.ImageWriteOptions.Format)
 	);
 
+	// Bind the event when the operation is completed.
 	Options.ImageWriteOptions.NativeOnComplete = [Filename](bool bIsSucceeded)
 	{
 		if (bIsSucceeded)
 		{
 			const FText& Message = FText::FromString(TEXT("GraphEditor capture saved as"));
-			GraphPrinterCore::ShowNotification(
-				Message, GraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
+			FGraphPrinterCore::ShowNotification(
+				Message, FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
 				FText::FromString(Filename),
 				FSimpleDelegate::CreateLambda([Filename]()
 			{
-				GraphPrinterCore::OpenFolderWithExplorer(Filename);
+				FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 			}));
 		}
 		else
 		{
 			const FText& Message = FText::FromString(TEXT("Failed capture GraphEditor."));
-			GraphPrinterCore::ShowNotification(Message, GraphPrinterCore::CS_Fail);
+			FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
 		}
 	};
 
-	GraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options.ImageWriteOptions);
+	// If draw in the same frame as the camera operation, 
+	// the drawing will be broken, so draw and output in the after waiting for a while.
+	UWorld* World = FGraphPrinterCore::GetEditorWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	FTimerHandle UnuseHandle;
+	World->GetTimerManager().SetTimer(UnuseHandle, [GraphEditor, DrawSize, Options, Filename]()
+	{
+		UTextureRenderTarget2D* RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
+		FGraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options.ImageWriteOptions);
+	}, FMath::Max(CameraMoveDistance / 1000.f, World->DeltaTimeSeconds), false);
 }
 
 void UGraphPrinterUtils::OpenExportDestinationFolder()
@@ -111,10 +129,10 @@ void UGraphPrinterUtils::OpenExportDestinationFolder()
 		return;
 	}
 
-	GraphPrinterCore::OpenFolderWithExplorer(Settings->OutputDirectoryPath);
+	FGraphPrinterCore::OpenFolderWithExplorer(Settings->OutputDirectoryPath);
 }
 
 void UGraphPrinterUtils::OpenFolderWithExplorer(const FString& FilePath)
 {
-	GraphPrinterCore::OpenFolderWithExplorer(FilePath);
+	FGraphPrinterCore::OpenFolderWithExplorer(FilePath);
 }

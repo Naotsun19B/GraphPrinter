@@ -16,7 +16,7 @@ enum class EDesiredImageFormat : uint8;
 /**
  * Internal processing functions used in this plugin.
  */
-class GRAPHPRINTER_API GraphPrinterCore
+class GRAPHPRINTER_API FGraphPrinterCore
 {
 public:
 	// Define notification types so don't need to include "SNotificationList.h".
@@ -35,6 +35,9 @@ public:
 		const FText& InteractionText = FText(),
 		FSimpleDelegate InteractionCallback = nullptr
 	);
+
+	// Get the editor world without context.
+	static UWorld* GetEditorWorld();
 
 	// Recursively collect all child widgets of the specified widget.
 	static void CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren);

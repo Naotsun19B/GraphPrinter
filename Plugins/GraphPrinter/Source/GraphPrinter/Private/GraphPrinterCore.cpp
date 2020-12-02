@@ -13,11 +13,11 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
-const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
-const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
-const GraphPrinterCore::TCompletionState GraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
+const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
+const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
+const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
 
-TSharedPtr<SNotificationItem> GraphPrinterCore::ShowNotification(
+TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 	const FText& NotificationText, 
 	TCompletionState CompletionState, 
 	float ExpireDuration /* = 4.f */,
@@ -62,7 +62,21 @@ TSharedPtr<SNotificationItem> GraphPrinterCore::ShowNotification(
 	return NotificationItem;
 }
 
-void GraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
+UWorld* FGraphPrinterCore::GetEditorWorld()
+{
+	TGuardValue<bool> UnattendedScriptGuard(GIsRunningUnattendedScript, true);
+
+	if (!GIsEditor ||									// No editor instance.
+		!IsInGameThread() ||							// Called by someone other than the game thread.
+		(GEditor->PlayWorld || GIsPlayInEditorWorld))	// Running PIE.
+	{
+		return nullptr;
+	}
+
+	return GEditor->GetEditorWorldContext(false).World();
+}
+
+void FGraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
 {
 	if (SearchTarget != nullptr)
 	{
@@ -78,7 +92,7 @@ void GraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, 
 	}
 }
 
-TSharedPtr<SGraphEditor> GraphPrinterCore::FindGraphEditor(TSharedPtr<SWidget> SearchTarget)
+TSharedPtr<SGraphEditor> FGraphPrinterCore::FindGraphEditor(TSharedPtr<SWidget> SearchTarget)
 {
 	TArray<TSharedPtr<SWidget>> ChildWidgets;
 	CollectAllChildWidgets(SearchTarget, ChildWidgets);
@@ -95,7 +109,7 @@ TSharedPtr<SGraphEditor> GraphPrinterCore::FindGraphEditor(TSharedPtr<SWidget> S
 	return nullptr;
 }
 
-UTextureRenderTarget2D* GraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SWidget> WidgetToRender, FVector2D DrawSize, bool bUseGamma, TextureFilter Filter)
+UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SWidget> WidgetToRender, FVector2D DrawSize, bool bUseGamma, TextureFilter Filter)
 {
 	FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(bUseGamma, false);
 	if (WidgetRenderer == nullptr)
@@ -123,7 +137,7 @@ UTextureRenderTarget2D* GraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SW
 	return RenderTarget;
 }
 
-void GraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options)
+void FGraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options)
 {
 	FText ValidatePathErrorText;
 	if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
@@ -160,7 +174,7 @@ void GraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString& 
 	UImageWriteBlueprintLibrary::ExportToDisk(Texture, FullFilename + Extension, Options);
 }
 
-bool GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding)
+bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding)
 {
 	if (!GraphEditor.IsValid())
 	{
@@ -178,17 +192,12 @@ bool GraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize
 		return false;
 	}
 	DrawSize = Bounds.GetSize();
-
-	// TODO : From the selection and the size of the viewport, 
-	// need to calculate the position of the viewport and the position 
-	// where the upper right node is at the upper right edge of the screen.
-	float ZoomAmount;
-	GraphEditor->GetViewLocation(ViewLocation, ZoomAmount);
+	ViewLocation = Bounds.GetTopLeft();
 
 	return true;
 }
 
-FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
+FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 {
 	if (GraphEditor.IsValid())
 	{
@@ -209,7 +218,7 @@ FString GraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 	return TEXT("Invalid GraphEditor");
 }
 
-FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
+FString FGraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
 {
 	if (UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 	{
@@ -226,7 +235,7 @@ FString GraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
 	return FString();
 }
 
-void GraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
+void FGraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
 {
 	const FString& FullFilePath = FPaths::ConvertRelativePathToFull(FilePath);
 

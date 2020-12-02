@@ -8,13 +8,13 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrintCommands"
 
-#define REGISTER_COMMAND(CommandName, InDescription, InDefaultChord) \
-	UI_COMMAND(CommandName, #CommandName, InDescription, EUserInterfaceActionType::None, InDefaultChord);
+#define REGISTER_COMMAND(InCommandName, InDescription, InDefaultChord) \
+	UI_COMMAND(InCommandName, #InCommandName, InDescription, EUserInterfaceActionType::None, InDefaultChord);
 
-#define BIND_COMMAND(CommandName) \
+#define BIND_COMMAND(InCommandName) \
 	CommandBindings->MapAction( \
-		FGraphPrinterCommands::Get().##CommandName, \
-		FExecuteAction::CreateStatic(UGraphPrinterUtils::##CommandName) \
+		FGraphPrinterCommands::Get().##InCommandName, \
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::##InCommandName) \
 	);
 
 FGraphPrinterCommands::FGraphPrinterCommands()
