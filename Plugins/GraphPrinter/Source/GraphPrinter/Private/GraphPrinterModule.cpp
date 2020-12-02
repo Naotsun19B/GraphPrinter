@@ -22,15 +22,12 @@ public:
 void FGraphPrinterModule::StartupModule()
 {
 	UGraphPrinterSettings::Register();
-
 	FGraphPrinterCommands::Register();
-	FGraphPrinterCommands::Bind();
 }
 
 void FGraphPrinterModule::ShutdownModule()
 {
 	FGraphPrinterCommands::Unregister();
-
 	UGraphPrinterSettings::Unregister();
 }
 
