@@ -46,13 +46,24 @@ public:
 	static TSharedPtr<SGraphEditor> FindGraphEditor(TSharedPtr<SWidget> SearchTarget);
 
 	// Draw the widget on the render target.
-	static UTextureRenderTarget2D* DrawWidgetToRenderTarget(TSharedPtr<SWidget> WidgetToRender, FVector2D DrawSize, bool bUseGamma, TextureFilter Filter);
+	// Setting the "NumberOfDrawingAttempts" too high can slow down the operation or, in the worst case, cause the engine to crash.
+	static UTextureRenderTarget2D* DrawWidgetToRenderTarget(
+		TSharedPtr<SWidget> WidgetToRender, 
+		const FVector2D& DrawSize, 
+		bool bUseGamma, 
+		TextureFilter Filter
+	);
 
 	// Saves the render target in the specified format.
 	static void SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options);
 
 	// Calculate the range and view location to use when drawing the graph editor.
-	static bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding);
+	static bool CalculateGraphDrawSizeAndViewLocation(
+		FVector2D& DrawSize, 
+		FVector2D& ViewLocation, 
+		TSharedPtr<SGraphEditor> GraphEditor, 
+		float Padding
+	);
 
 	// Get the title of the graph being edited in the graph editor.
 	static FString GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor);

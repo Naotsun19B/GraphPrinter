@@ -56,16 +56,13 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		return;
 	}
 
-	// Calculate the drawing size from the position of the node and draw on the render target.
+	// Select all nodes if needed.
 	if (!Options.bOnlySelectedNodes)
 	{
 		GraphEditor->SelectAllNodes();
 	}
 
-	FVector2D PreviousViewLocation;
-	float ZoomAmount;
-	GraphEditor->GetViewLocation(PreviousViewLocation, ZoomAmount);
-
+	// Get the range of the selected node and the position of the camera to use when drawing.
 	FVector2D DrawSize;
 	FVector2D ViewLocation;
 	if (!FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
@@ -74,9 +71,14 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
 		return;
 	}
-	GraphEditor->SetViewLocation(ViewLocation, 1.f);
 
-	float CameraMoveDistance = FVector2D::Distance(PreviousViewLocation, ViewLocation);
+	// Set the camera position to the calculated location, draw with a zoom magnification of 1: 1 and restore it.
+	FVector2D PreviousViewLocation;
+	float PreviousZoomAmount;
+	GraphEditor->GetViewLocation(PreviousViewLocation, PreviousZoomAmount);
+	GraphEditor->SetViewLocation(ViewLocation, 1.f);
+	UTextureRenderTarget2D* RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
+	GraphEditor->SetViewLocation(PreviousViewLocation, PreviousZoomAmount);
 
 	// Create output options and file path and output as image file.
 	const FString& Filename = FPaths::ConvertRelativePathToFull(
@@ -105,20 +107,8 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		}
 	};
 
-	// If draw in the same frame as the camera operation, 
-	// the drawing will be broken, so draw and output in the after waiting for a while.
-	UWorld* World = FGraphPrinterCore::GetEditorWorld();
-	if (!IsValid(World))
-	{
-		return;
-	}
-
-	FTimerHandle UnuseHandle;
-	World->GetTimerManager().SetTimer(UnuseHandle, [GraphEditor, DrawSize, Options, Filename]()
-	{
-		UTextureRenderTarget2D* RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
-		FGraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options.ImageWriteOptions);
-	}, FMath::Max(CameraMoveDistance / 1000.f, World->DeltaTimeSeconds), false);
+	// Export the render target in the specified file format.
+	FGraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options.ImageWriteOptions);
 }
 
 void UGraphPrinterUtils::OpenExportDestinationFolder()

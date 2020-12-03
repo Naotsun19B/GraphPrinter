@@ -13,6 +13,14 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
+namespace GraphPrinterCoreDefine
+{
+	// Number of attempts to draw the widget on the render target.
+	// The drawing result may be corrupted once.
+	// Probably if draw twice, the drawing result will not be corrupted.
+	static const int32 DrawTimes = 2;
+}
+
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
@@ -109,7 +117,12 @@ TSharedPtr<SGraphEditor> FGraphPrinterCore::FindGraphEditor(TSharedPtr<SWidget> 
 	return nullptr;
 }
 
-UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<SWidget> WidgetToRender, FVector2D DrawSize, bool bUseGamma, TextureFilter Filter)
+UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(
+	TSharedPtr<SWidget> WidgetToRender,
+	const FVector2D& DrawSize,
+	bool bUseGamma,
+	TextureFilter Filter
+)
 {
 	FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(bUseGamma, false);
 	if (WidgetRenderer == nullptr)
@@ -130,8 +143,13 @@ UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(TSharedPtr<S
 		RenderTarget->UpdateResourceImmediate(true);
 	}
 
-	WidgetRenderer->DrawWidget(RenderTarget, WidgetToRender.ToSharedRef(), DrawSize, 0.f, false);
-	FlushRenderingCommands();
+	// Since the drawing result may be corrupted the first time, draw multiple times.
+	for (int32 Count = 0; Count < GraphPrinterCoreDefine::DrawTimes; Count++)
+	{
+		WidgetRenderer->DrawWidget(RenderTarget, WidgetToRender.ToSharedRef(), DrawSize, 0.f, false);
+		FlushRenderingCommands();
+	}
+
 	BeginCleanup(WidgetRenderer);
 
 	return RenderTarget;
@@ -174,7 +192,12 @@ void FGraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString&
 	UImageWriteBlueprintLibrary::ExportToDisk(Texture, FullFilename + Extension, Options);
 }
 
-bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation, TSharedPtr<SGraphEditor> GraphEditor, float Padding)
+bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(
+	FVector2D& DrawSize, 
+	FVector2D& ViewLocation, 
+	TSharedPtr<SGraphEditor> GraphEditor, 
+	float Padding
+)
 {
 	if (!GraphEditor.IsValid())
 	{
