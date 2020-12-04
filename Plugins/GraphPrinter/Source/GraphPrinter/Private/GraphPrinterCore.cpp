@@ -9,7 +9,6 @@
 #include "GraphEditor.h"
 #include "HAL/FileManager.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
-#include "ReferenceViewer/EdGraph_ReferenceViewer.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
@@ -41,7 +40,6 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 		NotificationInfo.ExpireDuration = ExpireDuration;
 	}
 	NotificationInfo.bUseLargeFont = true;
-	//NotificationInfo.Image = &Brush;
 
 	auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
 	switch (InteractionType)
@@ -68,20 +66,6 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 	}
 	
 	return NotificationItem;
-}
-
-UWorld* FGraphPrinterCore::GetEditorWorld()
-{
-	TGuardValue<bool> UnattendedScriptGuard(GIsRunningUnattendedScript, true);
-
-	if (!GIsEditor ||									// No editor instance.
-		!IsInGameThread() ||							// Called by someone other than the game thread.
-		(GEditor->PlayWorld || GIsPlayInEditorWorld))	// Running PIE.
-	{
-		return nullptr;
-	}
-
-	return GEditor->GetEditorWorldContext(false).World();
 }
 
 void FGraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
@@ -226,13 +210,14 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 	{
 		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
 		{
-			// ReferenceViewer replaces outer name because Outer does not exist.
-			if (Graph->IsA<UEdGraph_ReferenceViewer>())
+			if (UObject* Outer = Graph->GetOuter())
 			{
-				return TEXT("ReferenceViewer");
-			}
-			else if (UObject* Outer = Graph->GetOuter())
-			{
+				// For ReferenceViewer, replace the name because the outer is a transiet object.
+				if (Outer->HasAnyFlags(RF_Transient))
+				{
+					return TEXT("ReferenceViewer");
+				}
+
 				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
 			}
 		}

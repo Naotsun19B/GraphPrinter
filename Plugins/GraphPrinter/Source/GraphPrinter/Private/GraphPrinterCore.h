@@ -36,9 +36,6 @@ public:
 		FSimpleDelegate InteractionCallback = nullptr
 	);
 
-	// Get the editor world without context.
-	static UWorld* GetEditorWorld();
-
 	// Recursively collect all child widgets of the specified widget.
 	static void CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren);
 

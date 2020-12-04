@@ -30,7 +30,6 @@ public class GraphPrinter : ModuleRules
 				"MainFrame",
 				"EditorStyle",
                 "ImageWriteQueue",
-                "AssetManagerEditor",
             }
 			);
     }
