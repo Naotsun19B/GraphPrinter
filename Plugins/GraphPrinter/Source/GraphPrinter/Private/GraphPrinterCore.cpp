@@ -6,7 +6,9 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Slate/WidgetRenderer.h"
+#include "Widgets/SWidget.h"
 #include "GraphEditor.h"
+#include "EdGraph/EdGraph.h"
 #include "HAL/FileManager.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
 
@@ -70,9 +72,9 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 
 void FGraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
 {
-	if (SearchTarget != nullptr)
+	if (SearchTarget.IsValid())
 	{
-		if (FChildren* Children = SearchTarget->GetAllChildren())
+		if (FChildren* Children = SearchTarget->GetChildren())
 		{
 			for (int32 Index = 0; Index < Children->Num(); Index++)
 			{
@@ -188,10 +190,19 @@ bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(
 		return false;
 	}
 
+#if BEFORE_UE_4_23
+	// Special support is implemented because SGraphEditor::GetNumberOfSelectedNodes before UE4.23 always returns 0.
+	const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
+	if (SelectedNodes.Num() == 0)
+	{
+		return false;
+	}
+#else
 	if (GraphEditor->GetNumberOfSelectedNodes() == 0)
 	{
 		return false;
 	}
+#endif
 
 	FSlateRect Bounds;
 	if (!GraphEditor->GetBoundsForSelectedNodes(Bounds, Padding + 100.f))
@@ -228,6 +239,13 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 
 FString FGraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat)
 {
+#if BEFORE_UE_4_21
+	if (UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDesiredImageFormat"), true))
+	{
+		const FString& Extension = EnumPtr->GetNameStringByIndex(static_cast<int32>(ImageFormat));
+		return FString::Printf(TEXT(".%s"), *Extension.ToLower());
+	}
+#else
 	if (UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 	{
 		const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
@@ -239,7 +257,9 @@ FString FGraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat
 			return FString::Printf(TEXT(".%s"), *Extension);
 		}
 	}
-
+#endif
+	
+	checkNoEntry();
 	return FString();
 }
 

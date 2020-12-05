@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "ImageWriteBlueprintLibrary.h"
+#include "Engine/Texture.h"
 #include "GraphPrinterTypes.generated.h"
 
 class SWidget;
-enum TextureFilter;
+class SWindow;
 
 /**
  * Option set for executing the PrintGraph command.
@@ -22,7 +23,7 @@ public:
 		: bOnlySelectedNodes(false)
 		, Padding(0.f)
 		, bUseGamma(true)
-		, FilteringMode(TF_Default)
+		, FilteringMode(TextureFilter::TF_Default)
 		, ImageWriteOptions()
 		, OutputDirectoryPath()
 		, TargetWindowOverride(nullptr)

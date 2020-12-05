@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "GraphPrinterTypes.h"
 #include "GraphPrinterUtils.generated.h"
-
-struct FPrintGraphOptions;
 
 /**
  * Make the features used in this plugin also available from Blueprint.

@@ -4,7 +4,9 @@
 #include "GraphPrinterGlobals.h"
 #include "GraphPrinterSettings.h"
 #include "GraphPrinterCore.h"
-#include "GraphPrinterTypes.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Widgets/SWindow.h"
+#include "GraphEditor.h"
 
 void UGraphPrinterUtils::PrintGraphWithAllNodes()
 {
@@ -79,6 +81,13 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	GraphEditor->SetViewLocation(ViewLocation, 1.f);
 	UTextureRenderTarget2D* RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
 	GraphEditor->SetViewLocation(PreviousViewLocation, PreviousZoomAmount);
+
+	if (!IsValid(RenderTarget))
+	{
+		const FText& Message = FText::FromString(TEXT("Failed to draw to render target."));
+		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
+		return;
+	}
 
 	// Create output options and file path and output as image file.
 	const FString& Filename = FPaths::ConvertRelativePathToFull(

@@ -3,22 +3,28 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "GraphPrinter",
-	"Description": "",
+	"Description": "It is a plug-in that adds a shortcut to output the graph editor to an image file.",
 	"Category": "Editor",
 	"CreatedBy": "Naotsun",
-	"CreatedByURL": "",
-	"DocsURL": "",
+	"CreatedByURL": "https://twitter.com/Naotsun_UE",
+	"DocsURL": "https://github.com/Naotsun19B/GraphPrinter",
 	"MarketplaceURL": "",
-	"SupportURL": "",
+	"SupportURL": "https://github.com/Naotsun19B/GraphPrinter",
 	"CanContainContent": false,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "GraphPrinter",
 			"Type": "Editor",
-			"LoadingPhase": "PreLoadingScreen"
+			"LoadingPhase": "PreLoadingScreen",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
 		}
 	]
 }
