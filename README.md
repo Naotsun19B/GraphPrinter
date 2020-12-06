@@ -54,7 +54,7 @@ The items that can be set from the editor preferences are as follows.
 
 ## License
 
-[MIT License](https://ja.wikipedia.org/wiki/MIT_License)
+[MIT License](https://en.wikipedia.org/wiki/MIT_License)
 
 ## Author
 
