@@ -31,27 +31,27 @@ public:
 	}
 
 	// Whether to target only the selected node.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	bool bOnlySelectedNodes;
 
 	// Margins when drawing the graph editor.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	float Padding;
 
 	// Whether to output the drawing result affected by the gamma value.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	bool bUseGamma;
 
 	// Texture filtering mode to use when outputting.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	TEnumAsByte<TextureFilter> FilteringMode;
 
 	// Options related to image output processing.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	FImageWriteOptions ImageWriteOptions;
 
 	// Directory path where the image file is output.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	FString OutputDirectoryPath;
 
 	// Used to specify the window to be output (native only).
