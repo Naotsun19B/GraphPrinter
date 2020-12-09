@@ -58,13 +58,12 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		return;
 	}
 
-	// Select all nodes if needed.
+	// Get the range of the selected node and the position of the camera to use when drawing.
 	if (!Options.bOnlySelectedNodes)
 	{
 		GraphEditor->SelectAllNodes();
 	}
 
-	// Get the range of the selected node and the position of the camera to use when drawing.
 	FVector2D DrawSize;
 	FVector2D ViewLocation;
 	if (!FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
@@ -73,6 +72,8 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
 		return;
 	}
+
+	GraphEditor->ClearSelectionSet();
 
 	// Set the camera position to the calculated location, draw with a zoom magnification of 1: 1 and restore it.
 	FVector2D PreviousViewLocation;
