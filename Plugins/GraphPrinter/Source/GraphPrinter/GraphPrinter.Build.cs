@@ -32,5 +32,10 @@ public class GraphPrinter : ModuleRules
                 "ImageWriteQueue",
             }
 			);
+
+        AddEngineThirdPartyPrivateStaticDependencies(Target,
+			"zlib",
+			"UElibPNG"
+		);
     }
 }
