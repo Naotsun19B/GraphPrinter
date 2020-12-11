@@ -18,8 +18,13 @@ class UGraphPrinterSettings : public UObject
 	GENERATED_UCLASS_BODY()
 	
 public:
-	// The desired output image format to write to disk.
+	// Whether to embed node configuration information in the image file.
+	// When this option is enabled, the only output image format is png.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	bool bIsIncludeNodeInfoInImageFile;
+
+	// The desired output image format to write to disk.
+	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (EditCondition = "!bIsIncludeNodeInfoInImageFile"))
 	EDesiredImageFormat Format;
 
 	// An image format specific compression setting. Either 0 (Default) or 1 (Uncompressed) for EXRs, or a value between 0 and 100.

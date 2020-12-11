@@ -70,6 +70,22 @@ public:
 
 	// Open the folder containing the file in Explorer.
 	static void OpenFolderWithExplorer(const FString& FilePath);
+
+	// Writes the information of the node selected in Graph Editor to the png file.
+	static bool ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor);
+
+	// Restore the node from the information read from the png file.
+	static bool RestoreGraphFromPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor);
+
+	// Show the file browser and let the user select a file.
+	static bool OpenFileDialog(
+		TArray<FString>& FilePaths,
+		const FString& DialogTitle = TEXT("Open File Dialog"),
+		const FString& DefaultPath = TEXT(""),
+		const FString& DefaultFile = TEXT(""),
+		const FString& FileTypes = TEXT("All (*)|*.*"),
+		bool bIsMultiple = false
+	);
 };
 
 /**

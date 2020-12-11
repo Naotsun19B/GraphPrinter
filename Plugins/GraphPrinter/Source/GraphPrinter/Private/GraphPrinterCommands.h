@@ -36,5 +36,6 @@ private:
 	// Instances of bound commands.
 	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
 	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
+	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 	TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
 };

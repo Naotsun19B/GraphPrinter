@@ -29,6 +29,7 @@ public class GraphPrinter : ModuleRules
 				"GraphEditor",
 				"MainFrame",
 				"EditorStyle",
+                "DesktopPlatform",
                 "ImageWriteQueue",
             }
 			);

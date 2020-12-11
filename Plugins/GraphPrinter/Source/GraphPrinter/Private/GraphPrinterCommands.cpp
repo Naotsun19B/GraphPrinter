@@ -41,6 +41,7 @@ void FGraphPrinterCommands::RegisterCommands()
 	// Register command here.
 	REGISTER_COMMAND(PrintGraphWithAllNodes, "Exports all nodes of the currently active graph editor as images.", FInputChord(EKeys::F9, EModifierKey::Control));
 	REGISTER_COMMAND(PrintGraphWithSelectedNodes, "Exports the selected node of the currently active graph editor as an image.", FInputChord(EKeys::F10, EModifierKey::Control));
+	REGISTER_COMMAND(RestoreNodesFromPngFile, "Open the file browser and restore the node from the selected png file.", FInputChord(EKeys::F11, EModifierKey::Control));
 	REGISTER_COMMAND(OpenExportDestinationFolder, "Open the folder containing the images saved by this plugin in Explorer.", FInputChord(EKeys::F12, EModifierKey::Control));
 }
 
@@ -68,6 +69,7 @@ void FGraphPrinterCommands::BindCommands()
 	// Bind command here.
 	BIND_COMMAND(PrintGraphWithAllNodes);
 	BIND_COMMAND(PrintGraphWithSelectedNodes);
+	BIND_COMMAND(RestoreNodesFromPngFile);
 	BIND_COMMAND(OpenExportDestinationFolder);
 }
 

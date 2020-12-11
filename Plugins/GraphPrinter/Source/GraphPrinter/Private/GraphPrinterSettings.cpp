@@ -23,6 +23,7 @@ namespace GraphPrinterSettingsInternal
 
 UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+	, bIsIncludeNodeInfoInImageFile(true)
 	, Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
 	, FilteringMode(TF_Default)
@@ -67,6 +68,14 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 	if (PropertyChangedEvent.MemberProperty == nullptr)
 	{
 		return;
+	}
+
+	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
+	{
+		if (bIsIncludeNodeInfoInImageFile)
+		{
+			Format = EDesiredImageFormat::PNG;
+		}
 	}
 
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, Format))

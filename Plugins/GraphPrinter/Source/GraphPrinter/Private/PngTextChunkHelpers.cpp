@@ -128,7 +128,10 @@ bool FPngTextChunkReader::ReadTextChunk(TMap<FString, FString>& TextChunk)
 
 FPngTextChunkWriter::~FPngTextChunkWriter()
 {
-	png_destroy_write_struct(&WritePtr, &InfoPtr);
+	if (WritePtr != NULL)
+	{
+		png_destroy_write_struct(&WritePtr, &InfoPtr);
+	}
 }
 
 bool FPngTextChunkWriter::WriteTextChunk(const FString& Key, const FString& Value)

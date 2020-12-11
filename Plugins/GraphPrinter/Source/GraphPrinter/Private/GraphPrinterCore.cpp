@@ -3,14 +3,19 @@
 #include "GraphPrinterCore.h"
 #include "GraphPrinterGlobals.h"
 #include "GraphPrinterSettings.h"
+#include "PngTextChunkHelpers.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "GenericPlatform/GenericPlatformProcess.h"
 #include "Slate/WidgetRenderer.h"
 #include "Widgets/SWidget.h"
 #include "GraphEditor.h"
 #include "EdGraph/EdGraph.h"
+#include "EdGraphUtilities.h"
 #include "HAL/FileManager.h"
-#include "GenericPlatform/GenericPlatformProcess.h"
+#include "Interfaces/IMainFrameModule.h"
+#include "DesktopPlatformModule.h"
+#include "IDesktopPlatform.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
@@ -20,6 +25,9 @@ namespace GraphPrinterCoreDefine
 	// The drawing result may be corrupted once.
 	// Probably if draw twice, the drawing result will not be corrupted.
 	static const int32 DrawTimes = 2;
+
+	// Key used when writing to a text chunk of a png file.
+	static const FString PngTextChunkKey = TEXT("GraphEditor");
 }
 
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
@@ -152,6 +160,7 @@ void FGraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString&
 
 	FString FullFilename = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false));
 	const FString& Extension = GetImageFileExtension(Options.Format);
+	// If the file cannot be overwritten, add a number after the file name.
 	if (!Options.bOverwriteFile)
 	{
 		if (IFileManager::Get().FileExists(*FString(FullFilename + Extension)))
@@ -275,6 +284,111 @@ void FGraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
 	}
 
 	FPlatformProcess::ExploreFolder(*FullFilePath);
+}
+
+bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor)
+{
+	if (!GraphEditor.IsValid())
+	{
+		return false;
+	}
+
+	FPngTextChunkWriter Writer(FilePath);
+
+	const FGraphPanelSelectionSet& SelectedNodes = GraphEditor->GetSelectedNodes();
+	if (SelectedNodes.Num() == 0)
+	{
+		return false;
+	}
+	FString ExportedText;
+	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
+
+	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
+	{
+		return false;
+	}
+
+	return Writer.WriteTextChunk(GraphPrinterCoreDefine::PngTextChunkKey, ExportedText);
+}
+
+bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor)
+{
+	if (!GraphEditor.IsValid())
+	{
+		return false;
+	}
+
+	FPngTextChunkReader Reader(FilePath);
+
+	TMap<FString, FString> TextChunk;
+	if (!Reader.ReadTextChunk(TextChunk))
+	{
+		return false;
+	}
+
+	// Find information on valid nodes.
+	if (!TextChunk.Contains(GraphPrinterCoreDefine::PngTextChunkKey))
+	{
+		return false;
+	}
+	const FString& TextToImport = TextChunk[GraphPrinterCoreDefine::PngTextChunkKey];
+	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport))
+	{
+		return false;
+	}
+
+	//  Restore the node from the information read from the png file.
+	TSet<UEdGraphNode*> ImportedNodeSet;
+	FEdGraphUtilities::ImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport, ImportedNodeSet);
+
+	return true;
+}
+
+bool FGraphPrinterCore::OpenFileDialog(
+	TArray<FString>& FilePaths, 
+	const FString& DialogTitle /* = TEXT("Open File Dialog") */,
+	const FString& DefaultPath /* = TEXT("") */,
+	const FString& DefaultFile /* = TEXT("") */,
+	const FString& FileTypes /* = TEXT("All (*)|*.*") */, 
+	bool bIsMultiple /* = false */
+)
+{
+	// Get the OS-level window handle of the editor's mainframe.
+	void* WindowHandle = nullptr;
+
+	IMainFrameModule& MainFrameModule = IMainFrameModule::Get();
+	TSharedPtr<SWindow> MainWindow = MainFrameModule.GetParentWindow();
+
+	if (MainWindow.IsValid())
+	{
+		TSharedPtr<FGenericWindow> NativeWindow = MainWindow->GetNativeWindow();
+		if (NativeWindow.IsValid())
+		{
+			WindowHandle = NativeWindow->GetOSWindowHandle();
+		}
+	}
+
+	if (WindowHandle == nullptr)
+	{
+		return false;
+	}
+
+	// Launch the file browser.
+	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+	if (DesktopPlatform == nullptr)
+	{
+		return false;
+	}
+
+	return DesktopPlatform->OpenFileDialog(
+		WindowHandle,
+		DialogTitle,
+		DefaultPath,
+		DefaultFile,
+		FileTypes,
+		(bIsMultiple ? EFileDialogFlags::Multiple : EFileDialogFlags::None),
+		FilePaths
+	);
 }
 
 #undef LOCTEXT_NAMESPACE

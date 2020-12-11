@@ -24,10 +24,14 @@ public:
 		, Padding(0.f)
 		, bUseGamma(true)
 		, FilteringMode(TextureFilter::TF_Default)
-		, ImageWriteOptions()
+		, bIsIncludeNodeInfoInImageFile(true)
 		, OutputDirectoryPath()
 		, TargetWindowOverride(nullptr)
 	{
+		ImageWriteOptions.bAsync = true;
+		ImageWriteOptions.bOverwriteFile = false;
+		ImageWriteOptions.CompressionQuality = 0;
+		ImageWriteOptions.Format = EDesiredImageFormat::PNG;
 	}
 
 	// Whether to target only the selected node.
@@ -45,6 +49,11 @@ public:
 	// Texture filtering mode to use when outputting.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	TEnumAsByte<TextureFilter> FilteringMode;
+
+	// Whether to embed node configuration information in the image file.
+	// When this option is enabled, the only output image format is png.
+	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	bool bIsIncludeNodeInfoInImageFile;
 
 	// Options related to image output processing.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")

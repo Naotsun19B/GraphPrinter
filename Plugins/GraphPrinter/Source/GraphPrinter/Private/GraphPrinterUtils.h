@@ -32,6 +32,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
 	static void CustomPrintGraph(FPrintGraphOptions Options);
 
+	// Open the file browser and restore the node from the selected png file.
+	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
+	static void RestoreNodesFromPngFile();
+	
 	// Open the folder containing the images saved by this plugin in Explorer.
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
 	static void OpenExportDestinationFolder();
@@ -39,4 +43,9 @@ public:
 	// Open the folder containing the file in Explorer.
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
 	static void OpenFolderWithExplorer(const FString& FilePath);
+
+protected:
+	// Get the currently active graph editor.
+	// If TargetWindow is nullptr, search from MainFrame.
+	static TSharedPtr<SGraphEditor> GetActiveGraphEditor(TSharedPtr<SWindow> TargetWindow = nullptr);
 };
