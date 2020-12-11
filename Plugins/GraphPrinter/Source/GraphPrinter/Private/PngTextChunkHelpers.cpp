@@ -22,7 +22,7 @@ FPngTextChunkHelpers::FPngTextChunkHelpers(const FString& InFilename)
 
 	// Check if the file opened.
 	FILE* FilePtr;
-	if (fopen_s(&FilePtr, TCHAR_TO_ANSI(*InFilename), "rb") != 0)
+	if (fopen_s(&FilePtr, TCHAR_TO_ANSI(*ValidFilename), "rb") != 0)
 	{
 		bIsValid = false;
 		return;

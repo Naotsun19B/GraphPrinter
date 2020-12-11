@@ -28,6 +28,9 @@ namespace GraphPrinterCoreDefine
 
 	// Key used when writing to a text chunk of a png file.
 	static const FString PngTextChunkKey = TEXT("GraphEditor");
+
+	// The beginning of the node information.
+	static const FString NodeInfoHeader = TEXT("Begin Object");
 }
 
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
@@ -331,15 +334,48 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TShared
 	{
 		return false;
 	}
-	const FString& TextToImport = TextChunk[GraphPrinterCoreDefine::PngTextChunkKey];
+	FString TextToImport = TextChunk[GraphPrinterCoreDefine::PngTextChunkKey];
+
+	// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
+	const int32 TextLength = TextToImport.Len();
+	const int32 HeaderLength = GraphPrinterCoreDefine::NodeInfoHeader.Len();
+	int32 Index;
+	for (Index = 0; Index < (TextLength - HeaderLength); Index++)
+	{
+		if (TextToImport.Mid(Index, Index + HeaderLength - 1) == GraphPrinterCoreDefine::NodeInfoHeader)
+		{
+			break;
+		}
+	}
+	if (Index > 0)
+	{
+		TextToImport = TextToImport.Mid(Index, TextLength - Index);
+	}
+
 	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport))
 	{
 		return false;
 	}
 
-	//  Restore the node from the information read from the png file.
+	// Restore the node from the information read from the png file.
 	TSet<UEdGraphNode*> ImportedNodeSet;
 	FEdGraphUtilities::ImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport, ImportedNodeSet);
+
+	// Move the nodes closer to the camera.
+	FVector2D ViewLocation;
+	float ZoomAmount;
+	GraphEditor->GetViewLocation(ViewLocation, ZoomAmount);
+
+	const FIntRect& Boundaries = FEdGraphUtilities::CalculateApproximateNodeBoundaries(ImportedNodeSet.Array());
+	const FVector2D& NodeOffset = ViewLocation - FVector2D(Boundaries.Min.X, Boundaries.Min.Y) + FVector2D(100.f);
+	for (const auto& ImportedNode : ImportedNodeSet)
+	{
+		if (IsValid(ImportedNode))
+		{
+			ImportedNode->NodePosX += NodeOffset.X;
+			ImportedNode->NodePosY += NodeOffset.Y;
+		}
+	}
 
 	return true;
 }
