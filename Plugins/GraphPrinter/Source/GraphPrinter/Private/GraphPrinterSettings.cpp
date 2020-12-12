@@ -61,6 +61,14 @@ void UGraphPrinterSettings::Unregister()
 	}
 }
 
+void UGraphPrinterSettings::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	ModifyFormat();
+	ModifyCompressionQuality();
+}
+
 void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -72,29 +80,32 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
 	{
-		if (bIsIncludeNodeInfoInImageFile)
-		{
-			Format = EDesiredImageFormat::PNG;
-		}
+		ModifyFormat();
 	}
 
-	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, Format))
+	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, Format) ||
+		PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, CompressionQuality))
 	{
-		if (Format == EDesiredImageFormat::EXR)
-		{
-			CompressionQuality = 0;
-		}
+		ModifyCompressionQuality();
 	}
+}
 
-	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, CompressionQuality))
+void UGraphPrinterSettings::ModifyFormat()
+{
+	if (bIsIncludeNodeInfoInImageFile)
 	{
-		int32 Max = 100;
-		if (Format == EDesiredImageFormat::EXR)
-		{
-			Max = 1;
-		}
-		CompressionQuality = FMath::Clamp(CompressionQuality, 0, Max);
+		Format = EDesiredImageFormat::PNG;
 	}
+}
+
+void UGraphPrinterSettings::ModifyCompressionQuality()
+{
+	int32 Max = 100;
+	if (Format == EDesiredImageFormat::EXR)
+	{
+		Max = 1;
+	}
+	CompressionQuality = FMath::Clamp(CompressionQuality, 0, Max);
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -58,6 +58,11 @@ public:
 
 protected:
 	// UObject interface.
+	virtual void PostInitProperties() override;
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	// End of UObject interface.
+
+	// Functions called when the value changes.
+	void ModifyFormat();
+	void ModifyCompressionQuality();
 };
