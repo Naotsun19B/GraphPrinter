@@ -8,15 +8,6 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrintCommands"
 
-#define REGISTER_COMMAND(InCommandName, InDescription, InDefaultChord) \
-	UI_COMMAND(InCommandName, #InCommandName, InDescription, EUserInterfaceActionType::None, InDefaultChord);
-
-#define BIND_COMMAND(InCommandName) \
-	CommandBindings->MapAction( \
-		FGraphPrinterCommands::Get().##InCommandName, \
-		FExecuteAction::CreateStatic(UGraphPrinterUtils::##InCommandName) \
-	);
-
 FGraphPrinterCommands::FGraphPrinterCommands()
 	: TCommands<FGraphPrinterCommands>
 	(
@@ -39,10 +30,10 @@ void FGraphPrinterCommands::RegisterCommands()
 	SlateWindowRenderedHandle = SlateRenderer->OnSlateWindowRendered().AddRaw(this, &FGraphPrinterCommands::HandleOnSlateWindowRendered);
 
 	// Register command here.
-	REGISTER_COMMAND(PrintGraphWithAllNodes, "Exports all nodes of the currently active graph editor as images.", FInputChord(EKeys::F9, EModifierKey::Control));
-	REGISTER_COMMAND(PrintGraphWithSelectedNodes, "Exports the selected node of the currently active graph editor as an image.", FInputChord(EKeys::F10, EModifierKey::Control));
-	REGISTER_COMMAND(RestoreNodesFromPngFile, "Open the file browser and restore the node from the selected png file.", FInputChord(EKeys::F11, EModifierKey::Control));
-	REGISTER_COMMAND(OpenExportDestinationFolder, "Open the folder containing the images saved by this plugin in Explorer.", FInputChord(EKeys::F12, EModifierKey::Control));
+	UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::None, FInputChord(EKeys::F9, EModifierKey::Control));
+	UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::None, FInputChord(EKeys::F10, EModifierKey::Control));
+	UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::None, FInputChord(EKeys::F11, EModifierKey::Control));
+	UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::None, FInputChord(EKeys::F12, EModifierKey::Control));
 }
 
 bool FGraphPrinterCommands::IsBound()
@@ -67,10 +58,25 @@ void FGraphPrinterCommands::BindCommands()
 	const TSharedRef<FUICommandList>& CommandBindings = MainFrame.GetMainFrameCommandBindings();
 
 	// Bind command here.
-	BIND_COMMAND(PrintGraphWithAllNodes);
-	BIND_COMMAND(PrintGraphWithSelectedNodes);
-	BIND_COMMAND(RestoreNodesFromPngFile);
-	BIND_COMMAND(OpenExportDestinationFolder);
+	CommandBindings->MapAction(
+		FGraphPrinterCommands::Get().PrintGraphWithAllNodes,
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraphWithAllNodes)
+	);
+
+	CommandBindings->MapAction(
+		FGraphPrinterCommands::Get().PrintGraphWithSelectedNodes,
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraphWithSelectedNodes)
+	);
+
+	CommandBindings->MapAction(
+		FGraphPrinterCommands::Get().RestoreNodesFromPngFile,
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::RestoreNodesFromPngFile)
+	);
+
+	CommandBindings->MapAction(
+		FGraphPrinterCommands::Get().OpenExportDestinationFolder,
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::OpenExportDestinationFolder)
+	);
 }
 
 void FGraphPrinterCommands::HandleOnSlateWindowRendered(SWindow& SlateWindow, void* ViewportRHIPtr)
