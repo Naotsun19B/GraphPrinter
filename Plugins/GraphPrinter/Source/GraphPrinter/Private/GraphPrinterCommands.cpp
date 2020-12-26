@@ -22,13 +22,6 @@ FGraphPrinterCommands::FGraphPrinterCommands()
 
 void FGraphPrinterCommands::RegisterCommands()
 {
-	FSlateRenderer* SlateRenderer = FSlateApplication::Get().GetRenderer();
-	if (SlateRenderer == nullptr)
-	{
-		UE_LOG(LogGraphPrinter, Fatal, TEXT("The command cannot be bound because SlateRender cannot be obtained."));
-	}
-	SlateWindowRenderedHandle = SlateRenderer->OnSlateWindowRendered().AddRaw(this, &FGraphPrinterCommands::HandleOnSlateWindowRendered);
-
 	// Register command here.
 	UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::None, FInputChord(EKeys::F9, EModifierKey::Control));
 	UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::None, FInputChord(EKeys::F10, EModifierKey::Control));
@@ -38,7 +31,12 @@ void FGraphPrinterCommands::RegisterCommands()
 
 bool FGraphPrinterCommands::IsBound()
 {
-	return FGraphPrinterCommands::Get().bIsBound;
+	return Instance.Pin()->bIsBound;
+}
+
+void FGraphPrinterCommands::Bind()
+{
+	Instance.Pin()->BindCommands();
 }
 
 void FGraphPrinterCommands::BindCommands()
@@ -77,24 +75,6 @@ void FGraphPrinterCommands::BindCommands()
 		FGraphPrinterCommands::Get().OpenExportDestinationFolder,
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::OpenExportDestinationFolder)
 	);
-}
-
-void FGraphPrinterCommands::HandleOnSlateWindowRendered(SWindow& SlateWindow, void* ViewportRHIPtr)
-{
-	if (GEditor == nullptr || !IsInGameThread())
-	{
-		const FString& FunctionName = GET_FUNCTION_NAME_STRING_CHECKED(FGraphPrinterCommands, HandleOnSlateWindowRendered);
-		UE_LOG(LogGraphPrinter, Fatal, TEXT("%s was called by someone other than GameThread."), *FunctionName);
-	}
-
-	FSlateRenderer* SlateRenderer = FSlateApplication::Get().GetRenderer();
-	if (SlateRenderer == nullptr)
-	{
-		UE_LOG(LogGraphPrinter, Fatal, TEXT("The command cannot be bound because SlateRender cannot be obtained."));
-	}
-	SlateRenderer->OnSlateWindowRendered().Remove(SlateWindowRenderedHandle);
-
-	BindCommands();
 }
 
 #undef LOCTEXT_NAMESPACE

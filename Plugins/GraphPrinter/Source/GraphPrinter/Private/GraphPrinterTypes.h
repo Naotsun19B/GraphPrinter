@@ -77,22 +77,3 @@ enum class ENotificationInteraction : uint8
 	Hyperlink,
 	Button,
 };
-
-/**
- * Types of graph editors to separate processes.
- */
-UENUM()
-enum class EGraphEditorType : uint8
-{
-	Blueprint,
-	Material,
-	BehaviorTree,
-	EnvironmentQuery,
-	Animation,
-	ControlRig,
-	SoundClass,
-	SoundCue,
-	SoundSubmix,
-	ReferenceViewer,
-	Other,
-};

@@ -18,24 +18,21 @@ public:
 	// Is the command registered here bound.
 	static bool IsBound();
 
+	// Processing of command binding.
+	static void Bind();
+
 protected:
 	// Internal processing of command binding.
 	virtual void BindCommands();
 
-private:
-	// Called when the editor window is displayed.
-	void HandleOnSlateWindowRendered(SWindow& SlateWindow, void* ViewportRHIPtr);
-
-private:
-	// Is the command registered here bound.
-	bool bIsBound;
-
-	// Delegate handle called when the editor window is displayed.
-	FDelegateHandle SlateWindowRenderedHandle;
-
+public:
 	// Instances of bound commands.
 	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
 	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
 	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 	TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
+
+private:
+	// Is the command registered here bound.
+	bool bIsBound;
 };
