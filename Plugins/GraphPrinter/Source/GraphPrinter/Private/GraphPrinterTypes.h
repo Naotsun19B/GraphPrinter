@@ -52,7 +52,7 @@ public:
 
 	// Whether to embed node configuration information in the image file.
 	// When this option is enabled, the only output image format is png.
-	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	bool bIsIncludeNodeInfoInImageFile;
 
 	// Options related to image output processing.
