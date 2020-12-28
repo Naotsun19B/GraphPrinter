@@ -1,30 +1,36 @@
 {
-	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "GraphPrinter",
-	"Description": "It is a plug-in that adds a shortcut to output the graph editor to an image file.",
-	"Category": "Editor",
-	"CreatedBy": "Naotsun",
-	"CreatedByURL": "https://twitter.com/Naotsun_UE",
-	"DocsURL": "https://github.com/Naotsun19B/GraphPrinter",
-	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/466303b6cd724968b3ee0a1a1b623f4b",
-	"SupportURL": "https://github.com/Naotsun19B/GraphPrinter",
-	"CanContainContent": false,
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
-	"Installed": true,
-	"Modules": [
-		{
-			"Name": "GraphPrinter",
-			"Type": "Editor",
-			"LoadingPhase": "PreLoadingScreen",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Win32",
-				"Mac",
-				"Linux"
-			]
-		}
-	]
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "GraphPrinter",
+  "Description": "It is a plug-in that adds a shortcut to output the graph editor to an image file.",
+  "Category": "Editor",
+  "CreatedBy": "Naotsun",
+  "CreatedByURL": "https://twitter.com/Naotsun_UE",
+  "DocsURL": "https://github.com/Naotsun19B/GraphPrinter",
+  "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/466303b6cd724968b3ee0a1a1b623f4b",
+  "SupportURL": "https://github.com/Naotsun19B/GraphPrinter",
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": true,
+  "Modules": [
+    {
+      "Name": "GraphPrinter",
+      "Type": "Editor",
+      "LoadingPhase": "PreLoadingScreen",
+      "WhitelistPlatforms": [
+        "Win64",
+        "Win32",
+        "Mac",
+        "Linux"
+      ]
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "AssetManagerEditor",
+      "Enabled": true
+    }
+  ]
 }

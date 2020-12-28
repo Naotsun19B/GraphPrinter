@@ -86,6 +86,9 @@ public:
 		const FString& FileTypes = TEXT("All (*)|*.*"),
 		bool bIsMultiple = false
 	);
+
+	// Create an FKeyEvent from FUICommandInfo.
+	static bool GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommandInfo>& UICommandInfo, FKeyEvent& OutKeyEvent);
 };
 
 /**

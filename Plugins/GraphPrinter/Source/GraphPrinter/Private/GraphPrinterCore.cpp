@@ -6,7 +6,10 @@
 #include "PngTextChunkHelpers.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "ReferenceViewer/EdGraph_ReferenceViewer.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
+#include "Framework/Commands/GenericCommands.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "Slate/WidgetRenderer.h"
 #include "Widgets/SWidget.h"
 #include "GraphEditor.h"
@@ -233,14 +236,13 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 	{
 		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
 		{
-			if (UObject* Outer = Graph->GetOuter())
+			// The reference viewer replaces the name because there is no outer object.
+			if (auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
 			{
-				// For ReferenceViewer, replace the name because the outer is a transiet object.
-				if (Outer->HasAnyFlags(RF_Transient))
-				{
-					return TEXT("ReferenceViewer");
-				}
-
+				return TEXT("ReferenceViewer");
+			}
+			else if (UObject* Outer = Graph->GetOuter())
+			{
 				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
 			}
 		}
@@ -298,15 +300,27 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr
 
 	FPngTextChunkWriter Writer(FilePath);
 
-	const FGraphPanelSelectionSet& SelectedNodes = GraphEditor->GetSelectedNodes();
-	if (SelectedNodes.Num() == 0)
+	// Make a shortcut key event for copy operation.
+	FKeyEvent KeyEvent;
+	if (!GetKeyEventFromUICommandInfo(FGenericCommands::Get().Copy, KeyEvent))
 	{
 		return false;
 	}
-	FString ExportedText;
-	FEdGraphUtilities::ExportNodesToText(SelectedNodes, ExportedText);
 
-	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
+	// Since the clipboard is used, the current data is temporarily saved.
+	FString CurrentClipboard;
+	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
+
+	// Get information about the selected node via the clipboard.
+	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
+
+	FString ExportedText;
+	FPlatformApplicationMisc::ClipboardPaste(ExportedText);
+
+	// Restore the saved clipboard data.
+	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
+
+	if (!bWasSucceedKeyDown || !FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
 	{
 		return false;
 	}
@@ -357,26 +371,24 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TShared
 		return false;
 	}
 
-	// Restore the node from the information read from the png file.
-	TSet<UEdGraphNode*> ImportedNodeSet;
-	FEdGraphUtilities::ImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport, ImportedNodeSet);
-
-	// Move the nodes closer to the camera.
-	FVector2D ViewLocation;
-	float ZoomAmount;
-	GraphEditor->GetViewLocation(ViewLocation, ZoomAmount);
-
-	const FIntRect& Boundaries = FEdGraphUtilities::CalculateApproximateNodeBoundaries(ImportedNodeSet.Array());
-	const FVector2D& NodeOffset = ViewLocation - FVector2D(Boundaries.Min.X, Boundaries.Min.Y) + FVector2D(100.f);
-	for (const auto& ImportedNode : ImportedNodeSet)
+	// Make a shortcut key event for copy operation.
+	FKeyEvent KeyEvent;
+	if (!GetKeyEventFromUICommandInfo(FGenericCommands::Get().Paste, KeyEvent))
 	{
-		if (IsValid(ImportedNode))
-		{
-			ImportedNode->NodePosX += NodeOffset.X;
-			ImportedNode->NodePosY += NodeOffset.Y;
-		}
+		return false;
 	}
 
+	// Since the clipboard is used, the current data is temporarily saved.
+	FString CurrentClipboard;
+	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
+
+	// Import node information from png image via clipboard.
+	FPlatformApplicationMisc::ClipboardCopy(*TextToImport);
+	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
+
+	// Restore the saved clipboard data.
+	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
+	
 	return true;
 }
 
@@ -425,6 +437,32 @@ bool FGraphPrinterCore::OpenFileDialog(
 		(bIsMultiple ? EFileDialogFlags::Multiple : EFileDialogFlags::None),
 		FilePaths
 	);
+}
+
+bool FGraphPrinterCore::GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommandInfo>& UICommandInfo, FKeyEvent& OutKeyEvent)
+{
+	if (!UICommandInfo.IsValid())
+	{
+		return false;
+	}
+	const TSharedRef<const FInputChord>& Chord = UICommandInfo->GetFirstValidChord();
+
+	FModifierKeysState ModifierKeys(
+		Chord->bShift, Chord->bShift,
+		Chord->bCtrl, Chord->bCtrl,
+		Chord->bAlt, Chord->bAlt,
+		Chord->bCmd, Chord->bCmd,
+		false
+	);
+	const uint32* CharacterCodePtr;
+	const uint32* KeyCodePtr;
+	FInputKeyManager::Get().GetCodesFromKey(Chord->Key, CharacterCodePtr, KeyCodePtr);
+	uint32 CharacterCode = (CharacterCodePtr != nullptr ? *CharacterCodePtr : 0);
+	uint32 KeyCode = (KeyCodePtr != nullptr ? *KeyCodePtr : 0);
+	FKeyEvent KeyEvent(Chord->Key, ModifierKeys, FSlateApplication::Get().GetUserIndexForKeyboard(), false, CharacterCode, KeyCode);
+	OutKeyEvent = KeyEvent;
+
+	return true;
 }
 
 #undef LOCTEXT_NAMESPACE
