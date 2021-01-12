@@ -86,7 +86,7 @@ bool UGraphPrinterSettings::CanEditChange(const FProperty* InProperty) const
 	{
 		if (InProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
 		{
-#if ENABLE_EMBED_NODE_INFO
+#ifdef ENABLE_EMBED_NODE_INFO
 			bCanEditChange = true;
 #else
 			bCanEditChange = false;
@@ -107,7 +107,7 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 		return;
 	}
 
-#if ENABLE_EMBED_NODE_INFO
+#ifdef ENABLE_EMBED_NODE_INFO
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
 	{
 		ModifyFormat();
