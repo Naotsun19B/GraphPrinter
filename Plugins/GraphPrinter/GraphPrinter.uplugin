@@ -1,7 +1,7 @@
 {
   "FileVersion": 3,
   "Version": 1,
-  "VersionName": "1.0",
+  "VersionName": "1.1",
   "FriendlyName": "GraphPrinter",
   "Description": "It is a plug-in that adds a shortcut to output the graph editor to an image file.",
   "Category": "Editor",
