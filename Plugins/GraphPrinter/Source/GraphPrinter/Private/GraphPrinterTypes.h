@@ -21,8 +21,9 @@ struct FPrintGraphOptions
 public:
 	FPrintGraphOptions()
 		: bOnlySelectedNodes(false)
-		, Padding(0.f)
 		, bUseGamma(true)
+		, Padding(0.f)
+		, MaxImageSize(FVector2D::ZeroVector)
 		, FilteringMode(TextureFilter::TF_Default)
 		, bIsIncludeNodeInfoInImageFile(true)
 		, OutputDirectoryPath()
@@ -38,13 +39,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	bool bOnlySelectedNodes;
 
+	// Whether to output the drawing result affected by the gamma value.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
+	bool bUseGamma;
+
 	// Margins when drawing the graph editor.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	float Padding;
 
-	// Whether to output the drawing result affected by the gamma value.
+	// Set the maximum size of the output image. There is no limit at (0.f, 0.f).
+	// If set it too high, you may run out of video memory and crash.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
-	bool bUseGamma;
+	FVector2D MaxImageSize;
 
 	// Texture filtering mode to use when outputting.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")

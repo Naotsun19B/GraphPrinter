@@ -33,6 +33,7 @@ UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectIni
 	, FilteringMode(TF_Default)
 	, bUseGamma(true)
 	, Padding(0.f)
+	, MaxImageSize(15000.f, 15000.f)
 	, bCanOverwriteFileWhenExport(false)
 	, OutputDirectoryPath(FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName))
 {
@@ -117,6 +118,18 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 		PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, CompressionQuality))
 	{
 		ModifyCompressionQuality();
+	}
+
+	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, MaxImageSize))
+	{
+		if (MaxImageSize.X < 0.f)
+		{
+			MaxImageSize.X = 0.f;
+		}
+		if (MaxImageSize.Y < 0.f)
+		{
+			MaxImageSize.Y = 0.f;
+		}
 	}
 }
 

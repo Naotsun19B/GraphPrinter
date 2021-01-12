@@ -28,8 +28,9 @@ void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, b
 
 	FPrintGraphOptions Options;
 	Options.bOnlySelectedNodes = bOnlySelectedNodes;
-	Options.Padding = Settings->Padding;
 	Options.bUseGamma = Settings->bUseGamma;
+	Options.Padding = Settings->Padding;
+	Options.MaxImageSize = Settings->MaxImageSize;
 	Options.FilteringMode = Settings->FilteringMode;
 	Options.bIsIncludeNodeInfoInImageFile = Settings->bIsIncludeNodeInfoInImageFile;
 	Options.ImageWriteOptions.bAsync = bIsAsync;
@@ -79,9 +80,23 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	GraphEditor->GetViewLocation(PreviousViewLocation, PreviousZoomAmount);
 	GraphEditor->SetViewLocation(ViewLocation, 1.f);
 
+	// Check draw size.
+	bool bIsBelowMaxDrawSize = true;
+	if (Options.MaxImageSize > FVector2D::ZeroVector)
+	{
+		if (DrawSize.X > Options.MaxImageSize.X || DrawSize.Y > Options.MaxImageSize.Y)
+		{
+			bIsBelowMaxDrawSize = false;
+		}
+	}
+
 	// Draw the graph editor on the render target.
-	UTextureRenderTarget2D* RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
-	
+	UTextureRenderTarget2D* RenderTarget = nullptr;
+	if (bIsBelowMaxDrawSize)
+	{
+		RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
+	}
+
 	// Restore camera position and zoom magnification.
 	GraphEditor->SetViewLocation(PreviousViewLocation, PreviousZoomAmount);
 
@@ -92,6 +107,16 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		{
 			GraphEditor->SetNodeSelection(GraphNode, true);
 		}
+	}
+
+	if (!bIsBelowMaxDrawSize)
+	{
+		const FText& Message = FText::FromString(FString::Printf(
+			TEXT("%s / %s\nThe drawing range is too wide.\nIf necessary, change the maximum size from the editor settings."),
+			*DrawSize.ToString(), *Options.MaxImageSize.ToString()
+		));
+		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail, 6.f);
+		return;
 	}
 
 	if (!IsValid(RenderTarget))
