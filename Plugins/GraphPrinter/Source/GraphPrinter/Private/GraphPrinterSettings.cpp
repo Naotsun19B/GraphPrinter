@@ -2,6 +2,7 @@
 
 #include "GraphPrinterSettings.h"
 #include "GraphPrinterGlobals.h"
+#include "GraphPrinterCore.h"
 #include "ISettingsModule.h"
 #include "ImageWriteTypes.h"
 
@@ -78,26 +79,6 @@ void UGraphPrinterSettings::PostInitProperties()
 	ModifyCompressionQuality();
 }
 
-bool UGraphPrinterSettings::CanEditChange(const FProperty* InProperty) const
-{
-	bool bCanEditChange = true;
-
-	if (InProperty != nullptr)
-	{
-		if (InProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
-		{
-#ifdef ENABLE_EMBED_NODE_INFO
-			bCanEditChange = true;
-#else
-			bCanEditChange = false;
-#endif
-		}
-	}
-
-
-	return Super::CanEditChange(InProperty) && bCanEditChange;
-}
-
 void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -107,12 +88,10 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 		return;
 	}
 
-#ifdef ENABLE_EMBED_NODE_INFO
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
 	{
 		ModifyFormat();
 	}
-#endif
 
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, Format) ||
 		PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, CompressionQuality))
@@ -140,6 +119,11 @@ void UGraphPrinterSettings::ModifyFormat()
 	{
 		Format = EDesiredImageFormat::PNG;
 	}
+#else
+	bIsIncludeNodeInfoInImageFile = false;
+
+	const FText& Message = FText::FromString(TEXT("This feature is under development.\nSee GraphPrinter.Build.cs to enable it."));
+	FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
 #endif
 }
 
