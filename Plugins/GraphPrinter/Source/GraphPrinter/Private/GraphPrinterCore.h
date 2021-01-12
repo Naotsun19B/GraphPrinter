@@ -71,6 +71,7 @@ public:
 	// Open the folder containing the file in Explorer.
 	static void OpenFolderWithExplorer(const FString& FilePath);
 
+#ifdef ENABLE_EMBED_NODE_INFO
 	// Writes the information of the node selected in Graph Editor to the png file.
 	static bool ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor);
 
@@ -89,6 +90,7 @@ public:
 
 	// Create an FKeyEvent from FUICommandInfo.
 	static bool GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommandInfo>& UICommandInfo, FKeyEvent& OutKeyEvent);
+#endif
 };
 
 /**

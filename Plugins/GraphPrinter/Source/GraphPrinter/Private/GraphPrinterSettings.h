@@ -59,6 +59,7 @@ public:
 protected:
 	// UObject interface.
 	virtual void PostInitProperties() override;
+	virtual bool CanEditChange(const FProperty* InProperty) const override;
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	// End of UObject interface.
 

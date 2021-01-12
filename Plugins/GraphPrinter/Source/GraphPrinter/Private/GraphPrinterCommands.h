@@ -29,7 +29,9 @@ public:
 	// Instances of bound commands.
 	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
 	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
+#ifdef ENABLE_EMBED_NODE_INFO
 	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
+#endif
 	TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
 
 private:

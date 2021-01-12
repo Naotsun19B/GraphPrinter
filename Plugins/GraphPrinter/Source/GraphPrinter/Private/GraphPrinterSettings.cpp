@@ -23,7 +23,11 @@ namespace GraphPrinterSettingsInternal
 
 UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+#ifdef ENABLE_EMBED_NODE_INFO
 	, bIsIncludeNodeInfoInImageFile(true)
+#else
+	, bIsIncludeNodeInfoInImageFile(false)
+#endif
 	, Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
 	, FilteringMode(TF_Default)
@@ -65,8 +69,32 @@ void UGraphPrinterSettings::PostInitProperties()
 {
 	Super::PostInitProperties();
 
+#ifndef ENABLE_EMBED_NODE_INFO
+	bIsIncludeNodeInfoInImageFile = false;
+#endif
+
 	ModifyFormat();
 	ModifyCompressionQuality();
+}
+
+bool UGraphPrinterSettings::CanEditChange(const FProperty* InProperty) const
+{
+	bool bCanEditChange = true;
+
+	if (InProperty != nullptr)
+	{
+		if (InProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
+		{
+#if ENABLE_EMBED_NODE_INFO
+			bCanEditChange = true;
+#else
+			bCanEditChange = false;
+#endif
+		}
+	}
+
+
+	return Super::CanEditChange(InProperty) && bCanEditChange;
 }
 
 void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
@@ -78,10 +106,12 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 		return;
 	}
 
+#if ENABLE_EMBED_NODE_INFO
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, bIsIncludeNodeInfoInImageFile))
 	{
 		ModifyFormat();
 	}
+#endif
 
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, Format) ||
 		PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, CompressionQuality))
@@ -92,10 +122,12 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 
 void UGraphPrinterSettings::ModifyFormat()
 {
+#ifdef ENABLE_EMBED_NODE_INFO
 	if (bIsIncludeNodeInfoInImageFile)
 	{
 		Format = EDesiredImageFormat::PNG;
 	}
+#endif
 }
 
 void UGraphPrinterSettings::ModifyCompressionQuality()

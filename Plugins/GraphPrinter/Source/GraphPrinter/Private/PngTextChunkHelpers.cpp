@@ -2,6 +2,12 @@
 
 #include "PngTextChunkHelpers.h"
 
+#ifdef ENABLE_EMBED_NODE_INFO
+
+THIRD_PARTY_INCLUDES_START
+#include "ThirdParty/zlib/zlib-1.2.5/Inc/zlib.h"
+THIRD_PARTY_INCLUDES_END
+
 //////////////////////////////////////////////////////
 // FPngTextChunkHelpers.
 
@@ -90,7 +96,10 @@ FPngTextChunkHelpers::FPngTextChunkHelpers(const FString& InFilename)
 
 FPngTextChunkHelpers::~FPngTextChunkHelpers()
 {
-	png_destroy_read_struct(&ReadPtr, &InfoPtr, NULL);
+	if (ReadPtr != NULL && InfoPtr != NULL)
+	{
+		png_destroy_read_struct(&ReadPtr, &InfoPtr, NULL);
+	}
 }
 
 //////////////////////////////////////////////////////
@@ -128,7 +137,7 @@ bool FPngTextChunkReader::ReadTextChunk(TMap<FString, FString>& TextChunk)
 
 FPngTextChunkWriter::~FPngTextChunkWriter()
 {
-	if (WritePtr != NULL)
+	if (WritePtr != NULL && InfoPtr != NULL)
 	{
 		png_destroy_write_struct(&WritePtr, &InfoPtr);
 	}
@@ -157,13 +166,14 @@ bool FPngTextChunkWriter::WriteTextChunk(const FString& Key, const FString& Valu
 	// Writing process starts from here.
 	png_init_io(WritePtr, FilePtr);
 
-	png_text text_ptr[1];
+	static const int32 TextNum = 1;
+	png_text TextPtr[TextNum];
 
-	text_ptr[0].key = TCHAR_TO_ANSI(*Key);
-	text_ptr[0].text = TCHAR_TO_ANSI(*Value);
-	text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
+	TextPtr[0].key = TCHAR_TO_ANSI(*Key);
+	TextPtr[0].text = TCHAR_TO_ANSI(*Value);
+	TextPtr[0].compression = PNG_TEXT_COMPRESSION_NONE;
 
-	png_set_text(WritePtr, InfoPtr, text_ptr, 1);
+	png_set_text(WritePtr, InfoPtr, TextPtr, TextNum);
 
 	png_set_rows(WritePtr, InfoPtr, RowPointers);
 
@@ -174,3 +184,5 @@ bool FPngTextChunkWriter::WriteTextChunk(const FString& Key, const FString& Valu
 
 	return true;
 }
+
+#endif 

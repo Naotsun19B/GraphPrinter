@@ -121,6 +121,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 				FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 			}));
 
+#ifdef ENABLE_EMBED_NODE_INFO
 			// Embed node information in the output png image.
 			if (Options.bIsIncludeNodeInfoInImageFile && (Options.ImageWriteOptions.Format == EDesiredImageFormat::PNG))
 			{
@@ -130,6 +131,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 					FGraphPrinterCore::ShowNotification(FailedMessage, FGraphPrinterCore::CS_Fail);
 				}
 			}
+#endif
 		}
 		else
 		{
@@ -144,6 +146,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 
 void UGraphPrinterUtils::RestoreNodesFromPngFile()
 {
+#ifdef ENABLE_EMBED_NODE_INFO
 	// Get the currently active topmost window.
 	TSharedPtr<SGraphEditor> GraphEditor = UGraphPrinterUtils::GetActiveGraphEditor();
 	if (!GraphEditor.IsValid())
@@ -199,6 +202,7 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 		const FText& FailedMessage = FText::FromString(TEXT("Failed restore nodes."));
 		FGraphPrinterCore::ShowNotification(FailedMessage, FGraphPrinterCore::CS_Fail);
 	}
+#endif
 }
 
 void UGraphPrinterUtils::OpenExportDestinationFolder()

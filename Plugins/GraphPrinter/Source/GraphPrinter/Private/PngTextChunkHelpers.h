@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#ifdef ENABLE_EMBED_NODE_INFO
+
 // Include libPNG headers needed to work with png.
 THIRD_PARTY_INCLUDES_START
 #include "ThirdParty/libPNG/libPNG-1.5.2/png.h"
@@ -83,3 +85,5 @@ private:
 	// Variable used by libPNG.
 	png_structp WritePtr;
 };
+
+#endif

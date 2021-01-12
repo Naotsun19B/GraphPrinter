@@ -291,6 +291,7 @@ void FGraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
 	FPlatformProcess::ExploreFolder(*FullFilePath);
 }
 
+#ifdef ENABLE_EMBED_NODE_INFO
 bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor)
 {
 	if (!GraphEditor.IsValid())
@@ -464,5 +465,6 @@ bool FGraphPrinterCore::GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommand
 
 	return true;
 }
+#endif
 
 #undef LOCTEXT_NAMESPACE
