@@ -20,7 +20,8 @@ Target platform : Windows, Mac, Linux
 
 ## Installation
 
-Put the Plugins/GraphPrinter folder in your project's Plugins folder.
+Put the Plugins/GraphPrinter folder in your project's Plugins folder.  
+Or install from the [marketplace](https://www.unrealengine.com/marketplace/en/product/graph-printer).  
 
 ## Usage
 
@@ -49,6 +50,7 @@ The items that can be set from the editor preferences are as follows.
 |Filtering Mode|Sets the texture filtering mode used on output.|
 |Use Gamma|Set whether to reflect the gamma value in the output image. If *false*, the output image may be darker than you can see in the editor.|
 |Padding|Set the margin when outputting to the image. Increase the value if the node is not included in the output image.|
+|MaxImageSize|Set the maximum size of the output image. If it exceeds this size, it cannot be output.|
 |Can Overwrite File when Export|Set whether to overwrite the file with the same name when outputting the image. If *false*, if there is a file with the same name, the suffix will be given number.|
 |Output Directory Path|Set the output destination directory. By default, it is under "[Project]/Saved/GraphPrinter/".|
 
@@ -61,6 +63,9 @@ The items that can be set from the editor preferences are as follows.
 [Naotsun](https://twitter.com/Naotsun_UE)
 
 ## History
+
+- (2021/01/12) v1.1   
+  Added the ability to limit the output size as it crashes when outputting a huge graph
 
 - (2020/12/06) v1.0   
   Publish plugin
