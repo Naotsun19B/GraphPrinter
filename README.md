@@ -64,6 +64,9 @@ The items that can be set from the editor preferences are as follows.
 
 ## History
 
+- (2021/01/21) v1.2   
+  Changed module type to EditorNoCommandlet as a countermeasure against errors when packaging
+
 - (2021/01/12) v1.1   
   Added the ability to limit the output size as it crashes when outputting a huge graph
 
