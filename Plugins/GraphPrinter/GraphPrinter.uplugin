@@ -1,7 +1,7 @@
 {
   "FileVersion": 3,
-  "Version": 1,
-  "VersionName": "1.1",
+  "Version": 1.2,
+  "VersionName": "1.2",
   "FriendlyName": "GraphPrinter",
   "Description": "It is a plug-in that adds a shortcut to output the graph editor to an image file.",
   "Category": "Editor",
@@ -13,12 +13,12 @@
   "CanContainContent": false,
   "IsBetaVersion": false,
   "IsExperimentalVersion": false,
-  "Installed": true,
+  "Installed": false,
   "Modules": [
     {
       "Name": "GraphPrinter",
-      "Type": "Editor",
-      "LoadingPhase": "PreLoadingScreen",
+      "Type": "EditorNoCommandlet",
+      "LoadingPhase": "Default",
       "WhitelistPlatforms": [
         "Win64",
         "Win32",
