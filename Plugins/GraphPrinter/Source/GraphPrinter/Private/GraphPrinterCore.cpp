@@ -6,7 +6,6 @@
 #include "PngTextChunkHelpers.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "ReferenceViewer/EdGraph_ReferenceViewer.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "HAL/PlatformApplicationMisc.h"
@@ -19,6 +18,10 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "DesktopPlatformModule.h"
 #include "IDesktopPlatform.h"
+
+#if !BEFORE_UE_4_21
+#include "ReferenceViewer/EdGraph_ReferenceViewer.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
@@ -237,11 +240,13 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
 		{
 			// The reference viewer replaces the name because there is no outer object.
+#if !BEFORE_UE_4_21
 			if (auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
 			{
 				return TEXT("ReferenceViewer");
 			}
-			else if (UObject* Outer = Graph->GetOuter())
+#endif
+			if (UObject* Outer = Graph->GetOuter())
 			{
 				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
 			}
