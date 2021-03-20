@@ -127,13 +127,10 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	}
 
 	// Create output options and file path and output as image file.
-	FString Filename = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(Options.OutputDirectoryPath, FGraphPrinterCore::GetGraphTitle(GraphEditor)) +
-		FGraphPrinterCore::GetImageFileExtension(Options.ImageWriteOptions.Format)
-	);
+	FString Filename = FGraphPrinterCore::CreateFilename(GraphEditor, Options);
 
 	// Bind the event when the operation is completed.
-	Options.ImageWriteOptions.NativeOnComplete = [Filename, Options, GraphEditor](bool bIsSucceeded)
+	Options.ImageWriteOptions.NativeOnComplete = [Filename, Options, GraphEditor, SelectedNodes](bool bIsSucceeded)
 	{
 		if (bIsSucceeded)
 		{
@@ -150,7 +147,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 			// Embed node information in the output png image.
 			if (Options.bIsIncludeNodeInfoInImageFile && (Options.ImageWriteOptions.Format == EDesiredImageFormat::PNG))
 			{
-				if (!FGraphPrinterCore::ExportGraphToPngFile(Filename, GraphEditor))
+				if (!FGraphPrinterCore::ExportGraphToPngFile(Filename, GraphEditor, SelectedNodes))
 				{
 					const FText& FailedMessage = FText::FromString(TEXT("Failed to write node information to png file."));
 					FGraphPrinterCore::ShowNotification(FailedMessage, FGraphPrinterCore::CS_Fail);
@@ -166,7 +163,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	};
 
 	// Export the render target in the specified file format.
-	FGraphPrinterCore::SaveTextureAsImageFile(RenderTarget, Filename, Options.ImageWriteOptions);
+	UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, Options.ImageWriteOptions);
 }
 
 void UGraphPrinterUtils::RestoreNodesFromPngFile()

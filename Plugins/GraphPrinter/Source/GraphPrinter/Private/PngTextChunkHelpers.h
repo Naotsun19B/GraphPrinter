@@ -21,11 +21,11 @@ class FPngTextChunkHelpers
 {
 public:
 	// The signature length for PNG.
-	static const int32 SignatureLength;
+	static constexpr int32 SignatureLength = 8;
 	// Size of a byte.
-	static const int32 ByteSize;
+	static constexpr int32 ByteSize = 8;
 	// The number of bits used for storing the length of a file.
-	static const int32 SizeWidth;
+	static constexpr int32 SizeWidth = 32;
 
 public:
 	// Constructor.

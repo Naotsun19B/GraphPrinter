@@ -51,8 +51,8 @@ public:
 		TextureFilter Filter
 	);
 
-	// Saves the render target in the specified format.
-	static void SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options);
+	// Create a file path from options.
+	static FString CreateFilename(TSharedPtr<SGraphEditor> GraphEditor, const FPrintGraphOptions& Options);
 
 	// Calculate the range and view location to use when drawing the graph editor.
 	static bool CalculateGraphDrawSizeAndViewLocation(
@@ -73,7 +73,7 @@ public:
 
 #ifdef ENABLE_EMBED_NODE_INFO
 	// Writes the information of the node selected in Graph Editor to the png file.
-	static bool ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor);
+	static bool ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport);
 
 	// Restore the node from the information read from the png file.
 	static bool RestoreGraphFromPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor);

@@ -7,8 +7,6 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
-#include "Framework/Commands/GenericCommands.h"
-#include "HAL/PlatformApplicationMisc.h"
 #include "Slate/WidgetRenderer.h"
 #include "Widgets/SWidget.h"
 #include "GraphEditor.h"
@@ -158,21 +156,24 @@ UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(
 	return RenderTarget;
 }
 
-void FGraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString& Filename, const FImageWriteOptions& Options)
+FString FGraphPrinterCore::CreateFilename(TSharedPtr<SGraphEditor> GraphEditor, const FPrintGraphOptions& Options)
 {
+	FString Filename = FPaths::ConvertRelativePathToFull(
+		FPaths::Combine(Options.OutputDirectoryPath, FGraphPrinterCore::GetGraphTitle(GraphEditor))
+	);
+	const FString& Extension = GetImageFileExtension(Options.ImageWriteOptions.Format);
+
 	FText ValidatePathErrorText;
 	if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
 	{
 		ShowNotification(ValidatePathErrorText, CS_Fail);
-		return;
+		return FString();
 	}
 
-	FString FullFilename = FPaths::ConvertRelativePathToFull(FPaths::GetBaseFilename(Filename, false));
-	const FString& Extension = GetImageFileExtension(Options.Format);
 	// If the file cannot be overwritten, add a number after the file name.
-	if (!Options.bOverwriteFile)
+	if (!Options.ImageWriteOptions.bOverwriteFile)
 	{
-		if (IFileManager::Get().FileExists(*FString(FullFilename + Extension)))
+		if (IFileManager::Get().FileExists(*FString(Filename + Extension)))
 		{
 			auto CombineFilenameAndIndex = [](const FString& Filename, int32 Index) -> FString
 			{
@@ -180,20 +181,20 @@ void FGraphPrinterCore::SaveTextureAsImageFile(UTexture* Texture, const FString&
 			};
 
 			int32 Index = 0;
-			while (Index < INT32_MAX)
+			while (Index < TNumericLimits<int32>().Max())
 			{
-				const FString& FilenameWithExtension = CombineFilenameAndIndex(FullFilename, Index) + Extension;
+				const FString& FilenameWithExtension = CombineFilenameAndIndex(Filename, Index) + Extension;
 				if (!IFileManager::Get().FileExists(*FilenameWithExtension))
 				{
 					break;
 				}
 				Index++;
 			}
-			FullFilename = CombineFilenameAndIndex(FullFilename, Index);
+			Filename = CombineFilenameAndIndex(Filename, Index);
 		}
 	}
 
-	UImageWriteBlueprintLibrary::ExportToDisk(Texture, FullFilename + Extension, Options);
+	return (Filename + Extension);
 }
 
 bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(
@@ -297,7 +298,7 @@ void FGraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
 }
 
 #ifdef ENABLE_EMBED_NODE_INFO
-bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor)
+bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport)
 {
 	if (!GraphEditor.IsValid())
 	{
@@ -306,27 +307,10 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr
 
 	FPngTextChunkWriter Writer(FilePath);
 
-	// Make a shortcut key event for copy operation.
-	FKeyEvent KeyEvent;
-	if (!GetKeyEventFromUICommandInfo(FGenericCommands::Get().Copy, KeyEvent))
-	{
-		return false;
-	}
-
-	// Since the clipboard is used, the current data is temporarily saved.
-	FString CurrentClipboard;
-	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
-
-	// Get information about the selected node via the clipboard.
-	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
-
 	FString ExportedText;
-	FPlatformApplicationMisc::ClipboardPaste(ExportedText);
+	FEdGraphUtilities::ExportNodesToText(NodesToExport, ExportedText);
 
-	// Restore the saved clipboard data.
-	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
-
-	if (!bWasSucceedKeyDown || !FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
+	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
 	{
 		return false;
 	}
@@ -377,23 +361,8 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TShared
 		return false;
 	}
 
-	// Make a shortcut key event for copy operation.
-	FKeyEvent KeyEvent;
-	if (!GetKeyEventFromUICommandInfo(FGenericCommands::Get().Paste, KeyEvent))
-	{
-		return false;
-	}
-
-	// Since the clipboard is used, the current data is temporarily saved.
-	FString CurrentClipboard;
-	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
-
-	// Import node information from png image via clipboard.
-	FPlatformApplicationMisc::ClipboardCopy(*TextToImport);
-	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
-
-	// Restore the saved clipboard data.
-	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
+	TSet<UEdGraphNode*> ImportedNodeSet;
+	FEdGraphUtilities::ImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport, ImportedNodeSet);
 	
 	return true;
 }

@@ -11,10 +11,6 @@ THIRD_PARTY_INCLUDES_END
 //////////////////////////////////////////////////////
 // FPngTextChunkHelpers.
 
-const int32 FPngTextChunkHelpers::SignatureLength = 8;
-const int32 FPngTextChunkHelpers::ByteSize = 8;
-const int32 FPngTextChunkHelpers::SizeWidth = 32;
-
 FPngTextChunkHelpers::FPngTextChunkHelpers(const FString& InFilename)
 	: bIsValid(true)
 {
@@ -126,7 +122,10 @@ bool FPngTextChunkReader::ReadTextChunk(TMap<FString, FString>& TextChunk)
 
 	for (int32 Index = 0; Index < NumText; Index++)
 	{
-		TextChunk.Add(ANSI_TO_TCHAR(TextPtr[Index].key), ANSI_TO_TCHAR(TextPtr[Index].text));
+		const auto Key = FString(ANSI_TO_TCHAR(TextPtr[Index].key));
+		const auto Value = FString(ANSI_TO_TCHAR(TextPtr[Index].text));
+
+		TextChunk.Add(Key, Value);
 	}
 
 	return true;
@@ -166,11 +165,16 @@ bool FPngTextChunkWriter::WriteTextChunk(const FString& Key, const FString& Valu
 	// Writing process starts from here.
 	png_init_io(WritePtr, FilePtr);
 
-	static const int32 TextNum = 1;
+	static constexpr int32 TextNum = 1;
 	png_text TextPtr[TextNum];
+	FMemory::Memzero(TextPtr, sizeof(png_text) * TextNum);
 
-	TextPtr[0].key = TCHAR_TO_ANSI(*Key);
-	TextPtr[0].text = TCHAR_TO_ANSI(*Value);
+	const auto CastedKey = StringCast<ANSICHAR>(*Key);
+	const auto CastedValue = StringCast<ANSICHAR>(*Value);
+
+	TextPtr[0].key = const_cast<char*>(CastedKey.Get());
+	TextPtr[0].text = const_cast<char*>(CastedValue.Get());
+	TextPtr[0].text_length = TCString<char>::Strlen(TextPtr[0].text);
 	TextPtr[0].compression = PNG_TEXT_COMPRESSION_NONE;
 
 	png_set_text(WritePtr, InfoPtr, TextPtr, TextNum);
