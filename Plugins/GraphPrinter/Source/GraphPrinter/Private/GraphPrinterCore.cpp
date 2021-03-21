@@ -7,6 +7,8 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
+#include "Framework/Commands/GenericCommands.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "Slate/WidgetRenderer.h"
 #include "Widgets/SWidget.h"
 #include "GraphEditor.h"
@@ -307,10 +309,27 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr
 
 	FPngTextChunkWriter Writer(FilePath);
 
-	FString ExportedText;
-	FEdGraphUtilities::ExportNodesToText(NodesToExport, ExportedText);
+	// Make a shortcut key event for copy operation.
+	FKeyEvent KeyEvent;
+	if (!GetKeyEventFromUICommandInfo(FGenericCommands::Get().Copy, KeyEvent))
+	{
+		return false;
+	}
 
-	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
+	// Since the clipboard is used, the current data is temporarily saved.
+	FString CurrentClipboard;
+	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
+
+	// Get information about the selected node via the clipboard.
+	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
+
+	FString ExportedText;
+	FPlatformApplicationMisc::ClipboardPaste(ExportedText);
+
+	// Restore the saved clipboard data.
+	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
+
+	if (!bWasSucceedKeyDown || !FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
 	{
 		return false;
 	}
@@ -361,9 +380,24 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TShared
 		return false;
 	}
 
-	TSet<UEdGraphNode*> ImportedNodeSet;
-	FEdGraphUtilities::ImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport, ImportedNodeSet);
-	
+	// Make a shortcut key event for copy operation.
+	FKeyEvent KeyEvent;
+	if (!GetKeyEventFromUICommandInfo(FGenericCommands::Get().Paste, KeyEvent))
+	{
+		return false;
+	}
+
+	// Since the clipboard is used, the current data is temporarily saved.
+	FString CurrentClipboard;
+	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
+
+	// Import node information from png image via clipboard.
+	FPlatformApplicationMisc::ClipboardCopy(*TextToImport);
+	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
+
+	// Restore the saved clipboard data.
+	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
+
 	return true;
 }
 
