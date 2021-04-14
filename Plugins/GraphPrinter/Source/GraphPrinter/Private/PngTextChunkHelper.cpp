@@ -15,9 +15,6 @@ THIRD_PARTY_INCLUDES_END
 #pragma warning(disable:4611)
 #endif
 
-// Only allow one thread to use libpng at a time.
-FCriticalSection GPngTextChunkHelperSection;
-
 namespace PngTextChunkHelperInternal
 {
 	/**
@@ -212,6 +209,9 @@ namespace PngTextChunkHelperInternal
 
 		return FoundPosition;
 	}
+
+	// Only allow one thread to use libpng at a time.
+	FCriticalSection PngTextChunkHelperSection;
 }
 
 FPngTextChunkHelper::FPngTextChunkHelper()
@@ -229,7 +229,7 @@ TSharedPtr<FPngTextChunkHelper> FPngTextChunkHelper::CreatePngTextChunkHelper(co
 	TArray<uint8> CompressdData;
 	if (!FFileHelper::LoadFileToArray(CompressdData, *InFilename))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to load the file : %s"), *InFilename);
+		UE_LOG(LogGraphPrinter, Error, TEXT("Failed to load the file : %s"), *InFilename);
 		return nullptr;
 	}
 
@@ -249,12 +249,12 @@ bool FPngTextChunkHelper::Write(const TMap<FString, FString>& MapToWrite)
 	// Determine if the map is useable.
 	if (!PngTextChunkHelperInternal::ValidateMap(MapToWrite))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Writing to a text chunk is not possible because either the key or value is empty, or the key and value string contains \0."));
+		UE_LOG(LogGraphPrinter, Warning, TEXT("Writing to a text chunk is not possible because either the key or value is empty, or the key and value string contains \0."));
 		return false;
 	}
 
 	// Only allow one thread to use libpng at a time.
-	FScopeLock PNGLock(&GPngTextChunkHelperSection);
+	FScopeLock PngLock(&PngTextChunkHelperInternal::PngTextChunkHelperSection);
 	
 	// Reset to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
 	ReadOffset = 0;
@@ -352,7 +352,7 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 	check(IsPng());
 
 	// Only allow one thread to use libpng at a time.
-	FScopeLock PNGLock(&GPngTextChunkHelperSection);
+	FScopeLock PngLock(&PngTextChunkHelperInternal::PngTextChunkHelperSection);
 
 	// Reset to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
 	ReadOffset = 0;
@@ -449,10 +449,10 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 	// Fail if the number of carved data is not the number of NumText x2.
 	if (SplitedTextChunks.Num() != NumText * 2)
 	{
-		UE_LOG(LogTemp, Error, TEXT("------ The text could not be read correctly ------"));
-		UE_LOG(LogTemp, Error, TEXT("Number of texts retrieved from the library : %d"), NumText * 2);
-		UE_LOG(LogTemp, Error, TEXT("Number of texts actually retrieved         : %d"), SplitedTextChunks.Num());
-		UE_LOG(LogTemp, Error, TEXT("--------------------------------------------------"));
+		UE_LOG(LogGraphPrinter, Error, TEXT("------ The text could not be read correctly ------"));
+		UE_LOG(LogGraphPrinter, Error, TEXT("Number of texts retrieved from the library : %d"), NumText * 2);
+		UE_LOG(LogGraphPrinter, Error, TEXT("Number of texts actually retrieved         : %d"), SplitedTextChunks.Num());
+		UE_LOG(LogGraphPrinter, Error, TEXT("--------------------------------------------------"));
 		return false;
 	}
 
@@ -475,7 +475,7 @@ bool FPngTextChunkHelper::Initialize(const FString& InFilename, const void* InCo
 	FText FailedReason;
 	if (!FPaths::ValidatePath(InFilename, &FailedReason))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *FailedReason.ToString());
+		UE_LOG(LogGraphPrinter, Warning, TEXT("%s"), *FailedReason.ToString());
 		return false;
 	}
 
@@ -499,7 +499,7 @@ bool FPngTextChunkHelper::IsPng() const
 		return (0 == png_sig_cmp(reinterpret_cast<png_bytep>(&PngSignature), 0, PngSignatureSize));
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("This file is not a png file."));
+	UE_LOG(LogGraphPrinter, Error, TEXT("This file is not a png file."));
 	return false;
 }
 
@@ -508,7 +508,7 @@ void FPngTextChunkHelper::UserReadCompressed(png_structp PngPtr, png_bytep Data,
 	FPngTextChunkHelper* Context = reinterpret_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
 	if (Context == nullptr)
 	{
-		UE_LOG(LogTemp, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserReadCompressed));
+		UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserReadCompressed));
 	}
 
 	if (Context->ReadOffset + static_cast<int64>(Length) <= Context->CompressedData.Num())
@@ -518,7 +518,7 @@ void FPngTextChunkHelper::UserReadCompressed(png_structp PngPtr, png_bytep Data,
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Invalid read position for CompressedData."));
+		UE_LOG(LogGraphPrinter, Error, TEXT("Invalid read position for CompressedData."));
 	}
 }
 
@@ -527,7 +527,7 @@ void FPngTextChunkHelper::UserWriteCompressed(png_structp PngPtr, png_bytep Data
 	FPngTextChunkHelper* Context = reinterpret_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
 	if (Context == nullptr)
 	{
-		UE_LOG(LogTemp, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserWriteCompressed));
+		UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserWriteCompressed));
 	}
 
 	int64 Offset = Context->CompressedData.AddUninitialized(Length);
@@ -540,12 +540,12 @@ void FPngTextChunkHelper::UserFlushData(png_structp PngPtr)
 
 void FPngTextChunkHelper::UserError(png_structp PngPtr, png_const_charp ErrorMessage)
 {
-	UE_LOG(LogTemp, Error, TEXT("libPng Error : %s"), ANSI_TO_TCHAR(ErrorMessage));
+	UE_LOG(LogGraphPrinter, Error, TEXT("libpng Error : %s"), ANSI_TO_TCHAR(ErrorMessage));
 }
 
 void FPngTextChunkHelper::UserWarning(png_structp PngPtr, png_const_charp WarningMessage)
 {
-	UE_LOG(LogTemp, Warning, TEXT("libPng Warning : %s"), ANSI_TO_TCHAR(WarningMessage));
+	UE_LOG(LogGraphPrinter, Warning, TEXT("libpng Warning : %s"), ANSI_TO_TCHAR(WarningMessage));
 }
 
 void* FPngTextChunkHelper::UserMalloc(png_structp PngPtr, png_size_t Size)
