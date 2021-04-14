@@ -5,7 +5,7 @@ using UnrealBuildTool;
 public class GraphPrinter : ModuleRules
 {
 	// With this flag can turn on / off the function to embed node information in the png image.
-	private readonly bool bEnableEmbedNodeInfo = false;
+	private readonly bool bEnableEmbedNodeInfo = true;
 
 	public GraphPrinter(ReadOnlyTargetRules Target) : base(Target)
 	{
@@ -46,7 +46,7 @@ public class GraphPrinter : ModuleRules
 				"UElibPNG"
             );
 
-			PublicDefinitions.Add("ENABLE_EMBED_NODE_INFO");
+			PublicDefinitions.Add("WITH_EMBED_NODE_INFO");
         }
     }
 }

@@ -24,7 +24,7 @@ namespace GraphPrinterSettingsInternal
 
 UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	, bIsIncludeNodeInfoInImageFile(true)
 #else
 	, bIsIncludeNodeInfoInImageFile(false)
@@ -36,8 +36,8 @@ UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectIni
 	, Padding(0.f)
 	, MaxImageSize(15000.f, 15000.f)
 	, bCanOverwriteFileWhenExport(false)
-	, OutputDirectoryPath(FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName))
 {
+	OutputDirectory.Path = FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName);
 }
 
 void UGraphPrinterSettings::Register()
@@ -71,7 +71,7 @@ void UGraphPrinterSettings::PostInitProperties()
 {
 	Super::PostInitProperties();
 
-#ifndef ENABLE_EMBED_NODE_INFO
+#if !ENABLE_EMBED_NODE_INFO
 	bIsIncludeNodeInfoInImageFile = false;
 #endif
 
@@ -114,7 +114,7 @@ void UGraphPrinterSettings::PostEditChangeProperty(struct FPropertyChangedEvent&
 
 void UGraphPrinterSettings::ModifyFormat()
 {
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	if (bIsIncludeNodeInfoInImageFile)
 	{
 		Format = EDesiredImageFormat::PNG;
@@ -122,8 +122,10 @@ void UGraphPrinterSettings::ModifyFormat()
 #else
 	bIsIncludeNodeInfoInImageFile = false;
 
-	const FText& Message = FText::FromString(TEXT("This feature is under development.\nSee GraphPrinter.Build.cs to enable it."));
-	FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
+	FGraphPrinterCore::ShowNotification(
+		LOCTEXT("EmbedNodeInfoDisabled", "This feature is under development.\nSee GraphPrinter.Build.cs to enable it."),
+		FGraphPrinterCore::CS_Fail
+	);
 #endif
 }
 

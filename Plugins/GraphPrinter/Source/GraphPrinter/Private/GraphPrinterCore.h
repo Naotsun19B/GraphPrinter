@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GraphPrinterGlobals.h"
 #include "GraphPrinterTypes.h"
 
 class SWidget;
@@ -69,18 +70,18 @@ public:
 	static FString GetImageFileExtension(EDesiredImageFormat ImageFormat);
 
 	// Open the folder containing the file in Explorer.
-	static void OpenFolderWithExplorer(const FString& FilePath);
+	static void OpenFolderWithExplorer(const FString& Filename);
 
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	// Writes the information of the node selected in Graph Editor to the png file.
-	static bool ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport);
+	static bool ExportGraphToPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport);
 
 	// Restore the node from the information read from the png file.
-	static bool RestoreGraphFromPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor);
+	static bool RestoreGraphFromPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor);
 
 	// Show the file browser and let the user select a file.
 	static bool OpenFileDialog(
-		TArray<FString>& FilePaths,
+		TArray<FString>& Filenames,
 		const FString& DialogTitle = TEXT("Open File Dialog"),
 		const FString& DefaultPath = TEXT(""),
 		const FString& DefaultFile = TEXT(""),

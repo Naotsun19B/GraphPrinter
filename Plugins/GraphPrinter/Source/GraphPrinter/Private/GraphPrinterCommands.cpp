@@ -1,7 +1,6 @@
 ﻿// Copyright 2020 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterCommands.h"
-#include "GraphPrinterGlobals.h"
 #include "GraphPrinterUtils.h"
 #include "EditorStyleSet.h"
 #include "Interfaces/IMainFrameModule.h"
@@ -25,7 +24,7 @@ void FGraphPrinterCommands::RegisterCommands()
 	// Register command here.
 	UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::None, FInputChord(EKeys::F9, EModifierKey::Control));
 	UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::None, FInputChord(EKeys::F10, EModifierKey::Control));
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::None, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
 	UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::None, FInputChord(EKeys::F12, EModifierKey::Control));
@@ -68,7 +67,7 @@ void FGraphPrinterCommands::BindCommands()
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraphWithSelectedNodes)
 	);
 
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	CommandBindings->MapAction(
 		FGraphPrinterCommands::Get().RestoreNodesFromPngFile,
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::RestoreNodesFromPngFile)

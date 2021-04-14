@@ -3,7 +3,7 @@
 #include "GraphPrinterCore.h"
 #include "GraphPrinterGlobals.h"
 #include "GraphPrinterSettings.h"
-#include "PngTextChunkHelpers.h"
+#include "PngTextChunkHelper.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "GenericPlatform/GenericPlatformProcess.h"
@@ -285,29 +285,27 @@ FString FGraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat
 	return FString();
 }
 
-void FGraphPrinterCore::OpenFolderWithExplorer(const FString& FilePath)
+void FGraphPrinterCore::OpenFolderWithExplorer(const FString& Filename)
 {
-	const FString& FullFilePath = FPaths::ConvertRelativePathToFull(FilePath);
+	const FString& FullFilename = FPaths::ConvertRelativePathToFull(Filename);
 
 	FText ValidatePathErrorText;
-	if (!FPaths::ValidatePath(FullFilePath, &ValidatePathErrorText))
+	if (!FPaths::ValidatePath(FullFilename, &ValidatePathErrorText))
 	{
 		ShowNotification(ValidatePathErrorText, CS_Fail);
 		return;
 	}
 
-	FPlatformProcess::ExploreFolder(*FullFilePath);
+	FPlatformProcess::ExploreFolder(*FullFilename);
 }
 
-#ifdef ENABLE_EMBED_NODE_INFO
-bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport)
+#if ENABLE_EMBED_NODE_INFO
+bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport)
 {
 	if (!GraphEditor.IsValid())
 	{
 		return false;
 	}
-
-	FPngTextChunkWriter Writer(FilePath);
 
 	// Make a shortcut key event for copy operation.
 	FKeyEvent KeyEvent;
@@ -334,45 +332,69 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& FilePath, TSharedPtr
 		return false;
 	}
 
-	return Writer.WriteTextChunk(GraphPrinterCoreDefine::PngTextChunkKey, ExportedText);
+	// Write data to png file using helper class.
+	TMap<FString, FString> MapToWrite;
+	MapToWrite.Add(GraphPrinterCoreDefine::PngTextChunkKey, ExportedText);
+	
+	TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
+	if (!PngTextChunkHelper.IsValid())
+	{
+		return false;
+	}
+	return PngTextChunkHelper->Write(MapToWrite);
 }
 
-bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TSharedPtr<SGraphEditor> GraphEditor)
+#pragma optimize("", off)
+bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor)
 {
 	if (!GraphEditor.IsValid())
 	{
 		return false;
 	}
 
-	FPngTextChunkReader Reader(FilePath);
-
-	TMap<FString, FString> TextChunk;
-	if (!Reader.ReadTextChunk(TextChunk))
+	// Read data from png file using helper class.
+	TMap<FString, FString> MapToRead;
+	TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
+	if (!PngTextChunkHelper.IsValid())
+	{
+		return false;
+	}
+	if (!PngTextChunkHelper->Read(MapToRead))
 	{
 		return false;
 	}
 
 	// Find information on valid nodes.
-	if (!TextChunk.Contains(GraphPrinterCoreDefine::PngTextChunkKey))
+	if (!MapToRead.Contains(GraphPrinterCoreDefine::PngTextChunkKey))
 	{
 		return false;
 	}
-	FString TextToImport = TextChunk[GraphPrinterCoreDefine::PngTextChunkKey];
+	FString TextToImport = MapToRead[GraphPrinterCoreDefine::PngTextChunkKey];
 
 	// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
+	int32 StartPosition = 0;
 	const int32 TextLength = TextToImport.Len();
 	const int32 HeaderLength = GraphPrinterCoreDefine::NodeInfoHeader.Len();
-	int32 Index;
-	for (Index = 0; Index < (TextLength - HeaderLength); Index++)
+	for (int32 Index = 0; Index < TextLength - HeaderLength; Index++)
 	{
-		if (TextToImport.Mid(Index, Index + HeaderLength - 1) == GraphPrinterCoreDefine::NodeInfoHeader)
+		bool bIsMatch = true;
+		for (int32 Offset = 0; Offset < HeaderLength; Offset++)
 		{
+			if (TextToImport[Index + Offset] != GraphPrinterCoreDefine::NodeInfoHeader[Offset])
+			{
+				bIsMatch = false;
+			}
+		}
+
+		if (bIsMatch)
+		{
+			StartPosition = Index;
 			break;
 		}
 	}
-	if (Index > 0)
+	if (StartPosition > 0)
 	{
-		TextToImport = TextToImport.Mid(Index, TextLength - Index);
+		TextToImport = TextToImport.Mid(StartPosition, TextLength - StartPosition);
 	}
 
 	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport))
@@ -400,9 +422,10 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& FilePath, TShared
 
 	return true;
 }
+#pragma optimize("", on)
 
 bool FGraphPrinterCore::OpenFileDialog(
-	TArray<FString>& FilePaths, 
+	TArray<FString>& Filenames, 
 	const FString& DialogTitle /* = TEXT("Open File Dialog") */,
 	const FString& DefaultPath /* = TEXT("") */,
 	const FString& DefaultFile /* = TEXT("") */,
@@ -444,7 +467,7 @@ bool FGraphPrinterCore::OpenFileDialog(
 		DefaultFile,
 		FileTypes,
 		(bIsMultiple ? EFileDialogFlags::Multiple : EFileDialogFlags::None),
-		FilePaths
+		Filenames
 	);
 }
 

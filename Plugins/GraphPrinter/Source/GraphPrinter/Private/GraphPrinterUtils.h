@@ -42,7 +42,7 @@ public:
 
 	// Open the folder containing the file in Explorer.
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
-	static void OpenFolderWithExplorer(const FString& FilePath);
+	static void OpenFolderWithExplorer(const FString& Filename);
 
 protected:
 	// Get the currently active graph editor.

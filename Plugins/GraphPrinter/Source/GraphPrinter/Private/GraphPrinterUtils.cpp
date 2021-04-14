@@ -8,6 +8,8 @@
 #include "Widgets/SWindow.h"
 #include "GraphEditor.h"
 
+#define LOCTEXT_NAMESPACE "GraphPrinter"
+
 void UGraphPrinterUtils::PrintGraphWithAllNodes()
 {
 	PrintGraphFromEditorSettings(false);
@@ -37,7 +39,7 @@ void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, b
 	Options.ImageWriteOptions.Format = Settings->Format;
 	Options.ImageWriteOptions.bOverwriteFile = Settings->bCanOverwriteFileWhenExport;
 	Options.ImageWriteOptions.CompressionQuality = Settings->CompressionQuality;
-	Options.OutputDirectoryPath = Settings->OutputDirectoryPath;
+	Options.OutputDirectoryPath = Settings->OutputDirectory.Path;
 
 	CustomPrintGraph(Options);
 }
@@ -50,8 +52,10 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	// If don't have an active graph editor, end here.
 	if (!GraphEditor.IsValid())
 	{
-		const FText& Message = FText::FromString(TEXT("The graph editor isn't currently open."));
-		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(
+			LOCTEXT("GraphOpenError", "The graph editor isn't currently open."),
+			FGraphPrinterCore::CS_Fail
+		);
 		return;
 	}
 
@@ -65,8 +69,10 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	FVector2D ViewLocation;
 	if (!FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
 	{
-		const FText& Message = FText::FromString(TEXT("No node is selected."));
-		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(
+			LOCTEXT("NotSelectedError", "No node is selected."),
+			FGraphPrinterCore::CS_Fail
+		);
 		return;
 	}
 
@@ -121,8 +127,10 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 
 	if (!IsValid(RenderTarget))
 	{
-		const FText& Message = FText::FromString(TEXT("Failed to draw to render target."));
-		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(
+			LOCTEXT("DrawError", "Failed to draw to render target."),
+			FGraphPrinterCore::CS_Fail
+		);
 		return;
 	}
 
@@ -134,31 +142,35 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	{
 		if (bIsSucceeded)
 		{
-			const FText& SuccessedMessage = FText::FromString(TEXT("GraphEditor capture saved as"));
 			FGraphPrinterCore::ShowNotification(
-				SuccessedMessage, FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
+				LOCTEXT("SuccessedOutput", "GraphEditor capture saved as"),
+				FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
 				FText::FromString(Filename),
 				FSimpleDelegate::CreateLambda([Filename]()
 			{
 				FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 			}));
 
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 			// Embed node information in the output png image.
 			if (Options.bIsIncludeNodeInfoInImageFile && (Options.ImageWriteOptions.Format == EDesiredImageFormat::PNG))
 			{
 				if (!FGraphPrinterCore::ExportGraphToPngFile(Filename, GraphEditor, SelectedNodes))
 				{
-					const FText& FailedMessage = FText::FromString(TEXT("Failed to write node information to png file."));
-					FGraphPrinterCore::ShowNotification(FailedMessage, FGraphPrinterCore::CS_Fail);
+					FGraphPrinterCore::ShowNotification(
+						LOCTEXT("FailedEmbedNodeInfoError", "Failed to write node information to png file."),
+						FGraphPrinterCore::CS_Fail
+					);
 				}
 			}
 #endif
 		}
 		else
 		{
-			const FText& FailedMessage = FText::FromString(TEXT("Failed capture GraphEditor."));
-			FGraphPrinterCore::ShowNotification(FailedMessage, FGraphPrinterCore::CS_Fail);
+			FGraphPrinterCore::ShowNotification(
+				LOCTEXT("FailedOutputError", "Failed capture GraphEditor."),
+				FGraphPrinterCore::CS_Fail
+			);
 		}
 	};
 
@@ -168,28 +180,30 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 
 void UGraphPrinterUtils::RestoreNodesFromPngFile()
 {
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	// Get the currently active topmost window.
 	TSharedPtr<SGraphEditor> GraphEditor = UGraphPrinterUtils::GetActiveGraphEditor();
 	if (!GraphEditor.IsValid())
 	{
-		const FText& Message = FText::FromString(TEXT("The graph editor isn't currently open."));
-		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(
+			LOCTEXT("NotFoundGraphEditorError", "The graph editor isn't currently open."),
+			FGraphPrinterCore::CS_Fail
+		);
 		return;
 	}
 
 	// Launch the file browser and select the png file.
-	FString FilePath;
+	FString Filename;
 	{
 		FString DefaultPath;
 		if (auto* Settings = GetDefault<UGraphPrinterSettings>())
 		{
-			DefaultPath = Settings->OutputDirectoryPath;
+			DefaultPath = Settings->OutputDirectory.Path;
 		}
 
-		TArray<FString> FilePaths;
+		TArray<FString> Filenames;
 		if (!FGraphPrinterCore::OpenFileDialog(
-			FilePaths,
+			Filenames,
 			TEXT("Select the png file that contains the node info"),
 			DefaultPath, TEXT(""),
 			TEXT("PNG Image (.png)|*.png"),
@@ -199,31 +213,35 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 			return;
 		}
 
-		if (!FilePaths.IsValidIndex(0))
+		if (!Filenames.IsValidIndex(0))
 		{
 			return;
 		}
 
-		FilePath = FPaths::ConvertRelativePathToFull(FilePaths[0]);
+		Filename = FPaths::ConvertRelativePathToFull(Filenames[0]);
 	}
 
 	// Restore node from png file.
-	if (FGraphPrinterCore::RestoreGraphFromPngFile(FilePath, GraphEditor))
+	if (FGraphPrinterCore::RestoreGraphFromPngFile(Filename, GraphEditor))
 	{
-		const FText& SuccessedMessage = FText::FromString(TEXT("Restore nodes from"));
 		FGraphPrinterCore::ShowNotification(
-			SuccessedMessage, FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
-			FText::FromString(FilePath),
-			FSimpleDelegate::CreateLambda([FilePath]()
+			LOCTEXT("SuccessedRestore", "Restore nodes from"),
+			FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
+			FText::FromString(Filename),
+			FSimpleDelegate::CreateLambda([Filename]()
 		{
-			FGraphPrinterCore::OpenFolderWithExplorer(FilePath);
+			FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 		}));
 	}
 	else
 	{
-		const FText& FailedMessage = FText::FromString(TEXT("Failed restore nodes."));
-		FGraphPrinterCore::ShowNotification(FailedMessage, FGraphPrinterCore::CS_Fail);
+		FGraphPrinterCore::ShowNotification(
+			LOCTEXT("FailedRestoreError", "Failed restore nodes."),
+			FGraphPrinterCore::CS_Fail
+		);
 	}
+#else
+	UE_LOG(LogGraphPrinter, Warning, TEXT("This function cannot be used because the function to embed node information in a png image is disabled.\nSee GraphPrinter.Build.cs to enable it."));
 #endif
 }
 
@@ -235,12 +253,12 @@ void UGraphPrinterUtils::OpenExportDestinationFolder()
 		return;
 	}
 
-	FGraphPrinterCore::OpenFolderWithExplorer(Settings->OutputDirectoryPath);
+	FGraphPrinterCore::OpenFolderWithExplorer(Settings->OutputDirectory.Path);
 }
 
-void UGraphPrinterUtils::OpenFolderWithExplorer(const FString& FilePath)
+void UGraphPrinterUtils::OpenFolderWithExplorer(const FString& Filename)
 {
-	FGraphPrinterCore::OpenFolderWithExplorer(FilePath);
+	FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 }
 
 TSharedPtr<SGraphEditor> UGraphPrinterUtils::GetActiveGraphEditor(TSharedPtr<SWindow> TargetWindow /* = nullptr */)
@@ -252,3 +270,5 @@ TSharedPtr<SGraphEditor> UGraphPrinterUtils::GetActiveGraphEditor(TSharedPtr<SWi
 	}
 	return FGraphPrinterCore::FindGraphEditor(ActiveWindow);
 }
+
+#undef LOCTEXT_NAMESPACE

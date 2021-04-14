@@ -23,6 +23,15 @@
 #endif
 
 /**
+ * Defines whether the ability to embed node information in text chunks is available
+ */
+#ifdef WITH_EMBED_NODE_INFO
+#define ENABLE_EMBED_NODE_INFO WITH_UNREALPNG
+#else
+#define ENABLE_EMBED_NODE_INFO 0
+#endif
+
+/**
  * Categories used for log output with this plugin.
  */
 GRAPHPRINTER_API DECLARE_LOG_CATEGORY_EXTERN(LogGraphPrinter, Log, All);

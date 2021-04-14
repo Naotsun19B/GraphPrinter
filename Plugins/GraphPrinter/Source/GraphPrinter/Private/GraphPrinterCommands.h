@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
+#include "GraphPrinterGlobals.h"
 
 class GRAPHPRINTER_API FGraphPrinterCommands : public TCommands<FGraphPrinterCommands>
 {
@@ -29,7 +30,7 @@ public:
 	// Instances of bound commands.
 	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
 	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
-#ifdef ENABLE_EMBED_NODE_INFO
+#if ENABLE_EMBED_NODE_INFO
 	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 #endif
 	TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;

@@ -54,7 +54,7 @@ public:
 
 	// Directory path where the image file is output.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
-	FString OutputDirectoryPath;
+	FDirectoryPath OutputDirectory;
 
 public:
 	// Register - unregister in the editor setting item.
