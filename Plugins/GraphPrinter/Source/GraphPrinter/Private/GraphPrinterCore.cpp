@@ -344,7 +344,6 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 	return PngTextChunkHelper->Write(MapToWrite);
 }
 
-#pragma optimize("", off)
 bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor)
 {
 	if (!GraphEditor.IsValid())
@@ -422,7 +421,6 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TShared
 
 	return true;
 }
-#pragma optimize("", on)
 
 bool FGraphPrinterCore::OpenFileDialog(
 	TArray<FString>& Filenames, 
