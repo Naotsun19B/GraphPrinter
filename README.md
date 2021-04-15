@@ -74,7 +74,7 @@ The items that can be set from the editor preferences are as follows.
   Added the function to embed node information in an image file and restore the node from the image file
 
 - (2021/03/08) v1.3   
-  Corrected the problem that the image output for the first time after starting the engine becomes whitish
+  ~~Corrected the problem that the image output for the first time after starting the engine becomes whitish~~
 
 - (2021/01/21) v1.2   
   Changed module type to EditorNoCommandlet as a countermeasure against errors when packaging
