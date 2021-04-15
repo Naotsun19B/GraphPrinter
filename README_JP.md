@@ -6,12 +6,13 @@
 
 このプラグインはUnreal Engineのグラフエディタ(BlueprintやMaterialなど...)を画像ファイルに出力するショートカットキーを追加します。
 また、下の画像の様にグラフエディタで表示していない部分も含めて画像ファイルに出力できます。
+さらに出力したpng形式の画像ファイルからノードを復元することもできます。  
 
 #### エディタ上での状態
 ![grapheditor](https://user-images.githubusercontent.com/51815450/101246223-50117000-3755-11eb-8966-5da5124d420e.PNG)
 
 #### 出力された画像
-![BP_Sky_Sphere-RefreshMaterial](https://user-images.githubusercontent.com/51815450/101246304-cd3ce500-3755-11eb-8c59-14a8158f73c5.png)
+![BP_Sky_Sphere-RefreshMaterial](https://user-images.githubusercontent.com/51815450/114880820-60d99d00-9e3d-11eb-92b6-e7ef5b6f4cc3.png)
 
 ## 動作環境
 
@@ -30,20 +31,22 @@
 |:---:|---|
 |Ctrl + F9|現在開いているグラフエディタのすべてのノードを含む画像を出力します。|
 |Ctrl + F10|現在開いているグラフエディタの選択中のノードを含む画像を出力します。|
+|Ctrl + F11|現在開いているグラフエディタに選択したpngファイルに含まれるノードを復元します。|
 |Ctrl + F12|エディタの環境設定で設定されている出力先のディレクトリを開きます。|
 
 また、ショートカットキーはエディタの環境設定のキーボードショートカットから変更できます。
 
-![keyconfig](https://user-images.githubusercontent.com/51815450/101246571-8b14a300-3757-11eb-992b-d803d5b01cf9.PNG)
+![keyconfig2](https://user-images.githubusercontent.com/51815450/114881766-43f19980-9e3e-11eb-9e71-da65bdfa5dbb.PNG)
 
 ## オプション
 
-![settings](https://user-images.githubusercontent.com/51815450/101246626-e5156880-3757-11eb-8cc6-b017afa3a331.PNG)
+![setting2](https://user-images.githubusercontent.com/51815450/114881742-3d632200-9e3e-11eb-8bab-5db67665dee5.PNG)
 
 エディタの環境設定から設定できる項目は以下の通りです。
 
 |**項目**|**説明**|
 |---|---|
+|Is Include Node Info in Image File|出力する画像ファイルにノードの情報を埋め込み、画像ファイルからノードを復元する機能をオンにします。この機能はpng形式のみサポートしています。|
 |Format|出力する画像の形式を設定します。対応している画像フォーマットは*png*、*jpeg*、*bmp*、*exr*です。|
 |Compression Quality|出力する画像の圧縮率を設定します。|
 |Filtering Mode|出力する際に使用するテクスチャのフィルタリングモードを設定します。|
@@ -62,8 +65,11 @@
 
 ## 履歴
 
+- (2021/04/15) v1.4   
+  ノード情報を画像ファイルに埋め込み、画像ファイルからノードを復元する機能を追加  
+
 - (2021/03/08) v1.3   
-  エンジンを起動して初めて出力する画像が白みがかる不具合の対処を行った
+  ~~エンジンを起動して初めて出力する画像が白みがかる不具合の対処を行った~~
 
 - (2021/01/21) v1.2   
   パッケージ化の際にエラーが発生する対策としてモジュールタイプをEditorNoCommandletに変更

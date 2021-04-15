@@ -6,12 +6,13 @@
 
 This plugin adds shortcut keys for printing the graph editor of Unreal Engine (blueprints, materials, etc.) to image files.
 As shown in the image below, you can also output the part that is not displayed in the graph editor to the image file.
+You can also restore the node from the output png format image file.  
 
 #### On the editor
 ![grapheditor](https://user-images.githubusercontent.com/51815450/101246223-50117000-3755-11eb-8966-5da5124d420e.PNG)
 
 #### Output image
-![BP_Sky_Sphere-RefreshMaterial](https://user-images.githubusercontent.com/51815450/101246304-cd3ce500-3755-11eb-8c59-14a8158f73c5.png)
+![BP_Sky_Sphere-RefreshMaterial](https://user-images.githubusercontent.com/51815450/114880820-60d99d00-9e3d-11eb-92b6-e7ef5b6f4cc3.png)
 
 ## Requirement
 
@@ -31,20 +32,22 @@ The default shortcut keys that correspond to the added functions are as follows.
 |:---:|---|
 |Ctrl + F9|Outputs an image containing all the nodes of the currently open graph editor.|
 |Ctrl + F10|Outputs an image containing the selected nodes in the currently open graph editor.|
+|Ctrl + F11|Restores the nodes contained in the selected png file in the currently open graph editor.|
 |Ctrl + F12|Open the output destination directory set in the editor preferences.|
 
 You can also change the shortcut keys from the keyboard shortcuts in the editor preferences.
 
-![keyconfig](https://user-images.githubusercontent.com/51815450/101246571-8b14a300-3757-11eb-992b-d803d5b01cf9.PNG)
+![keyconfig2](https://user-images.githubusercontent.com/51815450/114881766-43f19980-9e3e-11eb-9e71-da65bdfa5dbb.PNG)
 
 ## Settings
 
-![settings](https://user-images.githubusercontent.com/51815450/101246626-e5156880-3757-11eb-8cc6-b017afa3a331.PNG)
+![setting2](https://user-images.githubusercontent.com/51815450/114881742-3d632200-9e3e-11eb-8bab-5db67665dee5.PNG)
 
 The items that can be set from the editor preferences are as follows.
 
 |**Item**|**Description**|
 |---|---|
+|Is Include Node Info in Image File|Embed node information in the output image file and turn on the function to restore the node from the image file. This feature only supports png format.|
 |Format|Set the format of the output image. Supported image formats are *png*, *jpeg*, *bmp*, *exr*.|
 |Compression Quality|Set the compression rate of the output image.|
 |Filtering Mode|Sets the texture filtering mode used on output.|
@@ -63,6 +66,9 @@ The items that can be set from the editor preferences are as follows.
 [Naotsun](https://twitter.com/Naotsun_UE)
 
 ## History
+
+- (2021/04/15) v1.4   
+  Added the function to embed node information in an image file and restore the node from the image file
 
 - (2021/03/08) v1.3   
   Corrected the problem that the image output for the first time after starting the engine becomes whitish
