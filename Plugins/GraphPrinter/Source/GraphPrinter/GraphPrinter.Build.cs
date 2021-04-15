@@ -1,5 +1,6 @@
 // Copyright 2020 Naotsun. All Rights Reserved.
 
+using System.IO;
 using UnrealBuildTool;
 
 public class GraphPrinter : ModuleRules
@@ -38,6 +39,14 @@ public class GraphPrinter : ModuleRules
                 "AssetManagerEditor",
             }
 			);
+
+        // To use SGraphEditorImpl.
+        PublicIncludePaths.AddRange(
+            new string[]
+            {
+                Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
+            }
+            );
 
         if (bEnableEmbedNodeInfo)
 		{

@@ -1,36 +1,36 @@
-﻿{
-  "FileVersion": 3,
-  "Version": 1.4,
-  "VersionName": "1.4",
-  "FriendlyName": "GraphPrinter",
-  "Description": "It is a plug-in that adds a shortcut to output the graph editor to an image file.",
-  "Category": "Editor",
-  "CreatedBy": "Naotsun",
-  "CreatedByURL": "https://twitter.com/Naotsun_UE",
-  "DocsURL": "https://github.com/Naotsun19B/GraphPrinter",
-  "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/466303b6cd724968b3ee0a1a1b623f4b",
-  "SupportURL": "https://github.com/Naotsun19B/GraphPrinter",
-  "CanContainContent": false,
-  "IsBetaVersion": false,
-  "IsExperimentalVersion": false,
-  "Installed": true,
-  "Modules": [
-    {
-      "Name": "GraphPrinter",
-      "Type": "EditorNoCommandlet",
-      "LoadingPhase": "Default",
-      "WhitelistPlatforms": [
-        "Win64",
-        "Win32",
-        "Mac",
-        "Linux"
-      ]
-    }
-  ],
-  "Plugins": [
-    {
-      "Name": "AssetManagerEditor",
-      "Enabled": true
-    }
-  ]
+{
+	"FileVersion": 3,
+	"Version": 1.4,
+	"VersionName": "1.4",
+	"FriendlyName": "GraphPrinter",
+	"Description": "It is a plugin that adds a shortcut to output the graph editor to the image file and a shortcut to restore the node from the image file.",
+	"Category": "Editor",
+	"CreatedBy": "Naotsun",
+	"CreatedByURL": "https://twitter.com/Naotsun_UE",
+	"DocsURL": "https://github.com/Naotsun19B/GraphPrinter",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/466303b6cd724968b3ee0a1a1b623f4b",
+	"SupportURL": "https://github.com/Naotsun19B/GraphPrinter",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "GraphPrinter",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "AssetManagerEditor",
+			"Enabled": true
+		}
+	]
 }

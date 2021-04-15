@@ -12,6 +12,7 @@
 #include "Slate/WidgetRenderer.h"
 #include "Widgets/SWidget.h"
 #include "GraphEditor.h"
+#include "SGraphEditorImpl.h"
 #include "EdGraph/EdGraph.h"
 #include "EdGraphUtilities.h"
 #include "HAL/FileManager.h"
@@ -89,16 +90,15 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 
 void FGraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
 {
-	if (SearchTarget.IsValid())
+	check(SearchTarget.IsValid());
+
+	if (FChildren* Children = SearchTarget->GetChildren())
 	{
-		if (FChildren* Children = SearchTarget->GetChildren())
+		for (int32 Index = 0; Index < Children->Num(); Index++)
 		{
-			for (int32 Index = 0; Index < Children->Num(); Index++)
-			{
-				TSharedPtr<SWidget> ChildWidget = Children->GetChildAt(Index);
-				OutChildren.Add(ChildWidget);
-				CollectAllChildWidgets(ChildWidget, OutChildren);
-			}
+			TSharedPtr<SWidget> ChildWidget = Children->GetChildAt(Index);
+			OutChildren.Add(ChildWidget);
+			CollectAllChildWidgets(ChildWidget, OutChildren);
 		}
 	}
 }
@@ -110,7 +110,7 @@ TSharedPtr<SGraphEditor> FGraphPrinterCore::FindGraphEditor(TSharedPtr<SWidget> 
 
 	for (const auto& ChildWidget : ChildWidgets)
 	{
-		TSharedPtr<SGraphEditor> GraphEditor = CAST_SLATE_WIDGET(SGraphEditor, ChildWidget);
+		TSharedPtr<SGraphEditor> GraphEditor = CAST_SLATE_WIDGET(SGraphEditorImpl, ChildWidget);
 		if (GraphEditor.IsValid())
 		{
 			return GraphEditor;
@@ -127,6 +127,8 @@ UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(
 	TextureFilter Filter
 )
 {
+	check(WidgetToRender.IsValid());
+
 	FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(bUseGamma, false);
 	if (WidgetRenderer == nullptr)
 	{
@@ -206,10 +208,7 @@ bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(
 	float Padding
 )
 {
-	if (!GraphEditor.IsValid())
-	{
-		return false;
-	}
+	check(GraphEditor.IsValid());
 
 #if BEFORE_UE_4_23
 	// Special support is implemented because SGraphEditor::GetNumberOfSelectedNodes before UE4.23 always returns 0.
@@ -238,21 +237,20 @@ bool FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(
 
 FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 {
-	if (GraphEditor.IsValid())
+	check(GraphEditor.IsValid());
+
+	if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
 	{
-		if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
-		{
-			// The reference viewer replaces the name because there is no outer object.
+		// The reference viewer replaces the name because there is no outer object.
 #if !BEFORE_UE_4_21
-			if (auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
-			{
-				return TEXT("ReferenceViewer");
-			}
+		if (auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
+		{
+			return TEXT("ReferenceViewer");
+		}
 #endif
-			if (UObject* Outer = Graph->GetOuter())
-			{
-				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
-			}
+		if (UObject* Outer = Graph->GetOuter())
+		{
+			return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
 		}
 	}
 
@@ -302,10 +300,7 @@ void FGraphPrinterCore::OpenFolderWithExplorer(const FString& Filename)
 #if ENABLE_EMBED_NODE_INFO
 bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor, const FGraphPanelSelectionSet& NodesToExport)
 {
-	if (!GraphEditor.IsValid())
-	{
-		return false;
-	}
+	check(GraphEditor.IsValid());
 
 	// Make a shortcut key event for copy operation.
 	FKeyEvent KeyEvent;
@@ -319,7 +314,9 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 	FPlatformApplicationMisc::ClipboardPaste(CurrentClipboard);
 
 	// Get information about the selected node via the clipboard.
-	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
+	// Using "FSlateApplication::ProcessKeyDownEvent" seems to be a legitimate access, 
+	// but using that may not work outside the main window, so call the graph editor keydown event directly.
+	const FReply& Reply = GraphEditor->OnKeyDown(GraphEditor->GetTickSpaceGeometry(), KeyEvent);
 
 	FString ExportedText;
 	FPlatformApplicationMisc::ClipboardPaste(ExportedText);
@@ -327,7 +324,7 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 	// Restore the saved clipboard data.
 	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
 
-	if (!bWasSucceedKeyDown || !FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
+	if (!Reply.IsEventHandled() || !FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
 	{
 		return false;
 	}
@@ -346,10 +343,7 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 
 bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TSharedPtr<SGraphEditor> GraphEditor)
 {
-	if (!GraphEditor.IsValid())
-	{
-		return false;
-	}
+	check(GraphEditor.IsValid());
 
 	// Read data from png file using helper class.
 	TMap<FString, FString> MapToRead;
@@ -414,12 +408,15 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TShared
 
 	// Import node information from png image via clipboard.
 	FPlatformApplicationMisc::ClipboardCopy(*TextToImport);
-	bool bWasSucceedKeyDown = FSlateApplication::Get().ProcessKeyDownEvent(KeyEvent);
+
+	// Using "FSlateApplication::ProcessKeyDownEvent" seems to be a legitimate access, 
+	// but using that may not work outside the main window, so call the graph editor keydown event directly.
+	const FReply& Reply = GraphEditor->OnKeyDown(GraphEditor->GetTickSpaceGeometry(), KeyEvent);
 
 	// Restore the saved clipboard data.
 	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);
 
-	return true;
+	return Reply.IsEventHandled();
 }
 
 bool FGraphPrinterCore::OpenFileDialog(
@@ -471,10 +468,8 @@ bool FGraphPrinterCore::OpenFileDialog(
 
 bool FGraphPrinterCore::GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommandInfo>& UICommandInfo, FKeyEvent& OutKeyEvent)
 {
-	if (!UICommandInfo.IsValid())
-	{
-		return false;
-	}
+	check(UICommandInfo.IsValid());
+	
 	const TSharedRef<const FInputChord>& Chord = UICommandInfo->GetFirstValidChord();
 
 	FModifierKeysState ModifierKeys(

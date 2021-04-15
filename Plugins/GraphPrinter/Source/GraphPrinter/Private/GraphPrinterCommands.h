@@ -6,6 +6,9 @@
 #include "Framework/Commands/Commands.h"
 #include "GraphPrinterGlobals.h"
 
+/**
+ * Class to register the shortcut key used in this plugin.
+ */
 class GRAPHPRINTER_API FGraphPrinterCommands : public TCommands<FGraphPrinterCommands>
 {
 public:
