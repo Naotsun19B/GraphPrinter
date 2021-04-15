@@ -316,7 +316,11 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 	// Get information about the selected node via the clipboard.
 	// Using "FSlateApplication::ProcessKeyDownEvent" seems to be a legitimate access, 
 	// but using that may not work outside the main window, so call the graph editor keydown event directly.
+#if BEFORE_UE_4_23
+	const FReply& Reply = GraphEditor->OnKeyDown(GraphEditor->GetCachedGeometry(), KeyEvent);
+#else
 	const FReply& Reply = GraphEditor->OnKeyDown(GraphEditor->GetTickSpaceGeometry(), KeyEvent);
+#endif
 
 	FString ExportedText;
 	FPlatformApplicationMisc::ClipboardPaste(ExportedText);
@@ -411,7 +415,11 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TShared
 
 	// Using "FSlateApplication::ProcessKeyDownEvent" seems to be a legitimate access, 
 	// but using that may not work outside the main window, so call the graph editor keydown event directly.
+#if BEFORE_UE_4_23
+	const FReply& Reply = GraphEditor->OnKeyDown(GraphEditor->GetCachedGeometry(), KeyEvent);
+#else
 	const FReply& Reply = GraphEditor->OnKeyDown(GraphEditor->GetTickSpaceGeometry(), KeyEvent);
+#endif
 
 	// Restore the saved clipboard data.
 	FPlatformApplicationMisc::ClipboardCopy(*CurrentClipboard);

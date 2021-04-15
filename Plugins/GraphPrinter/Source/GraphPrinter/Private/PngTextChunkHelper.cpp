@@ -169,8 +169,8 @@ namespace PngTextChunkHelperInternal
 		return bIsValid;
 	}
 
-	// Converts a string in the state of TArray64<uint8> to FString.
-	FString ConvertByteArrayToString(const TArray64<uint8>& ByteArray)
+	// Converts a string in the state of TArray<uint8> to FString.
+	FString ConvertByteArrayToString(const TArray<uint8>& ByteArray)
 	{
 		FString ConvertedString = TEXT("");
 		for (const auto& Byte : ByteArray)
@@ -185,7 +185,7 @@ namespace PngTextChunkHelperInternal
 
 	// Gets the position of the next text chunk closest to the StartPosition.
 	// If not found, INDEX_NONE is returned.
-	int32 GetTextChunkPosition(const TArray64<uint8>& CompressedData, int32 StartPosition = 0)
+	int32 GetTextChunkPosition(const TArray<uint8>& CompressedData, int32 StartPosition = 0)
 	{
 		int32 FoundPosition = INDEX_NONE;
 		const int32 ChunkNameLength = TextChunkName.Len();
@@ -407,7 +407,7 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 	}
 
 	// Since there are as many text chunks as there are NumText, split the data by \0 by the amount of NumText.
-	TArray<TArray64<uint8>> SplitedTextChunks;
+	TArray<TArray<uint8>> SplitedTextChunks;
 	int32 SearchStartPosition = 0;
 	for (int32 Count = 0; Count < NumText; Count++)
 	{
@@ -426,7 +426,7 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 				SectionEnd = Index - 1;
 				if (SectionEnd - SectionStart > 0)
 				{
-					TArray64<uint8> SplitedTextChunk;
+					TArray<uint8> SplitedTextChunk;
 					for (int32 CopyIndex = SectionStart; CopyIndex <= SectionEnd; CopyIndex++)
 					{
 						SplitedTextChunk.Add(CompressedData[CopyIndex]);

@@ -64,7 +64,7 @@ protected:
 	FString Filename;
 
 	// Arrays of compressed data.
-	TArray64<uint8> CompressedData;
+	TArray<uint8> CompressedData;
 
 	// The read offset into our array.
 	int64 ReadOffset;
