@@ -8,11 +8,14 @@
 また、下の画像の様にグラフエディタで表示していない部分も含めて画像ファイルに出力できます。
 さらに出力したpng形式の画像ファイルからノードを復元することもできます。  
 
-#### エディタ上での状態
+#### エディタ上での状態  
 ![grapheditor](https://user-images.githubusercontent.com/51815450/101246223-50117000-3755-11eb-8966-5da5124d420e.PNG)
 
-#### 出力された画像
+#### 出力された画像  
 ![BP_Sky_Sphere-RefreshMaterial](https://user-images.githubusercontent.com/51815450/114880820-60d99d00-9e3d-11eb-92b6-e7ef5b6f4cc3.png)
+
+#### ノードの復元  
+![restore](https://user-images.githubusercontent.com/51815450/114888626-61c1fd00-9e44-11eb-96e8-602753fa40bd.gif)
 
 ## 動作環境
 
