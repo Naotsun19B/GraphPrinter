@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Naotsun. All Rights Reserved.
+﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterUtils.h"
 #include "GraphPrinterGlobals.h"

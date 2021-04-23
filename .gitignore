@@ -1,7 +1,10 @@
-# Visual Studio 2015 user specific files
+# Visual Studio user specific files
 .vs/
 
-# Visual Studio 2015 database file
+# Rider for Unreal Engine user specific files
+.idea/
+
+# Visual Studio database file
 *.VC.db
 
 # Compiled Object files

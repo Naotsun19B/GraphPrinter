@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Naotsun. All Rights Reserved.
+﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterCore.h"
 #include "GraphPrinterGlobals.h"
@@ -6,7 +6,6 @@
 #include "PngTextChunkHelper.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
-#include "GenericPlatform/GenericPlatformProcess.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Slate/WidgetRenderer.h"
