@@ -42,12 +42,12 @@ void FGraphPrinterCommands::Bind()
 
 void FGraphPrinterCommands::BindCommands()
 {
-	if (!FGraphPrinterCommands::IsRegistered())
+	if (!IsRegistered())
 	{
 		UE_LOG(LogGraphPrinter, Fatal, TEXT("Bound before UI Command was registered.\nPlease be sure to bind after registration."));
 	}
 
-	if (FGraphPrinterCommands::IsBound())
+	if (IsBound())
 	{
 		UE_LOG(LogGraphPrinter, Warning, TEXT("The binding process has already been completed."));
 	}
@@ -58,24 +58,24 @@ void FGraphPrinterCommands::BindCommands()
 
 	// Bind command here.
 	CommandBindings->MapAction(
-		FGraphPrinterCommands::Get().PrintGraphWithAllNodes,
+		PrintGraphWithAllNodes,
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraphWithAllNodes)
 	);
 
 	CommandBindings->MapAction(
-		FGraphPrinterCommands::Get().PrintGraphWithSelectedNodes,
+		PrintGraphWithSelectedNodes,
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraphWithSelectedNodes)
 	);
 
 #if ENABLE_EMBED_NODE_INFO
 	CommandBindings->MapAction(
-		FGraphPrinterCommands::Get().RestoreNodesFromPngFile,
+		RestoreNodesFromPngFile,
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::RestoreNodesFromPngFile)
 	);
 #endif
 
 	CommandBindings->MapAction(
-		FGraphPrinterCommands::Get().OpenExportDestinationFolder,
+		OpenExportDestinationFolder,
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::OpenExportDestinationFolder)
 	);
 }

@@ -226,15 +226,15 @@ FPngTextChunkHelper::~FPngTextChunkHelper()
 
 TSharedPtr<FPngTextChunkHelper> FPngTextChunkHelper::CreatePngTextChunkHelper(const FString& InFilename)
 {
-	TArray<uint8> CompressdData;
-	if (!FFileHelper::LoadFileToArray(CompressdData, *InFilename))
+	TArray<uint8> CompressedData;
+	if (!FFileHelper::LoadFileToArray(CompressedData, *InFilename))
 	{
 		UE_LOG(LogGraphPrinter, Error, TEXT("Failed to load the file : %s"), *InFilename);
 		return nullptr;
 	}
 
 	TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = MakeShared<FPngTextChunkHelper>();
-	if (!PngTextChunkHelper->Initialize(InFilename, CompressdData.GetData(), CompressdData.Num()))
+	if (!PngTextChunkHelper->Initialize(InFilename, CompressedData.GetData(), CompressedData.Num()))
 	{
 		return nullptr;
 	}
@@ -407,7 +407,7 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 	}
 
 	// Since there are as many text chunks as there are NumText, split the data by \0 by the amount of NumText.
-	TArray<TArray<uint8>> SplitedTextChunks;
+	TArray<TArray<uint8>> SplitTextChunks;
 	int32 SearchStartPosition = 0;
 	for (int32 Count = 0; Count < NumText; Count++)
 	{
@@ -426,18 +426,18 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 				SectionEnd = Index - 1;
 				if (SectionEnd - SectionStart > 0)
 				{
-					TArray<uint8> SplitedTextChunk;
+					TArray<uint8> SplitTextChunk;
 					for (int32 CopyIndex = SectionStart; CopyIndex <= SectionEnd; CopyIndex++)
 					{
-						SplitedTextChunk.Add(CompressedData[CopyIndex]);
+						SplitTextChunk.Add(CompressedData[CopyIndex]);
 					}
-					SplitedTextChunks.Add(SplitedTextChunk);
+					SplitTextChunks.Add(SplitTextChunk);
 				}
 
 				SectionStart = Index + 1;
 			}
 
-			if (SplitedTextChunks.Num() == (Count + 1) * 2)
+			if (SplitTextChunks.Num() == (Count + 1) * 2)
 			{
 				break;
 			}
@@ -447,22 +447,22 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 	}
 
 	// Fail if the number of carved data is not the number of NumText x2.
-	if (SplitedTextChunks.Num() != NumText * 2)
+	if (SplitTextChunks.Num() != NumText * 2)
 	{
 		UE_LOG(LogGraphPrinter, Error, TEXT("------ The text could not be read correctly ------"));
 		UE_LOG(LogGraphPrinter, Error, TEXT("Number of texts retrieved from the library : %d"), NumText * 2);
-		UE_LOG(LogGraphPrinter, Error, TEXT("Number of texts actually retrieved         : %d"), SplitedTextChunks.Num());
+		UE_LOG(LogGraphPrinter, Error, TEXT("Number of texts actually retrieved         : %d"), SplitTextChunks.Num());
 		UE_LOG(LogGraphPrinter, Error, TEXT("--------------------------------------------------"));
 		return false;
 	}
 
 	// Convert from a byte array to a string map.
-	for (int32 Index = 0; Index < SplitedTextChunks.Num(); Index += 2)
+	for (int32 Index = 0; Index < SplitTextChunks.Num(); Index += 2)
 	{
-		check(SplitedTextChunks.IsValidIndex(Index) && SplitedTextChunks.IsValidIndex(Index + 1));
+		check(SplitTextChunks.IsValidIndex(Index) && SplitTextChunks.IsValidIndex(Index + 1));
 
-		const FString& Key = PngTextChunkHelperInternal::ConvertByteArrayToString(SplitedTextChunks[Index]);
-		const FString& Value = PngTextChunkHelperInternal::ConvertByteArrayToString(SplitedTextChunks[Index + 1]);
+		const FString& Key = PngTextChunkHelperInternal::ConvertByteArrayToString(SplitTextChunks[Index]);
+		const FString& Value = PngTextChunkHelperInternal::ConvertByteArrayToString(SplitTextChunks[Index + 1]);
 
 		MapToRead.Add(Key, Value);
 	}
@@ -505,7 +505,7 @@ bool FPngTextChunkHelper::IsPng() const
 
 void FPngTextChunkHelper::UserReadCompressed(png_structp PngPtr, png_bytep Data, png_size_t Length)
 {
-	FPngTextChunkHelper* Context = reinterpret_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
+	FPngTextChunkHelper* Context = static_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
 	if (Context == nullptr)
 	{
 		UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserReadCompressed));
@@ -524,13 +524,13 @@ void FPngTextChunkHelper::UserReadCompressed(png_structp PngPtr, png_bytep Data,
 
 void FPngTextChunkHelper::UserWriteCompressed(png_structp PngPtr, png_bytep Data, png_size_t Length)
 {
-	FPngTextChunkHelper* Context = reinterpret_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
+	FPngTextChunkHelper* Context = static_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
 	if (Context == nullptr)
 	{
 		UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserWriteCompressed));
 	}
 
-	int64 Offset = Context->CompressedData.AddUninitialized(Length);
+	const int64 Offset = Context->CompressedData.AddUninitialized(Length);
 	FMemory::Memcpy(&Context->CompressedData[Offset], Data, Length);
 }
 
