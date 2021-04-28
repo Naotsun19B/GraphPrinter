@@ -176,6 +176,20 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 
 	// Export the render target in the specified file format.
 	UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, Options.ImageWriteOptions);
+
+	// As a symptomatic treatment for the problem that the first image output after startup is
+	// whitish, it is output twice only for the first time.
+	if ([]
+	{
+		static TAtomic<bool> bIsFirstTime = true;
+		return bIsFirstTime.Exchange(false);
+	}())
+	{
+		FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
+		ImageWriteOptions.bOverwriteFile = true;
+		ImageWriteOptions.NativeOnComplete = nullptr;
+		UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, ImageWriteOptions);
+	}
 }
 
 void UGraphPrinterUtils::RestoreNodesFromPngFile()
