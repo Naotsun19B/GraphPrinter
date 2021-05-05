@@ -70,6 +70,9 @@ The items that can be set from the editor preferences are as follows.
 
 ## History
 
+- (2021/05/05) v1.5   
+  Corrected the problem that the image output for the first time after starting the engine becomes whitish
+
 - (2021/04/15) v1.4   
   Added the function to embed node information in an image file and restore the node from the image file
 
