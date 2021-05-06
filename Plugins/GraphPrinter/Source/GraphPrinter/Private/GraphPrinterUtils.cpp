@@ -179,16 +179,14 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 
 	// As a symptomatic treatment for the problem that the first image output after startup is
 	// whitish, it is output twice only for the first time.
-	if ([]
-	{
-		static TAtomic<bool> bIsFirstTime = true;
-		return bIsFirstTime.Exchange(false);
-	}())
+	static bool bDoOnce = true;
+	if (bDoOnce)
 	{
 		FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
 		ImageWriteOptions.bOverwriteFile = true;
 		ImageWriteOptions.NativeOnComplete = nullptr;
 		UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, ImageWriteOptions);
+		bDoOnce = false;
 	}
 }
 
