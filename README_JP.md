@@ -24,7 +24,8 @@
 
 ## インストール
 
-プロジェクトのPluginsフォルダにPlugins/GraphPrinterフォルダを入れてください。
+プロジェクトのPluginsフォルダにPlugins/GraphPrinterフォルダを入れてください。  
+または、[マーケットプレイス](https://www.unrealengine.com/marketplace/en/product/graph-printer)からインストールしてください。
 
 ## 使い方
 
