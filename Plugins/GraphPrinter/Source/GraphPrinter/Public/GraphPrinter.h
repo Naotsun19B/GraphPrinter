@@ -18,7 +18,7 @@ MONOLITHIC_HEADER_BOILERPLATE()
 *****************************************************************************/
 
 #include "GraphPrinterGlobals.h"
-#include "GrapnPrinterTypes.h"
+#include "GraphPrinterTypes.h"
 #include "GraphPrinterCommands.h"
 #include "GraphPrinterCore.h"
 #include "GraphPrinterUtils.h"

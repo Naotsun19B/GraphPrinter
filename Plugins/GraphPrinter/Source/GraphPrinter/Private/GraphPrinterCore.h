@@ -12,6 +12,7 @@ class SNotificationItem;
 class UTexture;
 class UTextureRenderTarget2D;
 struct FImageWriteOptions;
+typedef TSet<class UObject*> FGraphPanelSelectionSet;
 enum class EDesiredImageFormat : uint8;
 
 /**
