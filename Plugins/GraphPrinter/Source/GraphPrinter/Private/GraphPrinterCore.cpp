@@ -6,6 +6,7 @@
 #include "PngTextChunkHelper.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Slate/WidgetRenderer.h"
