@@ -70,6 +70,9 @@ The items that can be set from the editor preferences are as follows.
 
 ## History
 
+- (2021/05/28) v1.6   
+  Changed so that the asset name is included in the file name when the reference viewer is output
+
 - (2021/05/05) v1.5   
   Corrected the problem that the image output for the first time after starting the engine becomes whitish
 
