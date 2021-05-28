@@ -25,7 +25,7 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
-namespace GraphPrinterCoreDefine
+namespace GraphPrinterCoreInternal
 {
 	// Number of attempts to draw the widget on the render target.
 	// The drawing result may be corrupted once.
@@ -37,7 +37,29 @@ namespace GraphPrinterCoreDefine
 
 	// The beginning of the node information.
 	static const FString NodeInfoHeader = TEXT("Begin Object");
+
+	/**
+	 * Cast function for classes that inherit from SWidget.
+	 */
+	template<class To, class From>
+	TSharedPtr<To> CastSlateWidget(TSharedPtr<From> FromPtr, const FName& ToClassName)
+	{
+		static_assert(TIsDerivedFrom<From, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
+		static_assert(TIsDerivedFrom<To, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
+
+		if (FromPtr.IsValid())
+		{
+			if (FromPtr->GetType() == ToClassName)
+			{
+				return StaticCastSharedPtr<To>(FromPtr);
+			}
+		}
+
+		return nullptr;
+	}
 }
+
+#define CAST_SLATE_WIDGET(ToClass, FromPtr) GraphPrinterCoreInternal::CastSlateWidget<ToClass>(FromPtr, #ToClass)
 
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
@@ -47,9 +69,7 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 	const FText& NotificationText, 
 	TCompletionState CompletionState, 
 	float ExpireDuration /* = 4.f */,
-	ENotificationInteraction InteractionType /* = ENotificationInteraction::None */,
-	const FText& InteractionText /* = FText()*/,
-	FSimpleDelegate InteractionCallback /* = nullptr*/
+	const TArray<FNotificationInteraction>& Interactions /* = TArray<FNotificationInteraction>() */
 )
 {
 	FNotificationInfo NotificationInfo(NotificationText);
@@ -60,24 +80,28 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 	}
 	NotificationInfo.bUseLargeFont = true;
 
-	auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
-	switch (InteractionType)
-	{
-	case ENotificationInteraction::Hyperlink:
-	{
-		NotificationInfo.HyperlinkText = InteractionText;
-		NotificationInfo.Hyperlink = InteractionCallback;
-		break;
-	}
-	case ENotificationInteraction::Button:
-	{
-		FNotificationButtonInfo ButtonInfo(InteractionText, FText(), InteractionCallback, StateEnum);
-		NotificationInfo.ButtonDetails.Add(ButtonInfo);
-		break;
-	}
-	default: break;
-	}
+	const auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
 
+	for (const auto& Interaction : Interactions)
+	{
+		switch (Interaction.Type)
+		{
+		case FNotificationInteraction::EInteractionType::Hyperlink:
+		{
+			NotificationInfo.HyperlinkText = Interaction.Text;
+			NotificationInfo.Hyperlink = Interaction.Callback;
+			break;
+		}
+		case FNotificationInteraction::EInteractionType::Button:
+		{
+			const FNotificationButtonInfo ButtonInfo(Interaction.Text, Interaction.Tooltip, Interaction.Callback, StateEnum);
+			NotificationInfo.ButtonDetails.Add(ButtonInfo);
+			break;
+		}
+		default: break;
+		}
+	}
+	
 	TSharedPtr<SNotificationItem> NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
 	if (NotificationItem.IsValid())
 	{
@@ -148,7 +172,7 @@ UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(
 	}
 
 	// Since the drawing result may be corrupted the first time, draw multiple times.
-	for (int32 Count = 0; Count < GraphPrinterCoreDefine::DrawTimes; Count++)
+	for (int32 Count = 0; Count < GraphPrinterCoreInternal::DrawTimes; Count++)
 	{
 		WidgetRenderer->DrawWidget(RenderTarget, WidgetToRender.ToSharedRef(), DrawSize, 0.f, false);
 		FlushRenderingCommands();
@@ -162,7 +186,7 @@ UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(
 FString FGraphPrinterCore::CreateFilename(TSharedPtr<SGraphEditor> GraphEditor, const FPrintGraphOptions& Options)
 {
 	FString Filename = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(Options.OutputDirectoryPath, FGraphPrinterCore::GetGraphTitle(GraphEditor))
+		FPaths::Combine(Options.OutputDirectoryPath, GetGraphTitle(GraphEditor))
 	);
 	const FString& Extension = GetImageFileExtension(Options.ImageWriteOptions.Format);
 
@@ -240,10 +264,16 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 
 	if (UEdGraph* Graph = GraphEditor->GetCurrentGraph())
 	{
-		// The reference viewer replaces the name because there is no outer object.
 #if !BEFORE_UE_4_21
+		// The reference viewer replaces the name because there is no outer object.
 		if (auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
 		{
+			const TArray<FAssetIdentifier>& Assets = ReferenceViewer->GetCurrentGraphRootIdentifiers();
+			if (Assets.IsValidIndex(0))
+			{
+				return FString::Printf(TEXT("ReferenceViewer_%s"), *FPaths::GetBaseFilename(Assets[0].PackageName.ToString()));
+			}
+			
 			return TEXT("ReferenceViewer");
 		}
 #endif
@@ -268,9 +298,9 @@ FString FGraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat
 	if (UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 	{
 		const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
-		FString UnuseString;
+		FString UnusedString;
 		FString Extension;
-		if (EnumString.Split(TEXT("::"), &UnuseString, &Extension))
+		if (EnumString.Split(TEXT("::"), &UnusedString, &Extension))
 		{
 			Extension = Extension.ToLower();
 			return FString::Printf(TEXT(".%s"), *Extension);
@@ -334,7 +364,7 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 
 	// Write data to png file using helper class.
 	TMap<FString, FString> MapToWrite;
-	MapToWrite.Add(GraphPrinterCoreDefine::PngTextChunkKey, ExportedText);
+	MapToWrite.Add(GraphPrinterCoreInternal::PngTextChunkKey, ExportedText);
 	
 	TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
 	if (!PngTextChunkHelper.IsValid())
@@ -361,22 +391,22 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TShared
 	}
 
 	// Find information on valid nodes.
-	if (!MapToRead.Contains(GraphPrinterCoreDefine::PngTextChunkKey))
+	if (!MapToRead.Contains(GraphPrinterCoreInternal::PngTextChunkKey))
 	{
 		return false;
 	}
-	FString TextToImport = MapToRead[GraphPrinterCoreDefine::PngTextChunkKey];
+	FString TextToImport = MapToRead[GraphPrinterCoreInternal::PngTextChunkKey];
 
 	// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
 	int32 StartPosition = 0;
 	const int32 TextLength = TextToImport.Len();
-	const int32 HeaderLength = GraphPrinterCoreDefine::NodeInfoHeader.Len();
+	const int32 HeaderLength = GraphPrinterCoreInternal::NodeInfoHeader.Len();
 	for (int32 Index = 0; Index < TextLength - HeaderLength; Index++)
 	{
 		bool bIsMatch = true;
 		for (int32 Offset = 0; Offset < HeaderLength; Offset++)
 		{
-			if (TextToImport[Index + Offset] != GraphPrinterCoreDefine::NodeInfoHeader[Offset])
+			if (TextToImport[Index + Offset] != GraphPrinterCoreInternal::NodeInfoHeader[Offset])
 			{
 				bIsMatch = false;
 			}
@@ -443,7 +473,7 @@ bool FGraphPrinterCore::OpenFileDialog(
 
 	if (MainWindow.IsValid())
 	{
-		TSharedPtr<FGenericWindow> NativeWindow = MainWindow->GetNativeWindow();
+		const TSharedPtr<FGenericWindow> NativeWindow = MainWindow->GetNativeWindow();
 		if (NativeWindow.IsValid())
 		{
 			WindowHandle = NativeWindow->GetOSWindowHandle();
@@ -479,7 +509,7 @@ bool FGraphPrinterCore::GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommand
 	
 	const TSharedRef<const FInputChord>& Chord = UICommandInfo->GetFirstValidChord();
 
-	FModifierKeysState ModifierKeys(
+	const FModifierKeysState ModifierKeys(
 		Chord->bShift, Chord->bShift,
 		Chord->bCtrl, Chord->bCtrl,
 		Chord->bAlt, Chord->bAlt,
@@ -489,13 +519,15 @@ bool FGraphPrinterCore::GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommand
 	const uint32* CharacterCodePtr;
 	const uint32* KeyCodePtr;
 	FInputKeyManager::Get().GetCodesFromKey(Chord->Key, CharacterCodePtr, KeyCodePtr);
-	uint32 CharacterCode = (CharacterCodePtr != nullptr ? *CharacterCodePtr : 0);
-	uint32 KeyCode = (KeyCodePtr != nullptr ? *KeyCodePtr : 0);
-	FKeyEvent KeyEvent(Chord->Key, ModifierKeys, FSlateApplication::Get().GetUserIndexForKeyboard(), false, CharacterCode, KeyCode);
+	const uint32 CharacterCode = (CharacterCodePtr != nullptr ? *CharacterCodePtr : 0);
+	const uint32 KeyCode = (KeyCodePtr != nullptr ? *KeyCodePtr : 0);
+	const FKeyEvent KeyEvent(Chord->Key, ModifierKeys, FSlateApplication::Get().GetUserIndexForKeyboard(), false, CharacterCode, KeyCode);
 	OutKeyEvent = KeyEvent;
 
 	return true;
 }
 #endif
+
+#undef CAST_SLATE_WIDGET
 
 #undef LOCTEXT_NAMESPACE

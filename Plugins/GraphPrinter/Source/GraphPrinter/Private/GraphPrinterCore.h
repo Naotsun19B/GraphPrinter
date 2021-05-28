@@ -27,15 +27,50 @@ public:
 	static const TCompletionState CS_Success;
 	static const TCompletionState CS_Fail;
 
+	// A structure for adding buttons, hyperlinks, etc. to notifications.
+	struct FNotificationInteraction
+	{
+	public:
+		// Types of things that users of editor notifications can interact with.
+		enum class EInteractionType : uint8 
+		{
+			Hyperlink,
+			Button,
+		};
+		EInteractionType Type;
+
+		// The text displayed by the button or hyperlink.
+		FText Text;
+
+		// Tooltip text that appears when you hover over a button.
+		FText Tooltip;
+
+		// A callback that is called when a button or hyperlink is pressed.
+		FSimpleDelegate Callback;
+
+	public:
+		// Constructor.
+		FNotificationInteraction(
+			EInteractionType InType,
+			const FText& InText,
+			const FText& InTooltip,
+			const FSimpleDelegate& InCallback
+		)
+			: Type(InType), Text(InText), Tooltip(InTooltip), Callback(InCallback)
+		{
+		}
+		FNotificationInteraction() : FNotificationInteraction(EInteractionType::Hyperlink, FText(), FText(), nullptr) {}
+		FNotificationInteraction(const FText& InText, const FSimpleDelegate& InCallback) : FNotificationInteraction(EInteractionType::Hyperlink, InText, FText(), InCallback) {}
+		FNotificationInteraction(const FText& InText, const FText& InTooltip, const FSimpleDelegate& InCallback) : FNotificationInteraction(EInteractionType::Button, InText, InTooltip, InCallback) {}
+	};
+	
 public:
 	// Show notifications at the bottom right of the editor (When Expire Duration is 0 or less, you need to call the fade process manually.).
 	static TSharedPtr<SNotificationItem> ShowNotification(
 		const FText& NotificationText, 
 		TCompletionState CompletionState, 
 		float ExpireDuration = 4.f, 
-		ENotificationInteraction InteractionType = ENotificationInteraction::None,
-		const FText& InteractionText = FText(),
-		FSimpleDelegate InteractionCallback = nullptr
+		const TArray<FNotificationInteraction>& Interactions = TArray<FNotificationInteraction>()
 	);
 
 	// Recursively collect all child widgets of the specified widget.
@@ -94,27 +129,3 @@ public:
 	static bool GetKeyEventFromUICommandInfo(const TSharedPtr<FUICommandInfo>& UICommandInfo, FKeyEvent& OutKeyEvent);
 #endif
 };
-
-/**
- * Cast function for classes that inherit from SWidget.
- */
-namespace CastSlateWidgetPrivate
-{
-	template<class To, class From>
-	TSharedPtr<To> CastSlateWidget(TSharedPtr<From> FromPtr, const FName& ToClassName)
-	{
-		static_assert(TIsDerivedFrom<From, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
-		static_assert(TIsDerivedFrom<To, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
-
-		if (FromPtr.IsValid())
-		{
-			if (FromPtr->GetType() == ToClassName)
-			{
-				return StaticCastSharedPtr<To>(FromPtr);
-			}
-		}
-
-		return nullptr;
-	}
-}
-#define CAST_SLATE_WIDGET(ToClass, FromPtr) CastSlateWidgetPrivate::CastSlateWidget<ToClass>(FromPtr, #ToClass)

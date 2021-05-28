@@ -10,6 +10,13 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
+namespace GraphPrinterUtilsInternal
+{
+	// The number of times to re-output as a countermeasure against the whitish image
+	// that is output for the first time after starting the engine.
+	static const int32 NumberOfReOutputWhenFirstTime = 2;
+}
+
 void UGraphPrinterUtils::PrintGraphWithAllNodes()
 {
 	PrintGraphFromEditorSettings(false);
@@ -144,12 +151,17 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		{
 			FGraphPrinterCore::ShowNotification(
 				LOCTEXT("SuccessedOutput", "GraphEditor capture saved as"),
-				FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
-				FText::FromString(Filename),
-				FSimpleDelegate::CreateLambda([Filename]()
-			{
-				FGraphPrinterCore::OpenFolderWithExplorer(Filename);
-			}));
+				FGraphPrinterCore::CS_Success, 5.f,
+				TArray<FGraphPrinterCore::FNotificationInteraction>{
+					FGraphPrinterCore::FNotificationInteraction(
+						FText::FromString(Filename),
+						FSimpleDelegate::CreateLambda([Filename]()
+						{
+							FGraphPrinterCore::OpenFolderWithExplorer(Filename);
+						})
+					)
+				}
+			);
 
 #if ENABLE_EMBED_NODE_INFO
 			// Embed node information in the output png image.
@@ -177,16 +189,19 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	// Export the render target in the specified file format.
 	UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, Options.ImageWriteOptions);
 
-	// As a symptomatic treatment for the problem that the first image output after startup is
-	// whitish, it is output twice only for the first time.
+	// As a symptomatic treatment for the problem that the first image output after startup is whitish,
+	// the first output is re-output as many times as NumberOfRedrawsWhenFirstTime.
 	static bool bDoOnce = true;
 	if (bDoOnce)
 	{
-		FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
-		ImageWriteOptions.bOverwriteFile = true;
-		ImageWriteOptions.NativeOnComplete = nullptr;
-		UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, ImageWriteOptions);
-		bDoOnce = false;
+		for (int32 Count = 0; Count <GraphPrinterUtilsInternal::NumberOfReOutputWhenFirstTime; Count++)
+		{
+			FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
+			ImageWriteOptions.bOverwriteFile = true;
+			ImageWriteOptions.NativeOnComplete = nullptr;
+			UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, ImageWriteOptions);
+			bDoOnce = false;
+		}	
 	}
 }
 
@@ -194,7 +209,7 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 {
 #if ENABLE_EMBED_NODE_INFO
 	// Get the currently active topmost window.
-	TSharedPtr<SGraphEditor> GraphEditor = UGraphPrinterUtils::GetActiveGraphEditor();
+	const TSharedPtr<SGraphEditor> GraphEditor = GetActiveGraphEditor();
 	if (!GraphEditor.IsValid())
 	{
 		FGraphPrinterCore::ShowNotification(
@@ -238,12 +253,17 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	{
 		FGraphPrinterCore::ShowNotification(
 			LOCTEXT("SuccessedRestore", "Restore nodes from"),
-			FGraphPrinterCore::CS_Success, 5.f, ENotificationInteraction::Hyperlink,
-			FText::FromString(Filename),
-			FSimpleDelegate::CreateLambda([Filename]()
-		{
-			FGraphPrinterCore::OpenFolderWithExplorer(Filename);
-		}));
+			FGraphPrinterCore::CS_Success, 5.f,
+			TArray<FGraphPrinterCore::FNotificationInteraction>{
+				FGraphPrinterCore::FNotificationInteraction(
+					FText::FromString(Filename),
+					FSimpleDelegate::CreateLambda([Filename]()
+					{
+						FGraphPrinterCore::OpenFolderWithExplorer(Filename);
+					})
+				)
+			}
+		);
 	}
 	else
 	{

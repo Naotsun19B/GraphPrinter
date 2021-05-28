@@ -72,14 +72,3 @@ public:
 	// Used to specify the window to be output (native only).
 	TSharedPtr<SWindow> TargetWindowOverride;
 };
-
-/**
- * Types of things that users of editor notifications can interact with.
- */
-UENUM()
-enum class ENotificationInteraction : uint8 
-{
-	None,
-	Hyperlink,
-	Button,
-};
