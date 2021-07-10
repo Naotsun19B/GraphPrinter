@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterGlobals.h"
 
 #if ENABLE_EMBED_NODE_INFO
 

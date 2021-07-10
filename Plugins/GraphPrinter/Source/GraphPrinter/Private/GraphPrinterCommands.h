@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
-#include "GraphPrinterGlobals.h"
 
 /**
  * Class to register the shortcut key used in this plugin.
@@ -33,6 +32,10 @@ public:
 	// Instances of bound commands.
 	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
 	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
+#if ENABLE_IMAGE_TO_CLIPBOARD
+	TSharedPtr<FUICommandInfo> CopyGraphWithAllNodesToClipboard;
+	TSharedPtr<FUICommandInfo> CopyGraphWithSelectedNodesToClipboard;
+#endif
 #if ENABLE_EMBED_NODE_INFO
 	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 #endif

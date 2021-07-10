@@ -1,9 +1,9 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterUtils.h"
-#include "GraphPrinterGlobals.h"
 #include "GraphPrinterSettings.h"
 #include "GraphPrinterCore.h"
+#include "ClipboardImageExtension.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 #include "GraphEditor.h"
@@ -19,15 +19,25 @@ namespace GraphPrinterUtilsInternal
 
 void UGraphPrinterUtils::PrintGraphWithAllNodes()
 {
-	PrintGraphFromEditorSettings(false);
+	PrintGraphFromEditorSettings(false, false);
 }
 
 void UGraphPrinterUtils::PrintGraphWithSelectedNodes()
 {
-	PrintGraphFromEditorSettings(true);
+	PrintGraphFromEditorSettings(true, false);
 }
 
-void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, bool bIsAsync /* = true */)
+void UGraphPrinterUtils::CopyGraphWithAllNodesToClipboard()
+{
+	PrintGraphFromEditorSettings(false, true);
+}
+
+void UGraphPrinterUtils::CopyGraphWithSelectedNodesToClipboard()
+{
+	PrintGraphFromEditorSettings(true, true);
+}
+
+void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, bool bCopyToClipboard, bool bIsAsync /* = true */)
 {
 	auto* Settings = GetDefault<UGraphPrinterSettings>();
 	if (!IsValid(Settings))
@@ -37,11 +47,12 @@ void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, b
 
 	FPrintGraphOptions Options;
 	Options.bOnlySelectedNodes = bOnlySelectedNodes;
+	Options.bCopyToClipboard = bCopyToClipboard;
+	Options.bIsIncludeNodeInfoInImageFile = Settings->bIsIncludeNodeInfoInImageFile;
 	Options.bUseGamma = Settings->bUseGamma;
 	Options.Padding = Settings->Padding;
 	Options.MaxImageSize = Settings->MaxImageSize;
 	Options.FilteringMode = Settings->FilteringMode;
-	Options.bIsIncludeNodeInfoInImageFile = Settings->bIsIncludeNodeInfoInImageFile;
 	Options.ImageWriteOptions.bAsync = bIsAsync;
 	Options.ImageWriteOptions.Format = Settings->Format;
 	Options.ImageWriteOptions.bOverwriteFile = Settings->bCanOverwriteFileWhenExport;
@@ -141,31 +152,65 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		return;
 	}
 
+#if ENABLE_IMAGE_TO_CLIPBOARD
+	// When copying to the clipboard, set the image format so that it can be copied.
+	if (Options.bCopyToClipboard)
+	{
+		Options.ImageWriteOptions.Format = FClipboardImageExtension::GetCopyableImageFormat();
+	}
+#endif
+
 	// Create output options and file path and output as image file.
 	FString Filename = FGraphPrinterCore::CreateFilename(GraphEditor, Options);
-
+	
 	// Bind the event when the operation is completed.
 	Options.ImageWriteOptions.NativeOnComplete = [Filename, Options, GraphEditor, SelectedNodes](bool bIsSucceeded)
 	{
 		if (bIsSucceeded)
 		{
-			FGraphPrinterCore::ShowNotification(
-				LOCTEXT("SuccessedOutput", "GraphEditor capture saved as"),
-				FGraphPrinterCore::CS_Success, 5.f,
-				TArray<FGraphPrinterCore::FNotificationInteraction>{
-					FGraphPrinterCore::FNotificationInteraction(
-						FText::FromString(Filename),
-						FSimpleDelegate::CreateLambda([Filename]()
-						{
-							FGraphPrinterCore::OpenFolderWithExplorer(Filename);
-						})
-					)
+			if (!Options.bCopyToClipboard)
+			{
+				FGraphPrinterCore::ShowNotification(
+				LOCTEXT("SucceededOutput", "GraphEditor capture saved as"),
+					FGraphPrinterCore::CS_Success, 5.f,
+					TArray<FGraphPrinterCore::FNotificationInteraction>{
+						FGraphPrinterCore::FNotificationInteraction(
+							FText::FromString(Filename),
+							FSimpleDelegate::CreateLambda([Filename]()
+							{
+								FGraphPrinterCore::OpenFolderWithExplorer(Filename);
+							})
+						)
+					}
+				);
+			}
+#if ENABLE_IMAGE_TO_CLIPBOARD
+			if (Options.bCopyToClipboard)
+			{
+				if (FClipboardImageExtension::ClipboardCopy(Filename))
+				{
+					FGraphPrinterCore::ShowNotification(
+						LOCTEXT("SucceededClipboardCopy", "Succeeded to copy image to clipboard."),
+						FGraphPrinterCore::CS_Success
+					);
 				}
-			);
+				else
+				{
+					FGraphPrinterCore::ShowNotification(
+						LOCTEXT("FailedClipboardCopy", "Failed to copy image to clipboard."),
+						FGraphPrinterCore::CS_Fail
+					);
+				}
 
+				IFileManager::Get().Delete(*Filename, false, true);
+			}
+#endif
 #if ENABLE_EMBED_NODE_INFO
 			// Embed node information in the output png image.
-			if (Options.bIsIncludeNodeInfoInImageFile && (Options.ImageWriteOptions.Format == EDesiredImageFormat::PNG))
+			// When copying to the clipboard, the process is skipped.
+			if (!Options.bCopyToClipboard &&
+				Options.bIsIncludeNodeInfoInImageFile &&
+				(Options.ImageWriteOptions.Format == EDesiredImageFormat::PNG))
 			{
 				if (!FGraphPrinterCore::ExportGraphToPngFile(Filename, GraphEditor, SelectedNodes))
 				{
@@ -194,7 +239,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	static bool bDoOnce = true;
 	if (bDoOnce)
 	{
-		for (int32 Count = 0; Count <GraphPrinterUtilsInternal::NumberOfReOutputWhenFirstTime; Count++)
+		for (int32 Count = 0; Count < GraphPrinterUtilsInternal::NumberOfReOutputWhenFirstTime; Count++)
 		{
 			FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
 			ImageWriteOptions.bOverwriteFile = true;
@@ -252,7 +297,7 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	if (FGraphPrinterCore::RestoreGraphFromPngFile(Filename, GraphEditor))
 	{
 		FGraphPrinterCore::ShowNotification(
-			LOCTEXT("SuccessedRestore", "Restore nodes from"),
+			LOCTEXT("SucceededRestore", "Restore nodes from"),
 			FGraphPrinterCore::CS_Success, 5.f,
 			TArray<FGraphPrinterCore::FNotificationInteraction>{
 				FGraphPrinterCore::FNotificationInteraction(

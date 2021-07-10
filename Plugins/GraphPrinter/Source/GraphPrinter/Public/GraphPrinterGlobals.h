@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Misc/Paths.h"
-#include "Engine/TextureRenderTarget2D.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 /**
@@ -23,12 +21,21 @@
 #endif
 
 /**
- * Defines whether the ability to embed node information in text chunks is available
+ * Defines whether the ability to embed node information in text chunks is available.
  */
 #ifdef WITH_EMBED_NODE_INFO
 #define ENABLE_EMBED_NODE_INFO WITH_UNREALPNG
 #else
 #define ENABLE_EMBED_NODE_INFO 0
+#endif
+
+/**
+ * Defines whether the ability to copy images to the clipboard is available.
+ */
+#if PLATFORM_WINDOWS
+#define ENABLE_IMAGE_TO_CLIPBOARD 1
+#else
+#define ENABLE_IMAGE_TO_CLIPBOARD 0
 #endif
 
 /**

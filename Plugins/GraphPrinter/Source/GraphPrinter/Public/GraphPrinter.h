@@ -12,6 +12,7 @@ MONOLITHIC_HEADER_BOILERPLATE()
 *****************************************************************************/
 
 #include "Core.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "ImageWriteBlueprintLibrary.h"
 
 /* Public includes.
@@ -19,6 +20,3 @@ MONOLITHIC_HEADER_BOILERPLATE()
 
 #include "GraphPrinterGlobals.h"
 #include "GraphPrinterTypes.h"
-#include "GraphPrinterCommands.h"
-#include "GraphPrinterCore.h"
-#include "GraphPrinterUtils.h"

@@ -24,6 +24,10 @@ void FGraphPrinterCommands::RegisterCommands()
 	// Register command here.
 	UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::None, FInputChord(EKeys::F9, EModifierKey::Control));
 	UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::None, FInputChord(EKeys::F10, EModifierKey::Control));
+#if ENABLE_IMAGE_TO_CLIPBOARD
+	UI_COMMAND(CopyGraphWithAllNodesToClipboard, "Copy Graph With All Nodes To Clipboard", "Copy all nodes of the currently active graph editor as images to clipboard.", EUserInterfaceActionType::None, FInputChord(EKeys::F7, EModifierKey::Control));
+	UI_COMMAND(CopyGraphWithSelectedNodesToClipboard, "Copy Graph With Selected Nodes To Clipboard", "Copy the selected node of the currently active graph editor as an image to clipboard.", EUserInterfaceActionType::None, FInputChord(EKeys::F8, EModifierKey::Control));
+#endif
 #if ENABLE_EMBED_NODE_INFO
 	UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::None, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
@@ -67,6 +71,18 @@ void FGraphPrinterCommands::BindCommands()
 		FExecuteAction::CreateStatic(UGraphPrinterUtils::PrintGraphWithSelectedNodes)
 	);
 
+#if ENABLE_IMAGE_TO_CLIPBOARD
+	CommandBindings->MapAction(
+		CopyGraphWithAllNodesToClipboard,
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::CopyGraphWithAllNodesToClipboard)
+	);
+
+	CommandBindings->MapAction(
+		CopyGraphWithSelectedNodesToClipboard,
+		FExecuteAction::CreateStatic(UGraphPrinterUtils::CopyGraphWithSelectedNodesToClipboard)
+	);
+#endif
+	
 #if ENABLE_EMBED_NODE_INFO
 	CommandBindings->MapAction(
 		RestoreNodesFromPngFile,

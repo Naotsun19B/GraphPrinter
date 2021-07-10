@@ -1,10 +1,9 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterSettings.h"
-#include "GraphPrinterGlobals.h"
-#include "GraphPrinterCore.h"
 #include "ISettingsModule.h"
 #include "ImageWriteTypes.h"
+#include "Modules/ModuleManager.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 

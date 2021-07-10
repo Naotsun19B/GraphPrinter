@@ -7,7 +7,6 @@
 #include "GraphPrinterSettings.generated.h"
 
 enum TextureFilter;
-enum class EDesiredImageFormat : uint8;
 
 /**
  * Editor settings for this plugin.

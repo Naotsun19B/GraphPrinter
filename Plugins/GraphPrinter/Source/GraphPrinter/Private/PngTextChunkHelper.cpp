@@ -126,7 +126,7 @@ namespace PngTextChunkHelperInternal
 		}
 		// Copy row pointers.
 		{
-			png_bytepp RowPointers = png_get_rows(SourcePngPtr, SourceInfoPtr);
+			const png_bytepp RowPointers = png_get_rows(SourcePngPtr, SourceInfoPtr);
 			png_set_rows(DestinationPngPtr, DestinationInfoPtr, RowPointers);
 		}
 		// Copy channels.
@@ -260,7 +260,7 @@ bool FPngTextChunkHelper::Write(const TMap<FString, FString>& MapToWrite)
 	ReadOffset = 0;
 
 	// Read the png_info of the original image file.
-	PngTextChunkHelperInternal::FPngReadGuard ReadGuard(
+	const PngTextChunkHelperInternal::FPngReadGuard ReadGuard(
 		this,
 		FPngTextChunkHelper::UserError,
 		FPngTextChunkHelper::UserWarning,
@@ -281,7 +281,7 @@ bool FPngTextChunkHelper::Write(const TMap<FString, FString>& MapToWrite)
 	png_read_png(ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr(), PNG_TRANSFORM_IDENTITY, nullptr);
 
 	// Prepare png_struct etc. for writing.
-	PngTextChunkHelperInternal::FPngWriteGuard WriteGuard(
+	const PngTextChunkHelperInternal::FPngWriteGuard WriteGuard(
 		this,
 		FPngTextChunkHelper::UserError,
 		FPngTextChunkHelper::UserWarning,
@@ -318,7 +318,7 @@ bool FPngTextChunkHelper::Write(const TMap<FString, FString>& MapToWrite)
 		const int32 KeyLength = TCString<ANSICHAR>::Strlen(Key.Get());
 		if (KeyLength > 0)
 		{
-			auto KeyBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(KeyLength));
+			auto* const KeyBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(KeyLength));
 			TCString<ANSICHAR>::Strcpy(KeyBuffer, KeyLength, Key.Get());
 			Text.key = KeyBuffer;
 		}
@@ -327,7 +327,7 @@ bool FPngTextChunkHelper::Write(const TMap<FString, FString>& MapToWrite)
 		const int32 ValueLength = TCString<ANSICHAR>::Strlen(Value.Get());
 		if (ValueLength > 0)
 		{
-			auto ValueBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(ValueLength));
+			auto* const ValueBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(ValueLength));
 			TCString<ANSICHAR>::Strcpy(ValueBuffer, ValueLength, Value.Get());
 			Text.text = ValueBuffer;
 		}
@@ -358,7 +358,7 @@ bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
 	ReadOffset = 0;
 
 	// Read png_info.
-	PngTextChunkHelperInternal::FPngReadGuard ReadGuard(
+	const PngTextChunkHelperInternal::FPngReadGuard ReadGuard(
 		this, 
 		FPngTextChunkHelper::UserError, 
 		FPngTextChunkHelper::UserWarning, 

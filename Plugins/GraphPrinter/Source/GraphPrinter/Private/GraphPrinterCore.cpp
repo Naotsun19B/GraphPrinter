@@ -1,7 +1,6 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterCore.h"
-#include "GraphPrinterGlobals.h"
 #include "GraphPrinterSettings.h"
 #include "PngTextChunkHelper.h"
 #include "Framework/Notifications/NotificationManager.h"
@@ -59,7 +58,6 @@ namespace GraphPrinterCoreInternal
 		return nullptr;
 	}
 }
-
 #define CAST_SLATE_WIDGET(ToClass, FromPtr) GraphPrinterCoreInternal::CastSlateWidget<ToClass>(FromPtr, #ToClass)
 
 const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
@@ -114,7 +112,10 @@ TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 
 void FGraphPrinterCore::CollectAllChildWidgets(TSharedPtr<SWidget> SearchTarget, TArray<TSharedPtr<SWidget>>& OutChildren)
 {
-	check(SearchTarget.IsValid());
+	if (!SearchTarget.IsValid())
+	{
+		return;
+	}
 
 	if (FChildren* Children = SearchTarget->GetChildren())
 	{

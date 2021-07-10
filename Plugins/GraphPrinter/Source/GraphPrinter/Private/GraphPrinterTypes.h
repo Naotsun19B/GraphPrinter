@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImageWriteBlueprintLibrary.h"
-#include "Engine/Texture.h"
 #include "GraphPrinterTypes.generated.h"
 
 class SWidget;
@@ -21,12 +19,12 @@ struct FPrintGraphOptions
 public:
 	FPrintGraphOptions()
 		: bOnlySelectedNodes(false)
+		, bCopyToClipboard(false)
+		, bIsIncludeNodeInfoInImageFile(true)
 		, bUseGamma(true)
 		, Padding(0.f)
 		, MaxImageSize(FVector2D::ZeroVector)
 		, FilteringMode(TextureFilter::TF_Default)
-		, bIsIncludeNodeInfoInImageFile(true)
-		, OutputDirectoryPath()
 		, TargetWindowOverride(nullptr)
 	{
 		ImageWriteOptions.bAsync = true;
@@ -39,6 +37,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	bool bOnlySelectedNodes;
 
+	// Whether to copy to the clipboard.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
+	bool bCopyToClipboard;
+
+	// Whether to embed node configuration information in the image file.
+	// When this option is enabled, the only output image format is png.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
+	bool bIsIncludeNodeInfoInImageFile;
+	
 	// Whether to output the drawing result affected by the gamma value.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	bool bUseGamma;
@@ -55,11 +62,6 @@ public:
 	// Texture filtering mode to use when outputting.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	TEnumAsByte<TextureFilter> FilteringMode;
-
-	// Whether to embed node configuration information in the image file.
-	// When this option is enabled, the only output image format is png.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
-	bool bIsIncludeNodeInfoInImageFile;
 
 	// Options related to image output processing.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")

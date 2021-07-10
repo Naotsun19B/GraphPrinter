@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "GraphPrinterTypes.h"
 #include "GraphPrinterUtils.generated.h"
+
+class SGraphEditor;
 
 /**
  * Make the features used in this plugin also available from Blueprint.
@@ -24,9 +25,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
 	static void PrintGraphWithSelectedNodes();
 
+	// Copy all nodes of the currently active graph editor as images to clipboard.
+	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
+	static void CopyGraphWithAllNodesToClipboard();
+
+	// Copy the selected node of the currently active graph editor as an image to clipboard.
+	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
+	static void CopyGraphWithSelectedNodesToClipboard();
+
 	// Export the graph editor as an image based on the editor settings.
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")
-	static void PrintGraphFromEditorSettings(bool bOnlySelectedNodes, bool bIsAsync = true);
+	static void PrintGraphFromEditorSettings(bool bOnlySelectedNodes, bool bCopyToClipboard, bool bIsAsync = true);
 
 	// Exports graph editor as image with various options.
 	UFUNCTION(BlueprintCallable, Category = "GraphPrinter")

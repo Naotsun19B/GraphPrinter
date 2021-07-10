@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterGlobals.h"
-#include "GraphPrinterTypes.h"
 
 class SWidget;
 class SGraphEditor;
