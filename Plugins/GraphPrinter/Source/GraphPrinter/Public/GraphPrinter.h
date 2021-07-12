@@ -12,6 +12,7 @@ MONOLITHIC_HEADER_BOILERPLATE()
 *****************************************************************************/
 
 #include "Core.h"
+#include "Framework/Commands/UICommandInfo.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "ImageWriteBlueprintLibrary.h"
 

@@ -30,12 +30,12 @@ protected:
 
 public:
 	// Instances of bound commands.
-	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
-	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
 #if ENABLE_IMAGE_TO_CLIPBOARD
 	TSharedPtr<FUICommandInfo> CopyGraphWithAllNodesToClipboard;
 	TSharedPtr<FUICommandInfo> CopyGraphWithSelectedNodesToClipboard;
 #endif
+	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
+	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
 #if ENABLE_EMBED_NODE_INFO
 	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 #endif

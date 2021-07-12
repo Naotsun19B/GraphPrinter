@@ -7,8 +7,6 @@
 
 #if PLATFORM_WINDOWS
 #include "Windows/WindowsApplication.h"
-#else
-#include "GraphPrinterCore.h"
 #endif
 
 namespace ClipboardImageExtensionInternal
@@ -95,10 +93,7 @@ namespace ClipboardImageExtensionInternal
 #else
 	void NotifyNotSupported()
 	{
-		FGraphPrinterCore::ShowNotification(
-			NSLOCTEXT("ClipboardImageExtension", "NotSupportedPlatform", "This feature is not supported on this platform."),
-			FGraphPrinterCore::CS_Fail
-		);
+		UE_LOG(LogGraphPrinter, Error, TEXT("This feature is not supported on this platform."));
 	}
 	
 	bool ClipboardCopy(const FString& Filename)
