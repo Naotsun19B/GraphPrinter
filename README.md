@@ -4,7 +4,7 @@
 
 ## Description
 
-This plugin adds shortcut keys for printing the graph editor of Unreal Engine (blueprints, materials, etc.) to image files.
+This plugin adds a shortcut key that prints an Unreal Engine graph editor (such as Blueprint or Material ...) to an image file or copies it to the clipboard.
 As shown in the image below, you can also output the part that is not displayed in the graph editor to the image file.
 You can also restore the node from the output png format image file.  
 
@@ -33,8 +33,8 @@ The default shortcut keys that correspond to the added functions are as follows.
 
 |**Shortcut Key**|**Function**|
 |:---:|---|
-|Ctrl + F7|Copy all currently open Graph Editor nodes to the clipboard. (**Windows Only**)|
-|Ctrl + F8|Copy the selected node of the currently open graph editor to the clipboard. (**Windows Only**)|
+|Ctrl + F7|Copy all currently open Graph Editor nodes to the clipboard. (**Windows Only / Node information cannot be embedded**)|
+|Ctrl + F8|Copy the selected node of the currently open graph editor to the clipboard. (**Windows Only / Node information cannot be embedded**)|
 |Ctrl + F9|Outputs an image containing all the nodes of the currently open graph editor.|
 |Ctrl + F10|Outputs an image containing the selected nodes in the currently open graph editor.|
 |Ctrl + F11|Restores the nodes contained in the selected png file in the currently open graph editor.|
