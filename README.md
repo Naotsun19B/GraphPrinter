@@ -19,7 +19,7 @@ You can also restore the node from the output png format image file.
 
 ## Requirement
 
-Target version : UE4.21 ～ 4.26  
+Target version : UE4.21 ～ 4.27  
 Target platform : Windows, Mac, Linux 
 
 ## Installation
