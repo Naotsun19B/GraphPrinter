@@ -1,9 +1,10 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterUtils.h"
-#include "GraphPrinterSettings.h"
-#include "GraphPrinterCore.h"
-#include "ClipboardImageExtension.h"
+#include "GraphPrinter/GraphPrinterUtils.h"
+#include "GraphPrinter/GraphPrinterSettings.h"
+#include "GraphPrinter/GraphPrinterCore.h"
+#include "GraphPrinter/ClipboardImageExtension.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Widgets/SWindow.h"
 #include "GraphEditor.h"
@@ -14,7 +15,7 @@ namespace GraphPrinterUtilsInternal
 {
 	// The number of times to re-output as a countermeasure against the whitish image
 	// that is output for the first time after starting the engine.
-	static const int32 NumberOfReOutputWhenFirstTime = 2;
+	static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
 }
 
 void UGraphPrinterUtils::PrintGraphWithAllNodes()
@@ -39,25 +40,21 @@ void UGraphPrinterUtils::CopyGraphWithSelectedNodesToClipboard()
 
 void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, bool bCopyToClipboard, bool bIsAsync /* = true */)
 {
-	auto* Settings = GetDefault<UGraphPrinterSettings>();
-	if (!IsValid(Settings))
-	{
-		return;
-	}
+	auto& Settings = UGraphPrinterSettings::Get();
 
 	FPrintGraphOptions Options;
 	Options.bOnlySelectedNodes = bOnlySelectedNodes;
 	Options.bCopyToClipboard = bCopyToClipboard;
-	Options.bIsIncludeNodeInfoInImageFile = Settings->bIsIncludeNodeInfoInImageFile;
-	Options.bUseGamma = Settings->bUseGamma;
-	Options.Padding = Settings->Padding;
-	Options.MaxImageSize = Settings->MaxImageSize;
-	Options.FilteringMode = Settings->FilteringMode;
+	Options.bIsIncludeNodeInfoInImageFile = Settings.bIsIncludeNodeInfoInImageFile;
+	Options.bUseGamma = Settings.bUseGamma;
+	Options.Padding = Settings.Padding;
+	Options.MaxImageSize = Settings.MaxImageSize;
+	Options.FilteringMode = Settings.FilteringMode;
 	Options.ImageWriteOptions.bAsync = bIsAsync;
-	Options.ImageWriteOptions.Format = Settings->Format;
-	Options.ImageWriteOptions.bOverwriteFile = Settings->bCanOverwriteFileWhenExport;
-	Options.ImageWriteOptions.CompressionQuality = Settings->CompressionQuality;
-	Options.OutputDirectoryPath = Settings->OutputDirectory.Path;
+	Options.ImageWriteOptions.Format = Settings.Format;
+	Options.ImageWriteOptions.bOverwriteFile = Settings.bCanOverwriteFileWhenExport;
+	Options.ImageWriteOptions.CompressionQuality = Settings.CompressionQuality;
+	Options.OutputDirectoryPath = Settings.OutputDirectory.Path;
 
 	CustomPrintGraph(Options);
 }
@@ -267,17 +264,12 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	// Launch the file browser and select the png file.
 	FString Filename;
 	{
-		FString DefaultPath;
-		if (auto* Settings = GetDefault<UGraphPrinterSettings>())
-		{
-			DefaultPath = Settings->OutputDirectory.Path;
-		}
-
 		TArray<FString> Filenames;
 		if (!FGraphPrinterCore::OpenFileDialog(
 			Filenames,
 			TEXT("Select the png file that contains the node info"),
-			DefaultPath, TEXT(""),
+			UGraphPrinterSettings::Get().OutputDirectory.Path,
+			TEXT(""),
 			TEXT("PNG Image (.png)|*.png"),
 			false
 		))
@@ -324,13 +316,7 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 
 void UGraphPrinterUtils::OpenExportDestinationFolder()
 {
-	auto* Settings = GetDefault<UGraphPrinterSettings>();
-	if (!IsValid(Settings))
-	{
-		return;
-	}
-
-	FGraphPrinterCore::OpenFolderWithExplorer(Settings->OutputDirectory.Path);
+	FGraphPrinterCore::OpenFolderWithExplorer(UGraphPrinterSettings::Get().OutputDirectory.Path);
 }
 
 void UGraphPrinterUtils::OpenFolderWithExplorer(const FString& Filename)

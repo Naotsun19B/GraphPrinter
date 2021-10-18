@@ -1,8 +1,9 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore.h"
-#include "GraphPrinterSettings.h"
-#include "PngTextChunkHelper.h"
+#include "GraphPrinter/GraphPrinterCore.h"
+#include "GraphPrinter/GraphPrinterSettings.h"
+#include "GraphPrinter/GraphPrinterTypes.h"
+#include "GraphPrinter/PngTextChunkHelper.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Framework/Application/SlateApplication.h"
@@ -18,6 +19,7 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "DesktopPlatformModule.h"
 #include "IDesktopPlatform.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 #if !BEFORE_UE_4_21
 #include "ReferenceViewer/EdGraph_ReferenceViewer.h"
@@ -30,7 +32,7 @@ namespace GraphPrinterCoreInternal
 	// Number of attempts to draw the widget on the render target.
 	// The drawing result may be corrupted once.
 	// Probably if draw twice, the drawing result will not be corrupted.
-	static const int32 DrawTimes = 2;
+	static constexpr int32 DrawTimes = 2;
 
 	// Key used when writing to a text chunk of a png file.
 	static const FString PngTextChunkKey = TEXT("GraphEditor");
@@ -60,9 +62,9 @@ namespace GraphPrinterCoreInternal
 }
 #define CAST_SLATE_WIDGET(ToClass, FromPtr) GraphPrinterCoreInternal::CastSlateWidget<ToClass>(FromPtr, #ToClass)
 
-const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
-const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
-const FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
+constexpr FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Pending = SNotificationItem::ECompletionState::CS_Pending;
+constexpr FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Success = SNotificationItem::ECompletionState::CS_Success;
+constexpr FGraphPrinterCore::TCompletionState FGraphPrinterCore::CS_Fail = SNotificationItem::ECompletionState::CS_Fail;
 
 TSharedPtr<SNotificationItem> FGraphPrinterCore::ShowNotification(
 	const FText& NotificationText, 
@@ -268,7 +270,7 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 	{
 #if !BEFORE_UE_4_21
 		// The reference viewer replaces the name because there is no outer object.
-		if (auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
+		if (const auto* ReferenceViewer = Cast<UEdGraph_ReferenceViewer>(Graph))
 		{
 			const TArray<FAssetIdentifier>& Assets = ReferenceViewer->GetCurrentGraphRootIdentifiers();
 			if (Assets.IsValidIndex(0))
@@ -279,7 +281,7 @@ FString FGraphPrinterCore::GetGraphTitle(TSharedPtr<SGraphEditor> GraphEditor)
 			return TEXT("ReferenceViewer");
 		}
 #endif
-		if (UObject* Outer = Graph->GetOuter())
+		if (const UObject* Outer = Graph->GetOuter())
 		{
 			return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
 		}
@@ -297,7 +299,7 @@ FString FGraphPrinterCore::GetImageFileExtension(EDesiredImageFormat ImageFormat
 		return FString::Printf(TEXT(".%s"), *Extension.ToLower());
 	}
 #else
-	if (UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
+	if (const UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 	{
 		const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
 		FString UnusedString;
@@ -367,8 +369,8 @@ bool FGraphPrinterCore::ExportGraphToPngFile(const FString& Filename, TSharedPtr
 	// Write data to png file using helper class.
 	TMap<FString, FString> MapToWrite;
 	MapToWrite.Add(GraphPrinterCoreInternal::PngTextChunkKey, ExportedText);
-	
-	TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
+
+	const TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
 	if (!PngTextChunkHelper.IsValid())
 	{
 		return false;
@@ -382,7 +384,7 @@ bool FGraphPrinterCore::RestoreGraphFromPngFile(const FString& Filename, TShared
 
 	// Read data from png file using helper class.
 	TMap<FString, FString> MapToRead;
-	TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
+	const TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = FPngTextChunkHelper::CreatePngTextChunkHelper(Filename);
 	if (!PngTextChunkHelper.IsValid())
 	{
 		return false;
@@ -470,8 +472,8 @@ bool FGraphPrinterCore::OpenFileDialog(
 	// Get the OS-level window handle of the editor's mainframe.
 	void* WindowHandle = nullptr;
 
-	IMainFrameModule& MainFrameModule = IMainFrameModule::Get();
-	TSharedPtr<SWindow> MainWindow = MainFrameModule.GetParentWindow();
+	const IMainFrameModule& MainFrameModule = IMainFrameModule::Get();
+	const TSharedPtr<SWindow> MainWindow = MainFrameModule.GetParentWindow();
 
 	if (MainWindow.IsValid())
 	{

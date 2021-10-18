@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-#include "GraphPrinterGlobals.h"
-#include "GraphPrinterCommands.h"
-#include "GraphPrinterSettings.h"
+#include "GraphPrinter/GraphPrinterGlobals.h"
+#include "GraphPrinter/GraphPrinterCommands.h"
+#include "GraphPrinter/GraphPrinterSettings.h"
 
 DEFINE_LOG_CATEGORY(LogGraphPrinter);
 

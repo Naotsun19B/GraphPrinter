@@ -1,8 +1,10 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
-#include "ClipboardImageExtension.h"
+#include "GraphPrinter/ClipboardImageExtension.h"
+#include "GraphPrinter/GraphPrinterGlobals.h"
 #include "IImageWrapperModule.h"
 #include "IImageWrapper.h"
+#include "Misc/FileHelper.h"
 #include "Modules/ModuleManager.h"
 
 #if PLATFORM_WINDOWS
@@ -21,7 +23,7 @@ namespace ClipboardImageExtensionInternal
 		}
 		
 		auto& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-		TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::BMP);
+		const TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::BMP);
 		if (!ImageWrapper.IsValid())
 		{
 			return nullptr;

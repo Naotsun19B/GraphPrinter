@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ImageWriteTypes.h"
+#include "ImageWriteBlueprintLibrary.h"
 #include "GraphPrinterTypes.generated.h"
 
 class SWidget;

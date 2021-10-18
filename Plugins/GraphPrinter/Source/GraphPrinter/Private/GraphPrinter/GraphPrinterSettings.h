@@ -7,14 +7,15 @@
 #include "GraphPrinterSettings.generated.h"
 
 enum TextureFilter;
+enum class EDesiredImageFormat : uint8;
 
 /**
  * Editor settings for this plugin.
  */
 UCLASS(Config = Editor, DefaultConfig)
-class UGraphPrinterSettings : public UObject
+class GRAPHPRINTER_API UGraphPrinterSettings : public UObject
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 	
 public:
 	// Whether to embed node configuration information in the image file.
@@ -56,10 +57,16 @@ public:
 	FDirectoryPath OutputDirectory;
 
 public:
+	// Constructor.
+	UGraphPrinterSettings();
+	
 	// Register - unregister in the editor setting item.
 	static void Register();
 	static void Unregister();
-
+	
+	// Returns reference of this settings.
+	static const UGraphPrinterSettings& Get();
+	
 protected:
 	// UObject interface.
 	virtual void PostInitProperties() override;

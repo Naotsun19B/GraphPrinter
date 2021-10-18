@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ImageWriteTypes.h"
 
 /**
  * Extension class for working with images on the clipboard.

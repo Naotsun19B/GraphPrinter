@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
+#include "GraphPrinter/GraphPrinterGlobals.h"
 
 /**
  * Class to register the shortcut key used in this plugin.

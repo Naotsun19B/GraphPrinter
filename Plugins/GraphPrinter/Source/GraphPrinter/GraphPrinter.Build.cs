@@ -11,7 +11,6 @@ public class GraphPrinter : ModuleRules
 	public GraphPrinter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		PrivatePCHHeaderFile = "Public/GraphPrinter.h";
 
 		PublicDependencyModuleNames.AddRange(
 			new string[]

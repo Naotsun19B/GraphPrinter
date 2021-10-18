@@ -1,7 +1,7 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCommands.h"
-#include "GraphPrinterUtils.h"
+#include "GraphPrinter/GraphPrinterCommands.h"
+#include "GraphPrinter/GraphPrinterUtils.h"
 #include "EditorStyleSet.h"
 #include "Interfaces/IMainFrameModule.h"
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "GraphPrinter/GraphPrinterTypes.h"
 #include "GraphPrinterUtils.generated.h"
 
 class SGraphEditor;

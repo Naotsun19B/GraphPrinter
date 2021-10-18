@@ -1,9 +1,14 @@
 ﻿// Copyright 2020-2021 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterSettings.h"
+#include "GraphPrinter/GraphPrinterSettings.h"
+#include "GraphPrinter/GraphPrinterGlobals.h"
 #include "ISettingsModule.h"
 #include "ImageWriteTypes.h"
 #include "Modules/ModuleManager.h"
+
+#if !ENABLE_EMBED_NODE_INFO
+#include "GraphPrinter/GraphPrinterCore.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
@@ -21,12 +26,11 @@ namespace GraphPrinterSettingsInternal
 	}
 }
 
-UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGraphPrinterSettings::UGraphPrinterSettings()
 #if ENABLE_EMBED_NODE_INFO
-	, bIsIncludeNodeInfoInImageFile(true)
+	: bIsIncludeNodeInfoInImageFile(true)
 #else
-	, bIsIncludeNodeInfoInImageFile(false)
+	: bIsIncludeNodeInfoInImageFile(false)
 #endif
 	, Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
@@ -37,6 +41,13 @@ UGraphPrinterSettings::UGraphPrinterSettings(const FObjectInitializer& ObjectIni
 	, bCanOverwriteFileWhenExport(false)
 {
 	OutputDirectory.Path = FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName);
+}
+
+const UGraphPrinterSettings& UGraphPrinterSettings::Get()
+{
+	const auto* Settings = GetDefault<UGraphPrinterSettings>();
+	check(IsValid(Settings));
+	return *Settings;
 }
 
 void UGraphPrinterSettings::Register()

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GraphPrinter/GraphPrinterGlobals.h"
 
 class SWidget;
 class SGraphEditor;
@@ -10,8 +11,10 @@ class SNotificationItem;
 class UTexture;
 class UTextureRenderTarget2D;
 struct FImageWriteOptions;
-typedef TSet<class UObject*> FGraphPanelSelectionSet;
+struct FPrintGraphOptions;
 enum class EDesiredImageFormat : uint8;
+
+using FGraphPanelSelectionSet = TSet<class UObject*>;
 
 /**
  * Internal processing functions used in this plugin.
