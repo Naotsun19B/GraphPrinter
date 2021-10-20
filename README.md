@@ -72,6 +72,9 @@ The items that can be set from the editor preferences are as follows.
 
 ## History  
 
+- (2021/10/20) v1.8   
+  Added support for UE5  
+
 - (2021/07/11) v1.7   
   Added a shortcut key to copy the image of Graph Editor to the clipboard (**Windows Only**)  
 
