@@ -6,43 +6,46 @@
 #include "Framework/Commands/Commands.h"
 #include "GraphPrinter/GraphPrinterGlobals.h"
 
-/**
- * Class to register the shortcut key used in this plugin.
- */
-class GRAPHPRINTER_API FGraphPrinterCommands : public TCommands<FGraphPrinterCommands>
+namespace GraphPrinter
 {
-public:
-	// Constructor.
-	FGraphPrinterCommands();
+	/**
+	 * Class to register the shortcut key used in this plugin.
+	 */
+	class GRAPHPRINTER_API FGraphPrinterCommands : public TCommands<FGraphPrinterCommands>
+	{
+	public:
+		// Constructor.
+		FGraphPrinterCommands();
 
-	// TCommands interface.
-	virtual void RegisterCommands() override;
-	// End of TCommands interface.
+		// TCommands interface.
+		virtual void RegisterCommands() override;
+		// End of TCommands interface.
 
-	// Is the command registered here bound.
-	static bool IsBound();
+		// Is the command registered here bound.
+		static bool IsBound();
 
-	// Processing of command binding.
-	static void Bind();
+		// Processing of command binding.
+		static void Bind();
 
-protected:
-	// Internal processing of command binding.
-	virtual void BindCommands();
+	protected:
+		// Internal processing of command binding.
+		virtual void BindCommands();
 
-public:
-	// Instances of bound commands.
+	public:
+		// Instances of bound commands.
 #if ENABLE_IMAGE_TO_CLIPBOARD
-	TSharedPtr<FUICommandInfo> CopyGraphWithAllNodesToClipboard;
-	TSharedPtr<FUICommandInfo> CopyGraphWithSelectedNodesToClipboard;
+		TSharedPtr<FUICommandInfo> CopyGraphWithAllNodesToClipboard;
+		TSharedPtr<FUICommandInfo> CopyGraphWithSelectedNodesToClipboard;
 #endif
-	TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
-	TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
+		TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
+		TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
 #if ENABLE_EMBED_NODE_INFO
-	TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
+		TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 #endif
-	TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
+		TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
 
-private:
-	// Is the command registered here bound.
-	bool bIsBound;
-};
+	private:
+		// Is the command registered here bound.
+		bool bIsBound;
+	};
+}

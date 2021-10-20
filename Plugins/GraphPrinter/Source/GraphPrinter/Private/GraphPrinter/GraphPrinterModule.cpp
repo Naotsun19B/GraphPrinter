@@ -8,30 +8,33 @@
 
 DEFINE_LOG_CATEGORY(LogGraphPrinter);
 
-class FGraphPrinterModule : public IModuleInterface
-{
-public:
-	// IModuleInterface interface.
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-	// End of IModuleInterface interface.
-};
-
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
-void FGraphPrinterModule::StartupModule()
+namespace GraphPrinter
 {
-	UGraphPrinterSettings::Register();
-	FGraphPrinterCommands::Register();
-	FGraphPrinterCommands::Bind();
-}
+	class FGraphPrinterModule : public IModuleInterface
+	{
+	public:
+		// IModuleInterface interface.
+		virtual void StartupModule() override;
+		virtual void ShutdownModule() override;
+		// End of IModuleInterface interface.
+	};
 
-void FGraphPrinterModule::ShutdownModule()
-{
-	FGraphPrinterCommands::Unregister();
-	UGraphPrinterSettings::Unregister();
+	void FGraphPrinterModule::StartupModule()
+	{
+		UGraphPrinterSettings::Register();
+		FGraphPrinterCommands::Register();
+		FGraphPrinterCommands::Bind();
+	}
+
+	void FGraphPrinterModule::ShutdownModule()
+	{
+		FGraphPrinterCommands::Unregister();
+		UGraphPrinterSettings::Unregister();
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FGraphPrinterModule, GraphPrinter)
+IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterModule, GraphPrinter)

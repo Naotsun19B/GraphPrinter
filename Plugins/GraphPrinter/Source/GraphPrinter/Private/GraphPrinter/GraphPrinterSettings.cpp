@@ -12,17 +12,20 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
-namespace GraphPrinterSettingsInternal
+namespace GraphPrinter
 {
-	static const FString OutputDirectoryName	= TEXT("GraphPrinter");
-
-	static const FName ContainerName			= TEXT("Editor");
-	static const FName CategoryName				= TEXT("Plugins");
-	static const FName SectionName				= TEXT("GraphPrinterSettings");
-
-	ISettingsModule* GetSettingsModule()
+	namespace Settings
 	{
-		return FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+		static const FString OutputDirectoryName	= TEXT("GraphPrinter");
+
+		static const FName ContainerName			= TEXT("Editor");
+		static const FName CategoryName				= TEXT("Plugins");
+		static const FName SectionName				= TEXT("GraphPrinterSettings");
+
+		ISettingsModule* GetSettingsModule()
+		{
+			return FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+		}
 	}
 }
 
@@ -40,7 +43,7 @@ UGraphPrinterSettings::UGraphPrinterSettings()
 	, MaxImageSize(15000.f, 15000.f)
 	, bCanOverwriteFileWhenExport(false)
 {
-	OutputDirectory.Path = FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinterSettingsInternal::OutputDirectoryName);
+	OutputDirectory.Path = FPaths::Combine(FPaths::ProjectSavedDir(), GraphPrinter::Settings::OutputDirectoryName);
 }
 
 const UGraphPrinterSettings& UGraphPrinterSettings::Get()
@@ -52,12 +55,12 @@ const UGraphPrinterSettings& UGraphPrinterSettings::Get()
 
 void UGraphPrinterSettings::Register()
 {
-	if (ISettingsModule* SettingsModule = GraphPrinterSettingsInternal::GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule())
 	{
 		SettingsModule->RegisterSettings(
-			GraphPrinterSettingsInternal::ContainerName,
-			GraphPrinterSettingsInternal::CategoryName,
-			GraphPrinterSettingsInternal::SectionName,
+			GraphPrinter::Settings::ContainerName,
+			GraphPrinter::Settings::CategoryName,
+			GraphPrinter::Settings::SectionName,
 			LOCTEXT("SettingName", "Graph Printer"),
 			LOCTEXT("SettingDescription", "Editor settings for Graph Printer"),
 			GetMutableDefault<UGraphPrinterSettings>()
@@ -67,12 +70,12 @@ void UGraphPrinterSettings::Register()
 
 void UGraphPrinterSettings::Unregister()
 {
-	if (ISettingsModule* SettingsModule = GraphPrinterSettingsInternal::GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule())
 	{
 		SettingsModule->UnregisterSettings(
-			GraphPrinterSettingsInternal::ContainerName,
-			GraphPrinterSettingsInternal::CategoryName,
-			GraphPrinterSettingsInternal::SectionName
+			GraphPrinter::Settings::ContainerName,
+			GraphPrinter::Settings::CategoryName,
+			GraphPrinter::Settings::SectionName
 		);
 	}
 }
@@ -132,9 +135,9 @@ void UGraphPrinterSettings::ModifyFormat()
 #else
 	bIsIncludeNodeInfoInImageFile = false;
 
-	FGraphPrinterCore::ShowNotification(
+	GraphPrinter::FGraphPrinterCore::ShowNotification(
 		LOCTEXT("EmbedNodeInfoDisabled", "This feature is under development.\nSee GraphPrinter.Build.cs to enable it."),
-		FGraphPrinterCore::CS_Fail
+		GraphPrinter::FGraphPrinterCore::CS_Fail
 	);
 #endif
 }

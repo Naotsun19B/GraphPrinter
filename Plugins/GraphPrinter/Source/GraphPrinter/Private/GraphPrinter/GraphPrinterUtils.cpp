@@ -11,11 +11,14 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinter"
 
-namespace GraphPrinterUtilsInternal
+namespace GraphPrinter
 {
-	// The number of times to re-output as a countermeasure against the whitish image
-	// that is output for the first time after starting the engine.
-	static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
+	namespace GraphPrinterUtilsInternal
+	{
+		// The number of times to re-output as a countermeasure against the whitish image
+		// that is output for the first time after starting the engine.
+		static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
+	}
 }
 
 void UGraphPrinterUtils::PrintGraphWithAllNodes()
@@ -67,9 +70,9 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	// If don't have an active graph editor, end here.
 	if (!GraphEditor.IsValid())
 	{
-		FGraphPrinterCore::ShowNotification(
+		GraphPrinter::FGraphPrinterCore::ShowNotification(
 			LOCTEXT("GraphOpenError", "The graph editor isn't currently open."),
-			FGraphPrinterCore::CS_Fail
+			GraphPrinter::FGraphPrinterCore::CS_Fail
 		);
 		return;
 	}
@@ -82,11 +85,11 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 
 	FVector2D DrawSize;
 	FVector2D ViewLocation;
-	if (!FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
+	if (!GraphPrinter::FGraphPrinterCore::CalculateGraphDrawSizeAndViewLocation(DrawSize, ViewLocation, GraphEditor, Options.Padding))
 	{
-		FGraphPrinterCore::ShowNotification(
+		GraphPrinter::FGraphPrinterCore::ShowNotification(
 			LOCTEXT("NotSelectedError", "No node is selected."),
-			FGraphPrinterCore::CS_Fail
+			GraphPrinter::FGraphPrinterCore::CS_Fail
 		);
 		return;
 	}
@@ -115,7 +118,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	UTextureRenderTarget2D* RenderTarget = nullptr;
 	if (bIsBelowMaxDrawSize)
 	{
-		RenderTarget = FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
+		RenderTarget = GraphPrinter::FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
 	}
 
 	// Restore camera position and zoom magnification.
@@ -136,15 +139,15 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 			TEXT("%s / %s\nThe drawing range is too wide.\nIf necessary, change the maximum size from the editor settings."),
 			*DrawSize.ToString(), *Options.MaxImageSize.ToString()
 		));
-		FGraphPrinterCore::ShowNotification(Message, FGraphPrinterCore::CS_Fail, 6.f);
+		GraphPrinter::FGraphPrinterCore::ShowNotification(Message, GraphPrinter::FGraphPrinterCore::CS_Fail, 6.f);
 		return;
 	}
 
 	if (!IsValid(RenderTarget))
 	{
-		FGraphPrinterCore::ShowNotification(
+		GraphPrinter::FGraphPrinterCore::ShowNotification(
 			LOCTEXT("DrawError", "Failed to draw to render target."),
-			FGraphPrinterCore::CS_Fail
+			GraphPrinter::FGraphPrinterCore::CS_Fail
 		);
 		return;
 	}
@@ -153,12 +156,12 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	// When copying to the clipboard, set the image format so that it can be copied.
 	if (Options.bCopyToClipboard)
 	{
-		Options.ImageWriteOptions.Format = FClipboardImageExtension::GetCopyableImageFormat();
+		Options.ImageWriteOptions.Format = GraphPrinter::FClipboardImageExtension::GetCopyableImageFormat();
 	}
 #endif
 
 	// Create output options and file path and output as image file.
-	FString Filename = FGraphPrinterCore::CreateFilename(GraphEditor, Options);
+	FString Filename = GraphPrinter::FGraphPrinterCore::CreateFilename(GraphEditor, Options);
 	
 	// Bind the event when the operation is completed.
 	Options.ImageWriteOptions.NativeOnComplete = [Filename, Options, GraphEditor, SelectedNodes](bool bIsSucceeded)
@@ -167,15 +170,15 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		{
 			if (!Options.bCopyToClipboard)
 			{
-				FGraphPrinterCore::ShowNotification(
+				GraphPrinter::FGraphPrinterCore::ShowNotification(
 				LOCTEXT("SucceededOutput", "GraphEditor capture saved as"),
-					FGraphPrinterCore::CS_Success, 5.f,
-					TArray<FGraphPrinterCore::FNotificationInteraction>{
-						FGraphPrinterCore::FNotificationInteraction(
+					GraphPrinter::FGraphPrinterCore::CS_Success, 5.f,
+					TArray<GraphPrinter::FGraphPrinterCore::FNotificationInteraction>{
+						GraphPrinter::FGraphPrinterCore::FNotificationInteraction(
 							FText::FromString(Filename),
 							FSimpleDelegate::CreateLambda([Filename]()
 							{
-								FGraphPrinterCore::OpenFolderWithExplorer(Filename);
+								GraphPrinter::FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 							})
 						)
 					}
@@ -184,18 +187,18 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 #if ENABLE_IMAGE_TO_CLIPBOARD
 			if (Options.bCopyToClipboard)
 			{
-				if (FClipboardImageExtension::ClipboardCopy(Filename))
+				if (GraphPrinter::FClipboardImageExtension::ClipboardCopy(Filename))
 				{
-					FGraphPrinterCore::ShowNotification(
+					GraphPrinter::FGraphPrinterCore::ShowNotification(
 						LOCTEXT("SucceededClipboardCopy", "Succeeded to copy image to clipboard."),
-						FGraphPrinterCore::CS_Success
+						GraphPrinter::FGraphPrinterCore::CS_Success
 					);
 				}
 				else
 				{
-					FGraphPrinterCore::ShowNotification(
+					GraphPrinter::FGraphPrinterCore::ShowNotification(
 						LOCTEXT("FailedClipboardCopy", "Failed to copy image to clipboard."),
-						FGraphPrinterCore::CS_Fail
+						GraphPrinter::FGraphPrinterCore::CS_Fail
 					);
 				}
 
@@ -209,11 +212,11 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 				Options.bIsIncludeNodeInfoInImageFile &&
 				(Options.ImageWriteOptions.Format == EDesiredImageFormat::PNG))
 			{
-				if (!FGraphPrinterCore::ExportGraphToPngFile(Filename, GraphEditor, SelectedNodes))
+				if (!GraphPrinter::FGraphPrinterCore::ExportGraphToPngFile(Filename, GraphEditor, SelectedNodes))
 				{
-					FGraphPrinterCore::ShowNotification(
+					GraphPrinter::FGraphPrinterCore::ShowNotification(
 						LOCTEXT("FailedEmbedNodeInfoError", "Failed to write node information to png file."),
-						FGraphPrinterCore::CS_Fail
+						GraphPrinter::FGraphPrinterCore::CS_Fail
 					);
 				}
 			}
@@ -221,9 +224,9 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 		}
 		else
 		{
-			FGraphPrinterCore::ShowNotification(
+			GraphPrinter::FGraphPrinterCore::ShowNotification(
 				LOCTEXT("FailedOutputError", "Failed capture GraphEditor."),
-				FGraphPrinterCore::CS_Fail
+				GraphPrinter::FGraphPrinterCore::CS_Fail
 			);
 		}
 	};
@@ -236,7 +239,7 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 	static bool bDoOnce = true;
 	if (bDoOnce)
 	{
-		for (int32 Count = 0; Count < GraphPrinterUtilsInternal::NumberOfReOutputWhenFirstTime; Count++)
+		for (int32 Count = 0; Count < GraphPrinter::GraphPrinterUtilsInternal::NumberOfReOutputWhenFirstTime; Count++)
 		{
 			FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
 			ImageWriteOptions.bOverwriteFile = true;
@@ -254,9 +257,9 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	const TSharedPtr<SGraphEditor> GraphEditor = GetActiveGraphEditor();
 	if (!GraphEditor.IsValid())
 	{
-		FGraphPrinterCore::ShowNotification(
+		GraphPrinter::FGraphPrinterCore::ShowNotification(
 			LOCTEXT("NotFoundGraphEditorError", "The graph editor isn't currently open."),
-			FGraphPrinterCore::CS_Fail
+			GraphPrinter::FGraphPrinterCore::CS_Fail
 		);
 		return;
 	}
@@ -265,7 +268,7 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	FString Filename;
 	{
 		TArray<FString> Filenames;
-		if (!FGraphPrinterCore::OpenFileDialog(
+		if (!GraphPrinter::FGraphPrinterCore::OpenFileDialog(
 			Filenames,
 			TEXT("Select the png file that contains the node info"),
 			UGraphPrinterSettings::Get().OutputDirectory.Path,
@@ -286,17 +289,17 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	}
 
 	// Restore node from png file.
-	if (FGraphPrinterCore::RestoreGraphFromPngFile(Filename, GraphEditor))
+	if (GraphPrinter::FGraphPrinterCore::RestoreGraphFromPngFile(Filename, GraphEditor))
 	{
-		FGraphPrinterCore::ShowNotification(
+		GraphPrinter::FGraphPrinterCore::ShowNotification(
 			LOCTEXT("SucceededRestore", "Restore nodes from"),
-			FGraphPrinterCore::CS_Success, 5.f,
-			TArray<FGraphPrinterCore::FNotificationInteraction>{
-				FGraphPrinterCore::FNotificationInteraction(
+			GraphPrinter::FGraphPrinterCore::CS_Success, 5.f,
+			TArray<GraphPrinter::FGraphPrinterCore::FNotificationInteraction>{
+				GraphPrinter::FGraphPrinterCore::FNotificationInteraction(
 					FText::FromString(Filename),
 					FSimpleDelegate::CreateLambda([Filename]()
 					{
-						FGraphPrinterCore::OpenFolderWithExplorer(Filename);
+						GraphPrinter::FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 					})
 				)
 			}
@@ -304,9 +307,9 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 	}
 	else
 	{
-		FGraphPrinterCore::ShowNotification(
+		GraphPrinter::FGraphPrinterCore::ShowNotification(
 			LOCTEXT("FailedRestoreError", "Failed restore nodes."),
-			FGraphPrinterCore::CS_Fail
+			GraphPrinter::FGraphPrinterCore::CS_Fail
 		);
 	}
 #else
@@ -316,12 +319,12 @@ void UGraphPrinterUtils::RestoreNodesFromPngFile()
 
 void UGraphPrinterUtils::OpenExportDestinationFolder()
 {
-	FGraphPrinterCore::OpenFolderWithExplorer(UGraphPrinterSettings::Get().OutputDirectory.Path);
+	GraphPrinter::FGraphPrinterCore::OpenFolderWithExplorer(UGraphPrinterSettings::Get().OutputDirectory.Path);
 }
 
 void UGraphPrinterUtils::OpenFolderWithExplorer(const FString& Filename)
 {
-	FGraphPrinterCore::OpenFolderWithExplorer(Filename);
+	GraphPrinter::FGraphPrinterCore::OpenFolderWithExplorer(Filename);
 }
 
 TSharedPtr<SGraphEditor> UGraphPrinterUtils::GetActiveGraphEditor(TSharedPtr<SWindow> TargetWindow /* = nullptr */)
@@ -331,7 +334,7 @@ TSharedPtr<SGraphEditor> UGraphPrinterUtils::GetActiveGraphEditor(TSharedPtr<SWi
 	{
 		ActiveWindow = FSlateApplication::Get().GetActiveTopLevelWindow();
 	}
-	return FGraphPrinterCore::FindGraphEditor(ActiveWindow);
+	return GraphPrinter::FGraphPrinterCore::FindGraphEditor(ActiveWindow);
 }
 
 #undef LOCTEXT_NAMESPACE
