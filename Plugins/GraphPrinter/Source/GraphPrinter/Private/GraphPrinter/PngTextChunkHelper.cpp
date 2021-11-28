@@ -6,6 +6,17 @@
 #if ENABLE_EMBED_NODE_INFO
 
 THIRD_PARTY_INCLUDES_START
+
+#if PLATFORM_LINUX || PLATFORM_LINUXAARCH64
+#include "ThirdParty/zlib/v1.2.8/include/Linux/x86_64-unknown-linux-gnu/zlib.h" 
+#else
+#include "ThirdParty/zlib/zlib-1.2.5/Inc/zlib.h"
+#endif
+
+#if !WITH_LIBPNG_1_6
+#include "ThirdParty/libPNG/libPNG-1.5.2/pnginfo.h"
+#endif
+
 #include <setjmp.h>
 THIRD_PARTY_INCLUDES_END
 
@@ -494,7 +505,7 @@ namespace GraphPrinter
 	bool FPngTextChunkHelper::IsPng() const
 	{
 		// Determine if this file is in Png format from the Png signature size.
-		const int32 PngSignatureSize = sizeof(png_size_t);
+		constexpr int32 PngSignatureSize = sizeof(png_size_t);
 		if (CompressedData.Num() > PngSignatureSize)
 		{
 			png_size_t PngSignature = *reinterpret_cast<const png_size_t*>(CompressedData.GetData());
