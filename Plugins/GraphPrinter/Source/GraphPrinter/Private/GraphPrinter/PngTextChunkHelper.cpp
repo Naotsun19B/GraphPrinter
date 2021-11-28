@@ -2,6 +2,8 @@
 
 #include "PngTextChunkHelper.h"
 #include "Misc/FileHelper.h"
+#include "Misc/ScopeLock.h"
+#include "Misc/Paths.h"
 
 #if ENABLE_EMBED_NODE_INFO
 

@@ -6,6 +6,7 @@
 #include "GraphPrinter/ClipboardImageExtension.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Framework/Application/SlateApplication.h"
+#include "HAL/FileManager.h"
 #include "Widgets/SWindow.h"
 #include "GraphEditor.h"
 

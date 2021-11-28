@@ -5,6 +5,8 @@
 #include "ISettingsModule.h"
 #include "ImageWriteTypes.h"
 #include "Modules/ModuleManager.h"
+#include "Engine/Texture.h"
+#include "Misc/Paths.h"
 
 #if !ENABLE_EMBED_NODE_INFO
 #include "GraphPrinter/GraphPrinterCore.h"

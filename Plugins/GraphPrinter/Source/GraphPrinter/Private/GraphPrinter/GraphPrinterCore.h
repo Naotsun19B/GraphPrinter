@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/Texture.h"
 #include "GraphPrinter/GraphPrinterGlobals.h"
 
 class SWidget;
@@ -10,6 +11,8 @@ class SGraphEditor;
 class SNotificationItem;
 class UTexture;
 class UTextureRenderTarget2D;
+class FUICommandInfo;
+struct FKeyEvent;
 struct FImageWriteOptions;
 struct FPrintGraphOptions;
 enum class EDesiredImageFormat : uint8;

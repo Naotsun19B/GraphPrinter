@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ImageWriteTypes.h"
 #include "ImageWriteBlueprintLibrary.h"
+#include "Engine/Texture.h"
 #include "GraphPrinterTypes.generated.h"
 
 class SWidget;
