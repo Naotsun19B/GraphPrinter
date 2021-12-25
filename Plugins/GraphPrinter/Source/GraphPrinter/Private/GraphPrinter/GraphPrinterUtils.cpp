@@ -54,6 +54,7 @@ void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, b
 	Options.Padding = Settings.Padding;
 	Options.MaxImageSize = Settings.MaxImageSize;
 	Options.FilteringMode = Settings.FilteringMode;
+	Options.bDrawOnlyGraph = Settings.bDrawOnlyGraph;
 	Options.ImageWriteOptions.bAsync = bIsAsync;
 	Options.ImageWriteOptions.Format = Settings.Format;
 	Options.ImageWriteOptions.bOverwriteFile = Settings.bCanOverwriteFileWhenExport;
@@ -66,7 +67,7 @@ void UGraphPrinterUtils::PrintGraphFromEditorSettings(bool bOnlySelectedNodes, b
 void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 {
 	// Get the currently active topmost window.
-	TSharedPtr<SGraphEditor> GraphEditor = UGraphPrinterUtils::GetActiveGraphEditor(Options.TargetWindowOverride);
+	TSharedPtr<SGraphEditor> GraphEditor = GetActiveGraphEditor(Options.TargetWindowOverride);
 
 	// If don't have an active graph editor, end here.
 	if (!GraphEditor.IsValid())
@@ -114,14 +115,20 @@ void UGraphPrinterUtils::CustomPrintGraph(FPrintGraphOptions Options)
 			bIsBelowMaxDrawSize = false;
 		}
 	}
-
+	
 	// Draw the graph editor on the render target.
 	UTextureRenderTarget2D* RenderTarget = nullptr;
 	if (bIsBelowMaxDrawSize)
 	{
-		RenderTarget = GraphPrinter::FGraphPrinterCore::DrawWidgetToRenderTarget(GraphEditor, DrawSize, Options.bUseGamma, Options.FilteringMode);
+		RenderTarget = GraphPrinter::FGraphPrinterCore::DrawGraphToRenderTarget(
+			GraphEditor,
+			DrawSize,
+			Options.bUseGamma,
+			Options.FilteringMode,
+			Options.bDrawOnlyGraph
+		);
 	}
-
+	
 	// Restore camera position and zoom magnification.
 	GraphEditor->SetViewLocation(PreviousViewLocation, PreviousZoomAmount);
 

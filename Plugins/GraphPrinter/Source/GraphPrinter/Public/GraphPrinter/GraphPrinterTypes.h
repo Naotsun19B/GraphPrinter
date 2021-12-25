@@ -28,6 +28,7 @@ public:
 		, Padding(0.f)
 		, MaxImageSize(FVector2D::ZeroVector)
 		, FilteringMode(TextureFilter::TF_Default)
+		, bDrawOnlyGraph(false)
 		, TargetWindowOverride(nullptr)
 	{
 		ImageWriteOptions.bAsync = true;
@@ -66,6 +67,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	TEnumAsByte<TextureFilter> FilteringMode;
 
+	// Whether to hide the title bar of the graph editor and the text of the graph type in the lower right.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
+	bool bDrawOnlyGraph;
+	
 	// Options related to image output processing.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PrintGraphOptions")
 	FImageWriteOptions ImageWriteOptions;

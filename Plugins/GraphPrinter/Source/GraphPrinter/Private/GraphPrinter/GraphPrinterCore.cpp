@@ -13,6 +13,8 @@
 #include "Widgets/SWidget.h"
 #include "GraphEditor.h"
 #include "SGraphEditorImpl.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/SOverlay.h"
 #include "EdGraph/EdGraph.h"
 #include "EdGraphUtilities.h"
 #include "HAL/FileManager.h"
@@ -60,6 +62,33 @@ namespace GraphPrinter
 			}
 
 			return nullptr;
+		}
+
+		// The name of the minimap widget class.
+		static const FName GraphMinimapClassName = TEXT("SGraphMinimap");
+		
+		// Returns a minimap if it was a child of the graph editor.
+		// What to do if Grap Minimap is installed.
+		static TSharedPtr<SWidget> FindNearestChildMinimap(TSharedPtr<SWidget> SearchTarget)
+		{
+			TSharedPtr<SWidget> FoundMinimap = nullptr;
+		
+			FGraphPrinterCore::EnumerateChildWidgets(
+				SearchTarget,
+				[&FoundMinimap](const TSharedPtr<SWidget> ChildWidget) -> bool
+				{
+					const TSharedPtr<SWidget> Minimap = CastSlateWidget<SWidget>(ChildWidget, GraphMinimapClassName);
+					if (Minimap.IsValid())
+					{
+						FoundMinimap = Minimap;
+						return false;
+					}
+
+					return true;
+				}
+			);
+
+			return FoundMinimap;
 		}
 	}
 #define GP_CAST_SLATE_WIDGET(ToClass, FromPtr) GraphPrinterCoreInternal::CastSlateWidget<ToClass>(FromPtr, #ToClass)
@@ -149,15 +178,50 @@ namespace GraphPrinter
 		return nullptr;
 	}
 
-	UTextureRenderTarget2D* FGraphPrinterCore::DrawWidgetToRenderTarget(
-		TSharedPtr<SWidget> WidgetToRender,
+	UTextureRenderTarget2D* FGraphPrinterCore::DrawGraphToRenderTarget(
+		TSharedPtr<SGraphEditor> GraphToRender,
 		const FVector2D& DrawSize,
 		bool bUseGamma,
-		TextureFilter Filter
+		TextureFilter Filter,
+		bool bDrawOnlyGraph
 	)
 	{
-		check(WidgetToRender.IsValid());
+		check(GraphToRender.IsValid());
 
+		// If there is a minimap, hide it only while drawing.
+		const TSharedPtr<SWidget> Minimap = GraphPrinterCoreInternal::FindNearestChildMinimap(GraphToRender);
+		TOptional<EVisibility> PreviousMinimapVisibility;
+		if (Minimap.IsValid())
+		{
+			PreviousMinimapVisibility = Minimap->GetVisibility();
+			Minimap->SetVisibility(EVisibility::Collapsed);
+		}
+		
+		// If there is a title bar, hide it only while drawing.
+		const TSharedPtr<SWidget> TitleBar = GraphToRender->GetTitleBar();
+		TOptional<EVisibility> PreviousTitleBarVisibility;
+		if (bDrawOnlyGraph && TitleBar.IsValid())
+		{
+			PreviousTitleBarVisibility = TitleBar->GetVisibility();
+			TitleBar->SetVisibility(EVisibility::Collapsed);
+		}
+
+		// Hide zoom magnification and graph type text while drawing.
+		TMap<TSharedPtr<STextBlock>, EVisibility> PreviousChildTextBlockVisibilities;
+		if (bDrawOnlyGraph)
+		{
+			const TSharedPtr<SOverlay> Overlay = FindNearestChildOverlay(GraphToRender);
+			TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks = GetVisibleChildTextBlocks(Overlay);
+			for (const TSharedPtr<STextBlock>& VisibleChildTextBlock : VisibleChildTextBlocks)
+			{
+				if (VisibleChildTextBlock.IsValid())
+				{
+					PreviousChildTextBlockVisibilities.Add(VisibleChildTextBlock, VisibleChildTextBlock->GetVisibility());
+					VisibleChildTextBlock->SetVisibility(EVisibility::Collapsed);
+				}
+			}
+		}
+		
 		FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(bUseGamma, false);
 		if (WidgetRenderer == nullptr)
 		{
@@ -180,13 +244,120 @@ namespace GraphPrinter
 		// Since the drawing result may be corrupted the first time, draw multiple times.
 		for (int32 Count = 0; Count < GraphPrinterCoreInternal::DrawTimes; Count++)
 		{
-			WidgetRenderer->DrawWidget(RenderTarget, WidgetToRender.ToSharedRef(), DrawSize, 0.f, false);
+			WidgetRenderer->DrawWidget(RenderTarget, GraphToRender.ToSharedRef(), DrawSize, 0.f, false);
 			FlushRenderingCommands();
 		}
 
 		BeginCleanup(WidgetRenderer);
 
+		// Restores the visibility of the title bar,
+		// zoom magnification text, and graph type text.
+		if (Minimap.IsValid() && PreviousMinimapVisibility.IsSet())
+		{
+			Minimap->SetVisibility(PreviousMinimapVisibility.GetValue());
+		}
+		
+		if (bDrawOnlyGraph && TitleBar.IsValid() && PreviousTitleBarVisibility.IsSet())
+		{
+			TitleBar->SetVisibility(PreviousTitleBarVisibility.GetValue());
+		}
+
+		if (bDrawOnlyGraph)
+		{
+			for (const auto& PreviousChildTextBlockVisibility : PreviousChildTextBlockVisibilities)
+			{
+				TSharedPtr<STextBlock> TextBlock = PreviousChildTextBlockVisibility.Key;
+				EVisibility PreviousVisibility = PreviousChildTextBlockVisibility.Value;
+				if (TextBlock.IsValid())
+				{
+					TextBlock->SetVisibility(PreviousVisibility);
+				}
+			}
+		}
+		
 		return RenderTarget;
+	}
+
+	
+	void FGraphPrinterCore::EnumerateChildWidgets(
+		TSharedPtr<SWidget> SearchTarget,
+		TFunction<bool(const TSharedPtr<SWidget> ChildWidget)> Predicate
+	)
+	{
+		if (!SearchTarget.IsValid())
+		{
+			return;
+		}
+
+		FChildren* Children = SearchTarget->GetChildren();
+		if (Children == nullptr)
+		{
+			return;
+		}
+
+		for (int32 Index = 0; Index < Children->Num(); Index++)
+		{
+			TSharedPtr<SWidget> ChildWidget = Children->GetChildAt(Index);
+			if (ChildWidget.IsValid())
+			{
+				if (Predicate(ChildWidget))
+				{
+					EnumerateChildWidgets(ChildWidget, Predicate);
+				}
+			}
+		}
+	}
+
+	TSharedPtr<SOverlay> FGraphPrinterCore::FindNearestChildOverlay(TSharedPtr<SWidget> SearchTarget)
+	{
+		TSharedPtr<SOverlay> FoundOverlay = nullptr;
+		
+		EnumerateChildWidgets(
+			SearchTarget,
+			[&FoundOverlay](const TSharedPtr<SWidget> ChildWidget) -> bool
+			{
+				const TSharedPtr<SOverlay> Overlay = GP_CAST_SLATE_WIDGET(SOverlay, ChildWidget);
+				if (Overlay.IsValid())
+				{
+					FoundOverlay = Overlay;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundOverlay;
+	}
+	
+	TArray<TSharedPtr<STextBlock>> FGraphPrinterCore::GetVisibleChildTextBlocks(TSharedPtr<SWidget> SearchTarget)
+	{
+		if (!SearchTarget.IsValid())
+		{
+			return {};
+		}
+
+		FChildren* Children = SearchTarget->GetChildren();
+		if (Children == nullptr)
+		{
+			return {};
+		}
+
+		TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks;
+		for (int32 Index = 0; Index < Children->Num(); Index++)
+		{
+			const TSharedPtr<SWidget> ChildWidget = Children->GetChildAt(Index);
+			TSharedPtr<STextBlock> TextBlock = GP_CAST_SLATE_WIDGET(STextBlock, ChildWidget);
+			if (TextBlock.IsValid())
+			{
+				if (TextBlock->GetVisibility().IsVisible())
+				{
+					VisibleChildTextBlocks.Add(TextBlock);
+				}
+			}
+		}
+		
+		return VisibleChildTextBlocks;
 	}
 
 	FString FGraphPrinterCore::CreateFilename(TSharedPtr<SGraphEditor> GraphEditor, const FPrintGraphOptions& Options)

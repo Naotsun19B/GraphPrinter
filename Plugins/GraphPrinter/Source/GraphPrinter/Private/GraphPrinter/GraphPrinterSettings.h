@@ -13,7 +13,7 @@ enum class EDesiredImageFormat : uint8;
 /**
  * Editor settings for this plugin.
  */
-UCLASS(Config = Editor, DefaultConfig)
+UCLASS(Config = Editor)
 class GRAPHPRINTER_API UGraphPrinterSettings : public UObject
 {
 	GENERATED_BODY()
@@ -36,6 +36,10 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	TEnumAsByte<TextureFilter> FilteringMode;
 
+	// Whether to hide the title bar of the graph editor and the text of the graph type in the lower right.
+	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	bool bDrawOnlyGraph;
+	
 	// Whether to output the drawing result affected by the gamma value.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	bool bUseGamma;

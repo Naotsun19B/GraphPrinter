@@ -8,7 +8,10 @@
 
 class SWidget;
 class SGraphEditor;
+class STextBlock;
+class SOverlay;
 class SNotificationItem;
+class UObject;
 class UTexture;
 class UTextureRenderTarget2D;
 class FUICommandInfo;
@@ -19,7 +22,7 @@ enum class EDesiredImageFormat : uint8;
 
 namespace GraphPrinter
 {
-	using FGraphPanelSelectionSet = TSet<class UObject*>;
+	using FGraphPanelSelectionSet = TSet<UObject*>;
 
 	/**
 	 * Internal processing functions used in this plugin.
@@ -85,14 +88,28 @@ namespace GraphPrinter
 		// Get SGraphEditor if it's in a child widget.
 		static TSharedPtr<SGraphEditor> FindGraphEditor(TSharedPtr<SWidget> SearchTarget);
 
-		// Draw the widget on the render target.
+		// Draw the graph editor on the render target.
 		// Setting the "NumberOfDrawingAttempts" too high can slow down the operation or, in the worst case, cause the engine to crash.
-		static UTextureRenderTarget2D* DrawWidgetToRenderTarget(
-			TSharedPtr<SWidget> WidgetToRender, 
+		static UTextureRenderTarget2D* DrawGraphToRenderTarget(
+			TSharedPtr<SGraphEditor> GraphToRender, 
 			const FVector2D& DrawSize, 
 			bool bUseGamma, 
-			TextureFilter Filter
+			TextureFilter Filter,
+			bool bDrawOnlyGraph
 		);
+
+		// Enumerate all widgets that are children of SearchTarget.
+		// if Predicate returns false, stop recursive process.
+		static void EnumerateChildWidgets(
+			TSharedPtr<SWidget> SearchTarget,
+			TFunction<bool(const TSharedPtr<SWidget> ChildWidget)> Predicate
+		);
+
+		// Find the widget that is the overlay and nearest parent of SearchTarget.
+		static TSharedPtr<SOverlay> FindNearestChildOverlay(TSharedPtr<SWidget> SearchTarget);
+		
+		// Returns the displayed text blocks that are children of SearchTarget.
+		static TArray<TSharedPtr<STextBlock>> GetVisibleChildTextBlocks(TSharedPtr<SWidget> SearchTarget);
 
 		// Create a file path from options.
 		static FString CreateFilename(TSharedPtr<SGraphEditor> GraphEditor, const FPrintGraphOptions& Options);
