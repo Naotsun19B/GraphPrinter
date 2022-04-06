@@ -3,6 +3,8 @@
 
 # Rider for Unreal Engine user specific files
 .idea/
+*.user
+Plugins/Developer/RiderLink/*
 
 # Visual Studio database file
 *.VC.db
@@ -79,3 +81,6 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Python modules
+Plugins/*/Content/Python/*
