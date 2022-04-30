@@ -1,21 +1,21 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinter/ClipboardImageExtension.h"
-#include "GraphPrinter/GraphPrinterGlobals.h"
+#include "ClipboardImageExtension/Windows/WindowsClipboardImageExtension.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "IImageWrapperModule.h"
 #include "IImageWrapper.h"
 #include "Misc/FileHelper.h"
 #include "Modules/ModuleManager.h"
 
-#if PLATFORM_WINDOWS
+#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
 #include "Windows/WindowsApplication.h"
 #endif
 
-namespace GraphPrinter
+namespace ClipboardImageExtension
 {
+#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
 	namespace ClipboardImageExtensionInternal
 	{
-#if PLATFORM_WINDOWS
 		HBITMAP LoadBitmapImage(const FString& Filename)
 		{
 			TArray<uint8> RawFileData;
@@ -23,7 +23,7 @@ namespace GraphPrinter
 			{
 				return nullptr;
 			}
-		
+			
 			auto& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
 			const TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::BMP);
 			if (!ImageWrapper.IsValid())
@@ -63,64 +63,41 @@ namespace GraphPrinter
 #endif
 			);
 		}
+#endif
+	}
 	
-		bool ClipboardCopy(const FString& Filename)
+	bool FWindowsClipboardImageExtension::ClipboardCopy(const FString& Filename)
+	{
+#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
+		const HBITMAP Bitmap = ClipboardImageExtensionInternal::LoadBitmapImage(Filename);
+		if (Bitmap == nullptr)
 		{
-			const HBITMAP Bitmap = LoadBitmapImage(Filename);
-			if (Bitmap == nullptr)
-			{
-				UE_LOG(LogGraphPrinter, Error, TEXT("Failed to load the file to copy to the clipboard (%s)"), *Filename);
-				return false;
-			}
-	
-			if (!OpenClipboard(GetActiveWindow()))
-			{
-				return false;
-			}
-
-			verify(EmptyClipboard());
-
-			if (SetClipboardData(CF_BITMAP, Bitmap) == nullptr)
-			{
-				UE_LOG(LogGraphPrinter, Fatal, TEXT("SetClipboardData failed with error code %i"), static_cast<uint32>(GetLastError()));
-			}
-
-			verify(CloseClipboard());
-
-			return true;
-		}
-
-		EDesiredImageFormat GetCopyableImageFormat()
-		{
-			return EDesiredImageFormat::BMP;
-		}
-#else
-		void NotifyNotSupported()
-		{
-			UE_LOG(LogGraphPrinter, Error, TEXT("This feature is not supported on this platform."));
+			UE_LOG(LogGraphPrinter, Error, TEXT("Failed to load the file to copy to the clipboard (%s)"), *Filename);
+			return false;
 		}
 	
-		bool ClipboardCopy(const FString& Filename)
+		if (!OpenClipboard(GetActiveWindow()))
 		{
-			NotifyNotSupported();
 			return false;
 		}
 
-		EDesiredImageFormat GetCopyableImageFormat()
+		verify(EmptyClipboard());
+
+		if (SetClipboardData(CF_BITMAP, Bitmap) == nullptr)
 		{
-			NotifyNotSupported();
-			return {};
+			UE_LOG(LogGraphPrinter, Fatal, TEXT("SetClipboardData failed with error code %i"), static_cast<uint32>(GetLastError()));
 		}
+
+		verify(CloseClipboard());
+
+		return true;
+#else
+		return false;
 #endif
 	}
 
-	bool FClipboardImageExtension::ClipboardCopy(const FString& Filename)
+	EDesiredImageFormat FWindowsClipboardImageExtension::GetCopyableImageFormat()
 	{
-		return ClipboardImageExtensionInternal::ClipboardCopy(Filename);
-	}
-
-	EDesiredImageFormat FClipboardImageExtension::GetCopyableImageFormat()
-	{
-		return ClipboardImageExtensionInternal::GetCopyableImageFormat();
+		return EDesiredImageFormat::BMP;
 	}
 }

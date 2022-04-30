@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "ImageWriteTypes.h"
 
-namespace GraphPrinter
+namespace ClipboardImageExtension
 {
 	/**
 	 * Extension class for working with images on the clipboard.
 	 */
-	class GRAPHPRINTER_API FClipboardImageExtension
+	class CLIPBOARDIMAGEEXTENSION_API FGenericClipboardImageExtension
 	{
 	public:
 		// Copies the image file with the specified path to the clipboard.
-		static bool ClipboardCopy(const FString& Filename);
+		static bool ClipboardCopy(const FString& Filename) { return false; }
 
 		// Returns an image format that can be copied to the clipboard.
-		static EDesiredImageFormat GetCopyableImageFormat();
+		static EDesiredImageFormat GetCopyableImageFormat() { return EDesiredImageFormat::PNG; }
 	};
 }

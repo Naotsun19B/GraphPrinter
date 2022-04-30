@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinter/GraphPrinterGlobals.h"
+#include "TextChunkHelper/ITextChunk.h"
 
-#if ENABLE_EMBED_NODE_INFO
+#if WITH_UNREALPNG
 
 THIRD_PARTY_INCLUDES_START
 // make sure no other versions of libpng headers are picked up.
@@ -18,32 +18,26 @@ THIRD_PARTY_INCLUDES_START
 #endif
 THIRD_PARTY_INCLUDES_END
 
-namespace GraphPrinter
+namespace TextChunkHelper
 {
 	/**
 	 * Helper class for accessing text chunks in png files.
 	 */
-	class GRAPHPRINTER_API FPngTextChunkHelper
+	class TEXTCHUNKHELPER_API FPngTextChunk : public ITextChunk
 	{
 	public:
 		// Constructor.
-		FPngTextChunkHelper();
+		FPngTextChunk();
 
 		// Destructor.
-		virtual ~FPngTextChunkHelper();
-
-		// Factory function that creates an instance of this class.
-		static TSharedPtr<FPngTextChunkHelper> CreatePngTextChunkHelper(const FString& InFilename);
-
-		// Write to text chunk of png file.
-		virtual bool Write(const TMap<FString, FString>& MapToWrite);
-
-		// Read into text chunks in png files.
-		virtual bool Read(TMap<FString, FString>& MapToRead);
+		virtual ~FPngTextChunk();
 
 	protected:
-		// Copy loaded data to member variables.
-		virtual bool Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize);
+		// ITextChunk interface.
+		virtual bool Write(const TMap<FString, FString>& MapToWrite) override;
+		virtual bool Read(TMap<FString, FString>& MapToRead) override;
+		virtual bool Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize) override;
+		// End of ITextChunk interface.
 
 		// Check if the format of the loaded image file is png.
 		virtual bool IsPng() const;

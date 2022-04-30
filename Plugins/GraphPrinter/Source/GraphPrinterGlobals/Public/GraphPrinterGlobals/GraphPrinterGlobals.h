@@ -47,4 +47,4 @@
 /**
  * Categories used for log output with this plugin.
  */
-GRAPHPRINTER_API DECLARE_LOG_CATEGORY_EXTERN(LogGraphPrinter, Log, All);
+GRAPHPRINTERGLOBALS_API DECLARE_LOG_CATEGORY_EXTERN(LogGraphPrinter, Log, All);

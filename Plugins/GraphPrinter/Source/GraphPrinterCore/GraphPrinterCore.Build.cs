@@ -3,22 +3,26 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class GraphPrinter : ModuleRules
+public class GraphPrinterCore : ModuleRules
 {
-	// With this flag can turn on / off the function to embed node information in the png image.
-	private readonly bool bEnableEmbedNodeInfo = true;
-
-	public GraphPrinter(ReadOnlyTargetRules Target) : base(Target)
+	public GraphPrinterCore(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		PrivateIncludePaths.AddRange(
+			new string[] 
+			{
+				Path.Combine(ModuleDirectory, "Private"),
+			}
+		);
+		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core",
 				"InputCore",
 			}
-			);
+		);
 			
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
@@ -37,8 +41,12 @@ public class GraphPrinter : ModuleRules
                 "DesktopPlatform",
                 "ImageWriteQueue",
                 "AssetManagerEditor",
+                
+                "GraphPrinterGlobals",
+                "TextChunkHelper",
+                "ClipboardImageExtension",
             }
-			);
+		);
 
         // To use SGraphEditorImpl.
         PublicIncludePaths.AddRange(
@@ -46,16 +54,6 @@ public class GraphPrinter : ModuleRules
             {
                 Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
             }
-            );
-
-        if (bEnableEmbedNodeInfo)
-		{
-            AddEngineThirdPartyPrivateStaticDependencies(Target,
-				"zlib",
-				"UElibPNG"
-            );
-
-			PublicDefinitions.Add("WITH_EMBED_NODE_INFO");
-        }
-    }
+        );
+	}
 }

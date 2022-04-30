@@ -1,11 +1,12 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "PngTextChunkHelper.h"
+#include "TextChunkHelper/Png/PngTextChunk.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Misc/FileHelper.h"
 #include "Misc/ScopeLock.h"
 #include "Misc/Paths.h"
 
-#if ENABLE_EMBED_NODE_INFO
+#if WITH_UNREALPNG
 
 THIRD_PARTY_INCLUDES_START
 
@@ -28,9 +29,9 @@ THIRD_PARTY_INCLUDES_END
 #pragma warning(disable:4611)
 #endif
 
-namespace GraphPrinter
+namespace TextChunkHelper
 {
-	namespace PngTextChunkHelperInternal
+	namespace PngTextChunkInternal
 	{
 		/**
 		 * Classes for safely handling pointers used by libpng.
@@ -226,62 +227,47 @@ namespace GraphPrinter
 		}
 
 		// Only allow one thread to use libpng at a time.
-		FCriticalSection PngTextChunkHelperSection;
+		static FCriticalSection PngTextChunkHelperSection;
+
+		// Determine if this file is in Png format from the Png signature size.
+		static constexpr int32 PngSignatureSize = sizeof(png_size_t);
 	}
 
-	FPngTextChunkHelper::FPngTextChunkHelper()
+	FPngTextChunk::FPngTextChunk()
 		: Filename(TEXT(""))
 		, ReadOffset(0)
 	{
 	}
 
-	FPngTextChunkHelper::~FPngTextChunkHelper()
+	FPngTextChunk::~FPngTextChunk()
 	{
 	}
 
-	TSharedPtr<FPngTextChunkHelper> FPngTextChunkHelper::CreatePngTextChunkHelper(const FString& InFilename)
-	{
-		TArray<uint8> CompressedData;
-		if (!FFileHelper::LoadFileToArray(CompressedData, *InFilename))
-		{
-			UE_LOG(LogGraphPrinter, Error, TEXT("Failed to load the file : %s"), *InFilename);
-			return nullptr;
-		}
-
-		TSharedPtr<FPngTextChunkHelper> PngTextChunkHelper = MakeShared<FPngTextChunkHelper>();
-		if (!PngTextChunkHelper->Initialize(InFilename, CompressedData.GetData(), CompressedData.Num()))
-		{
-			return nullptr;
-		}
-
-		return PngTextChunkHelper;
-	}
-
-	bool FPngTextChunkHelper::Write(const TMap<FString, FString>& MapToWrite)
+	bool FPngTextChunk::Write(const TMap<FString, FString>& MapToWrite)
 	{
 		check(IsPng());
 
 		// Determine if the map is useable.
-		if (!PngTextChunkHelperInternal::ValidateMap(MapToWrite))
+		if (!PngTextChunkInternal::ValidateMap(MapToWrite))
 		{
 			UE_LOG(LogGraphPrinter, Warning, TEXT("Writing to a text chunk is not possible because either the key or value is empty, or the key and value string contains \0."));
 			return false;
 		}
 
 		// Only allow one thread to use libpng at a time.
-		FScopeLock PngLock(&PngTextChunkHelperInternal::PngTextChunkHelperSection);
+		FScopeLock PngLock(&PngTextChunkInternal::PngTextChunkHelperSection);
 	
 		// Reset to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
 		ReadOffset = 0;
 
 		// Read the png_info of the original image file.
-		const PngTextChunkHelperInternal::FPngReadGuard ReadGuard(
+		const PngTextChunkInternal::FPngReadGuard ReadGuard(
 			this,
-			FPngTextChunkHelper::UserError,
-			FPngTextChunkHelper::UserWarning,
-			FPngTextChunkHelper::UserMalloc,
-			FPngTextChunkHelper::UserFree,
-			FPngTextChunkHelper::UserReadCompressed
+			FPngTextChunk::UserError,
+			FPngTextChunk::UserWarning,
+			FPngTextChunk::UserMalloc,
+			FPngTextChunk::UserFree,
+			FPngTextChunk::UserReadCompressed
 		);
 		if (!ReadGuard.IsValid())
 		{
@@ -296,12 +282,12 @@ namespace GraphPrinter
 		png_read_png(ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr(), PNG_TRANSFORM_IDENTITY, nullptr);
 
 		// Prepare png_struct etc. for writing.
-		const PngTextChunkHelperInternal::FPngWriteGuard WriteGuard(
+		const PngTextChunkInternal::FPngWriteGuard WriteGuard(
 			this,
-			FPngTextChunkHelper::UserError,
-			FPngTextChunkHelper::UserWarning,
-			FPngTextChunkHelper::UserWriteCompressed,
-			FPngTextChunkHelper::UserFlushData
+			FPngTextChunk::UserError,
+			FPngTextChunk::UserWarning,
+			FPngTextChunk::UserWriteCompressed,
+			FPngTextChunk::UserFlushData
 		);
 		if (!WriteGuard.IsValid())
 		{
@@ -314,7 +300,7 @@ namespace GraphPrinter
 		}
 
 		// Copy the read original png_info to png_info used for write.
-		PngTextChunkHelperInternal::CopyPngInfoStruct(
+		PngTextChunkInternal::CopyPngInfoStruct(
 			WriteGuard.GetWritePtr(), WriteGuard.GetInfoPtr(),
 			ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr()
 		);
@@ -362,24 +348,24 @@ namespace GraphPrinter
 		return FFileHelper::SaveArrayToFile(CompressedData, *Filename);
 	}
 
-	bool FPngTextChunkHelper::Read(TMap<FString, FString>& MapToRead)
+	bool FPngTextChunk::Read(TMap<FString, FString>& MapToRead)
 	{
 		check(IsPng());
 
 		// Only allow one thread to use libpng at a time.
-		FScopeLock PngLock(&PngTextChunkHelperInternal::PngTextChunkHelperSection);
+		FScopeLock PngLock(&PngTextChunkInternal::PngTextChunkHelperSection);
 
 		// Reset to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
 		ReadOffset = 0;
 
 		// Read png_info.
-		const PngTextChunkHelperInternal::FPngReadGuard ReadGuard(
+		const PngTextChunkInternal::FPngReadGuard ReadGuard(
 			this, 
-			FPngTextChunkHelper::UserError, 
-			FPngTextChunkHelper::UserWarning, 
-			FPngTextChunkHelper::UserMalloc, 
-			FPngTextChunkHelper::UserFree,
-			FPngTextChunkHelper::UserReadCompressed
+			FPngTextChunk::UserError, 
+			FPngTextChunk::UserWarning, 
+			FPngTextChunk::UserMalloc, 
+			FPngTextChunk::UserFree,
+			FPngTextChunk::UserReadCompressed
 		);
 		if (!ReadGuard.IsValid())
 		{
@@ -426,7 +412,7 @@ namespace GraphPrinter
 		int32 SearchStartPosition = 0;
 		for (int32 Count = 0; Count < NumText; Count++)
 		{
-			const int32 TextChunkStartPosition = PngTextChunkHelperInternal::GetTextChunkPosition(CompressedData, SearchStartPosition);
+			const int32 TextChunkStartPosition = PngTextChunkInternal::GetTextChunkPosition(CompressedData, SearchStartPosition);
 			if (TextChunkStartPosition == INDEX_NONE)
 			{
 				break;
@@ -476,16 +462,16 @@ namespace GraphPrinter
 		{
 			check(SplitTextChunks.IsValidIndex(Index) && SplitTextChunks.IsValidIndex(Index + 1));
 
-			const FString& Key = PngTextChunkHelperInternal::ConvertByteArrayToString(SplitTextChunks[Index]);
-			const FString& Value = PngTextChunkHelperInternal::ConvertByteArrayToString(SplitTextChunks[Index + 1]);
+			const FString& Key = PngTextChunkInternal::ConvertByteArrayToString(SplitTextChunks[Index]);
+			const FString& Value = PngTextChunkInternal::ConvertByteArrayToString(SplitTextChunks[Index + 1]);
 
 			MapToRead.Add(Key, Value);
 		}
 
-		return PngTextChunkHelperInternal::ValidateMap(MapToRead);
+		return PngTextChunkInternal::ValidateMap(MapToRead);
 	}
 
-	bool FPngTextChunkHelper::Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize)
+	bool FPngTextChunk::Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize)
 	{
 		FText FailedReason;
 		if (!FPaths::ValidatePath(InFilename, &FailedReason))
@@ -504,26 +490,24 @@ namespace GraphPrinter
 		return IsPng();
 	}
 
-	bool FPngTextChunkHelper::IsPng() const
+	bool FPngTextChunk::IsPng() const
 	{
-		// Determine if this file is in Png format from the Png signature size.
-		constexpr int32 PngSignatureSize = sizeof(png_size_t);
-		if (CompressedData.Num() > PngSignatureSize)
+		if (CompressedData.Num() > PngTextChunkInternal::PngSignatureSize)
 		{
 			png_size_t PngSignature = *reinterpret_cast<const png_size_t*>(CompressedData.GetData());
-			return (0 == png_sig_cmp(reinterpret_cast<png_bytep>(&PngSignature), 0, PngSignatureSize));
+			return (0 == png_sig_cmp(reinterpret_cast<png_bytep>(&PngSignature), 0, PngTextChunkInternal::PngSignatureSize));
 		}
 
 		UE_LOG(LogGraphPrinter, Error, TEXT("This file is not a png file."));
 		return false;
 	}
 
-	void FPngTextChunkHelper::UserReadCompressed(png_structp PngPtr, png_bytep Data, png_size_t Length)
+	void FPngTextChunk::UserReadCompressed(png_structp PngPtr, png_bytep Data, png_size_t Length)
 	{
-		FPngTextChunkHelper* Context = static_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
+		FPngTextChunk* Context = static_cast<FPngTextChunk*>(png_get_io_ptr(PngPtr));
 		if (Context == nullptr)
 		{
-			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserReadCompressed));
+			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunk, UserReadCompressed));
 		}
 
 		if (Context->ReadOffset + static_cast<int64>(Length) <= Context->CompressedData.Num())
@@ -537,39 +521,39 @@ namespace GraphPrinter
 		}
 	}
 
-	void FPngTextChunkHelper::UserWriteCompressed(png_structp PngPtr, png_bytep Data, png_size_t Length)
+	void FPngTextChunk::UserWriteCompressed(png_structp PngPtr, png_bytep Data, png_size_t Length)
 	{
-		FPngTextChunkHelper* Context = static_cast<FPngTextChunkHelper*>(png_get_io_ptr(PngPtr));
+		FPngTextChunk* Context = static_cast<FPngTextChunk*>(png_get_io_ptr(PngPtr));
 		if (Context == nullptr)
 		{
-			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunkHelper, UserWriteCompressed));
+			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunk, UserWriteCompressed));
 		}
 
 		const int64 Offset = Context->CompressedData.AddUninitialized(Length);
 		FMemory::Memcpy(&Context->CompressedData[Offset], Data, Length);
 	}
 
-	void FPngTextChunkHelper::UserFlushData(png_structp PngPtr)
+	void FPngTextChunk::UserFlushData(png_structp PngPtr)
 	{
 	}
 
-	void FPngTextChunkHelper::UserError(png_structp PngPtr, png_const_charp ErrorMessage)
+	void FPngTextChunk::UserError(png_structp PngPtr, png_const_charp ErrorMessage)
 	{
 		UE_LOG(LogGraphPrinter, Error, TEXT("libpng Error : %s"), ANSI_TO_TCHAR(ErrorMessage));
 	}
 
-	void FPngTextChunkHelper::UserWarning(png_structp PngPtr, png_const_charp WarningMessage)
+	void FPngTextChunk::UserWarning(png_structp PngPtr, png_const_charp WarningMessage)
 	{
 		UE_LOG(LogGraphPrinter, Warning, TEXT("libpng Warning : %s"), ANSI_TO_TCHAR(WarningMessage));
 	}
 
-	void* FPngTextChunkHelper::UserMalloc(png_structp PngPtr, png_size_t Size)
+	void* FPngTextChunk::UserMalloc(png_structp PngPtr, png_size_t Size)
 	{
 		check(Size > 0);
 		return FMemory::Malloc(Size);
 	}
 
-	void FPngTextChunkHelper::UserFree(png_structp PngPtr, png_voidp StructPtr)
+	void FPngTextChunk::UserFree(png_structp PngPtr, png_voidp StructPtr)
 	{
 		check(StructPtr);
 		FMemory::Free(StructPtr);

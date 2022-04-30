@@ -16,7 +16,40 @@
 	"Installed": true,
 	"Modules": [
 		{
-			"Name": "GraphPrinter",
+			"Name": "GraphPrinterGlobals",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
+			"Name": "GraphPrinterCore",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
+			"Name": "TextChunkHelper",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
+			"Name": "ClipboardImageExtension",
 			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [
