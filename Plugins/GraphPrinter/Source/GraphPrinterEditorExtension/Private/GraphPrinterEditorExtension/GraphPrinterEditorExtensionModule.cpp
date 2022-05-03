@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
+#include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
+#include "GraphPrinterEditorExtension/UIExtensions/GraphPrinterStyle.h"
 
 namespace GraphPrinterEditorExtension
 {
@@ -17,13 +19,25 @@ namespace GraphPrinterEditorExtension
 
 	void FGraphPrinterEditorExtensionModule::StartupModule()
 	{
-		// Register command actions
+		// Register command actions.
 		FGraphPrinterCommands::Register();
 		FGraphPrinterCommands::Bind();
+
+		// Register style set.
+		FGraphPrinterStyle::Register();
+		
+		// Register toolbar extension.
+		FToolbarExtender::Register();
 	}
 
 	void FGraphPrinterEditorExtensionModule::ShutdownModule()
 	{
+		// Unregister toolbar extension.
+		FToolbarExtender::Unregister();
+
+		// Unregister style set.
+		FGraphPrinterStyle::Unregister();
+		
 		// Unregister command actions.
 		FGraphPrinterCommands::Unregister();
 	}

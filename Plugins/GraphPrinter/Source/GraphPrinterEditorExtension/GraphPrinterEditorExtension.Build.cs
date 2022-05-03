@@ -21,8 +21,11 @@ public class GraphPrinterEditorExtension : ModuleRules
 				"CoreUObject",
 				"InputCore",
 				"Slate",
+				"SlateCore",
+				"UnrealEd",
 				"EditorStyle",
 				"MainFrame",
+				"Projects",
 
 				"GraphPrinterGlobals",
                 "GraphPrinterCore",
