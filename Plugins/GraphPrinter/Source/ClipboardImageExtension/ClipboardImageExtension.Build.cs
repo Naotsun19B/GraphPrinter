@@ -35,6 +35,7 @@ public class ClipboardImageExtension : ModuleRules
 			}
 		);
 
+		// #TODO: Allows images to be copied to the clipboard on Mac and Linux.
 		if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows))
 		{
 			PublicDefinitions.Add("WITH_CLIPBOARD_IMAGE_EXTENSION");

@@ -28,21 +28,8 @@ public class GraphPrinterCore : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
-				"UMG",
-				"Slate",
-				"SlateCore",
-				"RenderCore",
-				"UnrealEd",
-				"GraphEditor",
-				"MainFrame",
-				"EditorStyle",
-                "ApplicationCore",
-                "DesktopPlatform",
-                "ImageWriteQueue",
-                "AssetManagerEditor",
-                
-                "GraphPrinterGlobals",
+
+				"GraphPrinterGlobals",
                 "TextChunkHelper",
                 "ClipboardImageExtension",
             }

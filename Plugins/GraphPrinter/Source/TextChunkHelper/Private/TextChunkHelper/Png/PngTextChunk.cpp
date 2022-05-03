@@ -1,4 +1,4 @@
-﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
+// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "TextChunkHelper/Png/PngTextChunk.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
