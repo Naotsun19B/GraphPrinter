@@ -7,13 +7,19 @@
 
 namespace GraphPrinterGlobals
 {
- // The name of this plugin.
- static const FName PluginName = TEXT("GraphPrinter");
+	// The name of this plugin.
+	static const FName PluginName = TEXT("GraphPrinter");
 }
 
 /**
  * Macro to support each engine version.
  */
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION <= 0
+#define BEFORE_UE_5_00 1
+#else
+#define BEFORE_UE_5_00 0
+#endif
+
 #if ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION <= 24
 #define BEFORE_UE_4_24 1
 #else
@@ -30,24 +36,6 @@ namespace GraphPrinterGlobals
 #define BEFORE_UE_4_21 1
 #else
 #define BEFORE_UE_4_21 0
-#endif
-
-/**
- * Defines whether the ability to embed node information in text chunks is available.
- */
-#ifdef WITH_EMBED_NODE_INFO
-#define ENABLE_EMBED_NODE_INFO WITH_UNREALPNG
-#else
-#define ENABLE_EMBED_NODE_INFO 0
-#endif
-
-/**
- * Defines whether the ability to copy images to the clipboard is available.
- */
-#if PLATFORM_WINDOWS
-#define ENABLE_IMAGE_TO_CLIPBOARD 1
-#else
-#define ENABLE_IMAGE_TO_CLIPBOARD 0
 #endif
 
 /**

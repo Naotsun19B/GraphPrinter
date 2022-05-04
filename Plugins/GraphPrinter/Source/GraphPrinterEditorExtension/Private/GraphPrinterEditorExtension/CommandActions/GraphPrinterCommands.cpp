@@ -2,7 +2,7 @@
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
-#include "GraphPrinterEditorExtension/UIExtensions/GraphPrinterStyle.h"
+#include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Interfaces/IMainFrameModule.h"
 
@@ -48,6 +48,34 @@ namespace GraphPrinterEditorExtension
 	{
 		check(Instance.Pin().IsValid());
 		Instance.Pin()->BindCommands();
+	}
+
+	void FGraphPrinterCommands::FillMenuBuilder(FMenuBuilder& MenuBuilder)
+	{
+		const TSharedPtr<FGraphPrinterCommands> This = Instance.Pin();
+		check(This.IsValid());
+		
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("CopyToClipboardSectionName", "Copy To Clipboard"));
+		MenuBuilder.AddMenuEntry(This->CopyGraphWithAllNodesToClipboard);
+		MenuBuilder.AddMenuEntry(This->CopyGraphWithSelectedNodesToClipboard);
+		MenuBuilder.EndSection();
+#endif
+		
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ExportToImageFileSectionName", "Export To Image File"));
+		MenuBuilder.AddMenuEntry(This->PrintGraphWithAllNodes);
+		MenuBuilder.AddMenuEntry(This->PrintGraphWithSelectedNodes);
+		MenuBuilder.EndSection();
+
+#ifdef WITH_TEXT_CHUNK_HELPER
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ImportFromImageFileSectionName", "Import From Image File"));
+		MenuBuilder.AddMenuEntry(This->RestoreNodesFromPngFile);
+		MenuBuilder.EndSection();
+#endif
+		
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("OtherSectionName", "Other"));
+		MenuBuilder.AddMenuEntry(This->OpenExportDestinationFolder);
+		MenuBuilder.EndSection();
 	}
 
 	void FGraphPrinterCommands::BindCommands()

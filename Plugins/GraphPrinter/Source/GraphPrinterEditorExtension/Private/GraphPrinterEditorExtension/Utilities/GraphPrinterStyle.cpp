@@ -1,6 +1,6 @@
 // Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterEditorExtension/UIExtensions/GraphPrinterStyle.h"
+#include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Interfaces/IPluginManager.h"
 #include "Styling/SlateStyleRegistry.h"
@@ -35,7 +35,14 @@ namespace GraphPrinterEditorExtension
 		Instance->SetContentRoot(StyleContentRoot);
 		Instance->SetCoreContentRoot(StyleContentRoot);
 
-		Instance->Set(GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PluginIcon), new IMAGE_BRUSH("Icon128", IconSize::Icon64x64));
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PluginIcon),
+#if !BEFORE_UE_5_00
+			new IMAGE_BRUSH("Icon128", IconSize::Icon64x64)
+#else
+			new IMAGE_BRUSH("GrayIcon128", IconSize::Icon64x64)
+#endif
+		);
 
 		FSlateStyleRegistry::RegisterSlateStyle(*Instance);
 	}

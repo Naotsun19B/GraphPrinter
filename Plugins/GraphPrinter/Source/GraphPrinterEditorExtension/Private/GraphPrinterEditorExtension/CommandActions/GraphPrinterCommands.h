@@ -26,6 +26,9 @@ namespace GraphPrinterEditorExtension
 		// Processing of command binding.
 		static void Bind();
 
+		// Fill the menu builder with the commands of this plugin.
+		static void FillMenuBuilder(FMenuBuilder& MenuBuilder);
+		
 	protected:
 		// Internal processing of command binding.
 		virtual void BindCommands();
