@@ -23,7 +23,6 @@ public class GraphPrinterEditorExtension : ModuleRules
 				"Slate",
 				"SlateCore",
 				"UnrealEd",
-				"EditorStyle",
 				"MainFrame",
 				"Projects",
 

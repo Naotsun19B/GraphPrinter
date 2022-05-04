@@ -19,12 +19,12 @@ namespace GraphPrinterEditorExtension
 
 	void FGraphPrinterEditorExtensionModule::StartupModule()
 	{
+		// Register style set.
+		FGraphPrinterStyle::Register();
+		
 		// Register command actions.
 		FGraphPrinterCommands::Register();
 		FGraphPrinterCommands::Bind();
-
-		// Register style set.
-		FGraphPrinterStyle::Register();
 		
 		// Register toolbar extension.
 		FToolbarExtender::Register();
@@ -34,12 +34,12 @@ namespace GraphPrinterEditorExtension
 	{
 		// Unregister toolbar extension.
 		FToolbarExtender::Unregister();
-
-		// Unregister style set.
-		FGraphPrinterStyle::Unregister();
 		
 		// Unregister command actions.
 		FGraphPrinterCommands::Unregister();
+
+		// Unregister style set.
+		FGraphPrinterStyle::Unregister();
 	}
 }
 

@@ -9,7 +9,7 @@ namespace GraphPrinterEditorExtension
 	/**
 	 * A class that adds a menu that performs plugin functions to the toolbar of the Graph Editor.
 	 */
-	class GRAPHPRINTEREDITOREXTENSION_API FToolbarExtender
+	class FToolbarExtender
 	{
 	public:
 		// Register-Unregister the toolbar extension.
@@ -18,11 +18,11 @@ namespace GraphPrinterEditorExtension
 
 	private:
 		// Called when the toolbar is expanded.
-		static void OnExtendToolbar(FToolBarBuilder& ToolBarBuilder);
+		static void OnExtendToolbar(FToolBarBuilder& Builder);
 
 		// Called when building the contents of a combo box added to the toolbar.
 		static TSharedRef<SWidget> OnGetComboBoxContent();
-		
+
 	private:
 		// Toolbar extension point.
 		static TSharedPtr<FExtender> Extender;

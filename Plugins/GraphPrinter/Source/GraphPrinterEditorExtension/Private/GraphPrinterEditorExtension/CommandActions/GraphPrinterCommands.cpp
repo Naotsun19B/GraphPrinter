@@ -2,11 +2,11 @@
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
+#include "GraphPrinterEditorExtension/UIExtensions/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#include "EditorStyleSet.h"
 #include "Interfaces/IMainFrameModule.h"
 
-#define LOCTEXT_NAMESPACE "GraphPrintCommands"
+#define LOCTEXT_NAMESPACE "GraphPrinterCommands"
 
 namespace GraphPrinterEditorExtension
 {
@@ -16,8 +16,9 @@ namespace GraphPrinterEditorExtension
 			TEXT("GraphPrinter"),
 			NSLOCTEXT("Contexts", "GraphPrinter", "Graph Printer"),
 			NAME_None,
-			FEditorStyle::GetStyleSetName()
+			FGraphPrinterStyle::Get().GetStyleSetName()
 		)
+		, CommandBindings(MakeShared<FUICommandList>())
 		, bIsBound(false)
 	{
 	}
@@ -26,15 +27,15 @@ namespace GraphPrinterEditorExtension
 	{
 		// Register command here.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		UI_COMMAND(CopyGraphWithAllNodesToClipboard, "Copy Graph With All Nodes To Clipboard", "Copy all nodes of the currently active graph editor as images to clipboard.", EUserInterfaceActionType::None, FInputChord(EKeys::F7, EModifierKey::Control));
-		UI_COMMAND(CopyGraphWithSelectedNodesToClipboard, "Copy Graph With Selected Nodes To Clipboard", "Copy the selected node of the currently active graph editor as an image to clipboard.", EUserInterfaceActionType::None, FInputChord(EKeys::F8, EModifierKey::Control));
+		UI_COMMAND(CopyGraphWithAllNodesToClipboard, "Copy Graph With All Nodes To Clipboard", "Copy all nodes of the currently active graph editor as images to clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F7, EModifierKey::Control));
+		UI_COMMAND(CopyGraphWithSelectedNodesToClipboard, "Copy Graph With Selected Nodes To Clipboard", "Copy the selected node of the currently active graph editor as an image to clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F8, EModifierKey::Control));
 #endif
-		UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::None, FInputChord(EKeys::F9, EModifierKey::Control));
-		UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::None, FInputChord(EKeys::F10, EModifierKey::Control));
+		UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::Button, FInputChord(EKeys::F9, EModifierKey::Control));
+		UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::Button, FInputChord(EKeys::F10, EModifierKey::Control));
 #ifdef WITH_TEXT_CHUNK_HELPER
-		UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::None, FInputChord(EKeys::F11, EModifierKey::Control));
+		UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
-		UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::None, FInputChord(EKeys::F12, EModifierKey::Control));
+		UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::Button, FInputChord(EKeys::F12, EModifierKey::Control));
 	}
 
 	bool FGraphPrinterCommands::IsBound()
@@ -45,6 +46,7 @@ namespace GraphPrinterEditorExtension
 
 	void FGraphPrinterCommands::Bind()
 	{
+		check(Instance.Pin().IsValid());
 		Instance.Pin()->BindCommands();
 	}
 
@@ -58,11 +60,14 @@ namespace GraphPrinterEditorExtension
 		if (IsBound())
 		{
 			UE_LOG(LogGraphPrinter, Warning, TEXT("The binding process has already been completed."));
+			return;
 		}
 		bIsBound = true;
 
-		IMainFrameModule& MainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>("MainFrame");
-		const TSharedRef<FUICommandList>& CommandBindings = MainFrame.GetMainFrameCommandBindings();
+		IMainFrameModule& MainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
+		const TSharedRef<FUICommandList>& MainFrameCommandBindings = MainFrame.GetMainFrameCommandBindings();
+
+		MainFrameCommandBindings->Append(CommandBindings);
 
 		// Bind command here.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION

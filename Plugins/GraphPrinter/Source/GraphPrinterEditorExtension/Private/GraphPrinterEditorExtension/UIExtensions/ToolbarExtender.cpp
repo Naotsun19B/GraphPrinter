@@ -13,28 +13,21 @@ namespace GraphPrinterEditorExtension
 	{
 		Extender = MakeShared<FExtender>();
 		check(Extender.IsValid());
-		
+	
+		const TSharedPtr<FUICommandList>& CommandBindings = FGraphPrinterCommands::Get().CommandBindings;
+	
 		Extender->AddToolBarExtension(
 			TEXT("Asset"),
 			EExtensionHook::After,
-			nullptr,
+			CommandBindings,
 			FToolBarExtensionDelegate::CreateStatic(&FToolbarExtender::OnExtendToolbar)
 		);
-
-		const TSharedPtr<FExtensibilityManager> ExtensibilityManager = FAssetEditorToolkit::GetSharedMenuExtensibilityManager();
-		if (ExtensibilityManager.IsValid())
-		{
-			ExtensibilityManager->AddExtender(Extender);
-		}
+		FAssetEditorToolkit::GetSharedToolBarExtensibilityManager()->AddExtender(Extender);
 	}
 
 	void FToolbarExtender::Unregister()
 	{
-		const TSharedPtr<FExtensibilityManager> ExtensibilityManager = FAssetEditorToolkit::GetSharedMenuExtensibilityManager();
-		if (ExtensibilityManager.IsValid())
-		{
-			ExtensibilityManager->RemoveExtender(Extender);
-		}
+		FAssetEditorToolkit::GetSharedMenuExtensibilityManager()->RemoveExtender(Extender);
 	}
 
 	void FToolbarExtender::OnExtendToolbar(FToolBarBuilder& ToolBarBuilder)
@@ -51,32 +44,36 @@ namespace GraphPrinterEditorExtension
 
 	TSharedRef<SWidget> FToolbarExtender::OnGetComboBoxContent()
 	{
-		const auto& Commands = FGraphPrinterCommands::Get();
+		const auto& GraphPrinterCommands = FGraphPrinterCommands::Get();
 		
-		FMenuBuilder MenuBuilder(true, nullptr);
+		FMenuBuilder MenuBuilder(true, GraphPrinterCommands.CommandBindings);
 
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		MenuBuilder.AddSeparator();
-		MenuBuilder.AddMenuEntry(Commands.CopyGraphWithAllNodesToClipboard);
-		MenuBuilder.AddMenuEntry(Commands.CopyGraphWithSelectedNodesToClipboard);
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("CopyToClipboardSectionName", "Copy To Clipboard"));
+		MenuBuilder.AddMenuEntry(GraphPrinterCommands.CopyGraphWithAllNodesToClipboard);
+		MenuBuilder.AddMenuEntry(GraphPrinterCommands.CopyGraphWithSelectedNodesToClipboard);
+		MenuBuilder.EndSection();
 #endif
-
-		MenuBuilder.AddSeparator();
-		MenuBuilder.AddMenuEntry(Commands.PrintGraphWithAllNodes);
-		MenuBuilder.AddMenuEntry(Commands.PrintGraphWithSelectedNodes);
+		
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ExportToImageFileSectionName", "Export To Image File"));
+		MenuBuilder.AddMenuEntry(GraphPrinterCommands.PrintGraphWithAllNodes);
+		MenuBuilder.AddMenuEntry(GraphPrinterCommands.PrintGraphWithSelectedNodes);
+		MenuBuilder.EndSection();
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-		MenuBuilder.AddSeparator();
-		MenuBuilder.AddMenuEntry(Commands.RestoreNodesFromPngFile);
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ImportFromImageFileSectionName", "Import From Image File"));
+		MenuBuilder.AddMenuEntry(GraphPrinterCommands.RestoreNodesFromPngFile);
+		MenuBuilder.EndSection();
 #endif
-
-		MenuBuilder.AddSeparator();
-		MenuBuilder.AddMenuEntry(Commands.OpenExportDestinationFolder);
+		
+		MenuBuilder.BeginSection(NAME_None, LOCTEXT("OtherSectionName", "Other"));
+		MenuBuilder.AddMenuEntry(GraphPrinterCommands.OpenExportDestinationFolder);
+		MenuBuilder.EndSection();
 		
 		return MenuBuilder.MakeWidget();
 	}
 
 	TSharedPtr<FExtender> FToolbarExtender::Extender = nullptr;
 }
-
+	
 #undef LOCTEXT_NAMESPACE

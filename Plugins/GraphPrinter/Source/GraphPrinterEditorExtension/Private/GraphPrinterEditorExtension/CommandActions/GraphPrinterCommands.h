@@ -31,6 +31,9 @@ namespace GraphPrinterEditorExtension
 		virtual void BindCommands();
 
 	public:
+		// A list of shortcut keys used by this plugin.
+		TSharedRef<FUICommandList> CommandBindings;
+		
 		// Instances of bound commands.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		TSharedPtr<FUICommandInfo> CopyGraphWithAllNodesToClipboard;

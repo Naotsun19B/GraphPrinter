@@ -40,7 +40,7 @@
 		{
 			"Name": "GraphPrinterEditorExtension",
 			"Type": "EditorNoCommandlet",
-			"LoadingPhase": "PostEngineInit",
+			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [
 				"Win64",
 				"Win32",
