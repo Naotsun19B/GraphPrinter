@@ -1,6 +1,8 @@
 // Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
+#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
+#include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
 
 // #TODO: Calls the functions implemented in GraphPrinterCore module.
 
@@ -37,6 +39,13 @@ namespace GraphPrinterEditorExtension
 
 	void FGraphPrinterCommandActions::OpenExportDestinationFolder()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OpenExportDestinationFolder"));
+		GraphPrinterCore::FGraphPrinterUtils::OpenFolderWithExplorer(
+			UGraphPrinterSettings::Get().OutputDirectory.Path
+		);
+	}
+
+	void FGraphPrinterCommandActions::OpenPluginSettings()
+	{
+		UGraphPrinterSettings::OpenSettings();
 	}
 }

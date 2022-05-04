@@ -7,6 +7,8 @@ public class GraphPrinterCore : ModuleRules
 {
 	public GraphPrinterCore(ReadOnlyTargetRules Target) : base(Target)
 	{
+		OptimizeCode = CodeOptimization.Never;
+		
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PrivateIncludePaths.AddRange(
@@ -28,6 +30,12 @@ public class GraphPrinterCore : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+				"Engine",
+				"Slate",
+				"SlateCore",
+				"MainFrame",
+				"ImageWriteQueue",
+				"DesktopPlatform",
 
 				"GraphPrinterGlobals",
                 "TextChunkHelper",

@@ -36,6 +36,7 @@ namespace GraphPrinterEditorExtension
 		UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
 		UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::Button, FInputChord(EKeys::F12, EModifierKey::Control));
+		UI_COMMAND(OpenPluginSettings, "Open Plugin Settings", "Open the Graph Printer settings screen in the editor preferences.", EUserInterfaceActionType::Button, FInputChord());
 	}
 
 	bool FGraphPrinterCommands::IsBound()
@@ -75,6 +76,7 @@ namespace GraphPrinterEditorExtension
 		
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("OtherSectionName", "Other"));
 		MenuBuilder.AddMenuEntry(This->OpenExportDestinationFolder);
+		MenuBuilder.AddMenuEntry(This->OpenPluginSettings);
 		MenuBuilder.EndSection();
 	}
 
@@ -130,6 +132,11 @@ namespace GraphPrinterEditorExtension
 		CommandBindings->MapAction(
 			OpenExportDestinationFolder,
 			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::OpenExportDestinationFolder)
+		);
+
+		CommandBindings->MapAction(
+			OpenPluginSettings,
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::OpenPluginSettings)
 		);
 	}
 }

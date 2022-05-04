@@ -48,6 +48,7 @@ namespace GraphPrinterEditorExtension
 		TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 #endif
 		TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
+		TSharedPtr<FUICommandInfo> OpenPluginSettings;
 
 	private:
 		// Is the command registered here bound.

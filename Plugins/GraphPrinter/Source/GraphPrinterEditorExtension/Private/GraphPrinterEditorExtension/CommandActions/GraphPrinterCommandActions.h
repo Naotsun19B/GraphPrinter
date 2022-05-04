@@ -33,5 +33,8 @@ namespace GraphPrinterEditorExtension
 
 		// Open the folder containing the images saved by this plugin in Explorer.
 		static void OpenExportDestinationFolder();
+
+		// Open the Graph Printer settings screen in the editor preferences.
+		static void OpenPluginSettings();
 	};
 }

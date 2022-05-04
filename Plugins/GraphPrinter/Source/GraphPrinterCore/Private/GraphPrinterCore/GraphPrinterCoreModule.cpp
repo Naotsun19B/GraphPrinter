@@ -2,8 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
 
-namespace GraphPrinter
+namespace GraphPrinterCore
 {
 	class FGraphPrinterCoreModule : public IModuleInterface
 	{
@@ -16,11 +17,15 @@ namespace GraphPrinter
 
 	void FGraphPrinterCoreModule::StartupModule()
 	{
+		// Register settings.
+		UGraphPrinterSettings::Register();
 	}
 
 	void FGraphPrinterCoreModule::ShutdownModule()
 	{
+		// Unregister settings.
+		UGraphPrinterSettings::Unregister();
 	}
 }
 
-IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterCoreModule, GraphPrinter)
+IMPLEMENT_MODULE(GraphPrinterCore::FGraphPrinterCoreModule, GraphPrinter)

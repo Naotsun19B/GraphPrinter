@@ -3,6 +3,7 @@
 #include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
+#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
 #include "Toolkits/AssetEditorToolkit.h"
 
 #define LOCTEXT_NAMESPACE "ToolbarExtender"
@@ -11,6 +12,11 @@ namespace GraphPrinterEditorExtension
 {
 	void FToolbarExtender::Register()
 	{
+		if (!ShouldExtendToolbar())
+		{
+			return;
+		}
+		
 		Extender = MakeShared<FExtender>();
 		check(Extender.IsValid());
 	
@@ -32,11 +38,19 @@ namespace GraphPrinterEditorExtension
 
 	void FToolbarExtender::Unregister()
 	{
-		const TSharedPtr<FExtensibilityManager>& ExtensibilityManager = FAssetEditorToolkit::GetSharedToolBarExtensibilityManager();
-		if (ExtensibilityManager.IsValid())
+		if (Extender.IsValid())
 		{
-			ExtensibilityManager->RemoveExtender(Extender);
+			const TSharedPtr<FExtensibilityManager>& ExtensibilityManager = FAssetEditorToolkit::GetSharedToolBarExtensibilityManager();
+			if (ExtensibilityManager.IsValid())
+			{
+				ExtensibilityManager->RemoveExtender(Extender);
+			}
 		}
+	}
+
+	bool FToolbarExtender::ShouldExtendToolbar()
+	{
+		return !UGraphPrinterSettings::Get().bHideToolbarComboButton;
 	}
 
 	void FToolbarExtender::OnExtendToolbar(FToolBarBuilder& ToolBarBuilder)
