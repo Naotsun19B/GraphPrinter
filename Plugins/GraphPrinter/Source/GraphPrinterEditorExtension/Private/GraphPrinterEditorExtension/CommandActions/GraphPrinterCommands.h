@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	/**
 	 * Class to register the shortcut key used in this plugin.

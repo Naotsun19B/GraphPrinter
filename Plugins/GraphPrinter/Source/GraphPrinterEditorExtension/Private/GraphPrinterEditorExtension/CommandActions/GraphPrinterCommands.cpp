@@ -8,7 +8,7 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinterCommands"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	FGraphPrinterCommands::FGraphPrinterCommands()
 		: TCommands<FGraphPrinterCommands>

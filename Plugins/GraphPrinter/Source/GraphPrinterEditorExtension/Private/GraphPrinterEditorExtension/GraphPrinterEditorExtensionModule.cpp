@@ -7,7 +7,7 @@
 #include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtender.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	class FGraphPrinterEditorExtensionModule : public IModuleInterface
 	{
@@ -46,4 +46,4 @@ namespace GraphPrinterEditorExtension
 	}
 }
 
-IMPLEMENT_MODULE(GraphPrinterEditorExtension::FGraphPrinterEditorExtensionModule, GraphPrinterEditorExtension)
+IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterEditorExtensionModule, GraphPrinterEditorExtension)

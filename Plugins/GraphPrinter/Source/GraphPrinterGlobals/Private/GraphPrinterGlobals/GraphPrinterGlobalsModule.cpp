@@ -6,7 +6,7 @@
 
 DEFINE_LOG_CATEGORY(LogGraphPrinter);
 
-namespace GraphPrinterGlobals
+namespace GraphPrinter
 {
 	class FGraphPrinterGlobalsModule : public IModuleInterface
 	{
@@ -26,4 +26,4 @@ namespace GraphPrinterGlobals
 	}
 }
 
-IMPLEMENT_MODULE(GraphPrinterGlobals::FGraphPrinterGlobalsModule, GraphPrinterGlobals)
+IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterGlobalsModule, GraphPrinterGlobals)

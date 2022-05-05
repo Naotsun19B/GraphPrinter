@@ -11,7 +11,7 @@
 
 #define LOCTEXT_NAMESPACE "GraphPrinterSettings"
 
-namespace GraphPrinterCore
+namespace GraphPrinter
 {
 	namespace Settings
 	{
@@ -48,19 +48,19 @@ UGraphPrinterSettings::UGraphPrinterSettings()
 	OutputDirectory.Path = FPaths::ConvertRelativePathToFull(
 		FPaths::Combine(
 			FPaths::ProjectSavedDir(),
-			GraphPrinterGlobals::PluginName.ToString()
+			GraphPrinter::PluginName.ToString()
 		)
 	);
 }
 
 void UGraphPrinterSettings::Register()
 {
-	if (ISettingsModule* SettingsModule = GraphPrinterCore::Settings::GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule())
 	{
 		SettingsModule->RegisterSettings(
-			GraphPrinterCore::Settings::ContainerName,
-			GraphPrinterCore::Settings::CategoryName,
-			GraphPrinterCore::Settings::SectionName,
+			GraphPrinter::Settings::ContainerName,
+			GraphPrinter::Settings::CategoryName,
+			GraphPrinter::Settings::SectionName,
 			LOCTEXT("SettingName", "Graph Printer"),
 			LOCTEXT("SettingDescription", "Editor settings for Graph Printer"),
 			GetMutableDefault<UGraphPrinterSettings>()
@@ -70,12 +70,12 @@ void UGraphPrinterSettings::Register()
 
 void UGraphPrinterSettings::Unregister()
 {
-	if (ISettingsModule* SettingsModule = GraphPrinterCore::Settings::GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule())
 	{
 		SettingsModule->UnregisterSettings(
-			GraphPrinterCore::Settings::ContainerName,
-			GraphPrinterCore::Settings::CategoryName,
-			GraphPrinterCore::Settings::SectionName
+			GraphPrinter::Settings::ContainerName,
+			GraphPrinter::Settings::CategoryName,
+			GraphPrinter::Settings::SectionName
 		);
 	}
 }
@@ -89,12 +89,12 @@ const UGraphPrinterSettings& UGraphPrinterSettings::Get()
 
 void UGraphPrinterSettings::OpenSettings()
 {
-	if (ISettingsModule* SettingsModule = GraphPrinterCore::Settings::GetSettingsModule())
+	if (ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule())
 	{
 		SettingsModule->ShowViewer(
-			GraphPrinterCore::Settings::ContainerName,
-			GraphPrinterCore::Settings::CategoryName,
-			GraphPrinterCore::Settings::SectionName
+			GraphPrinter::Settings::ContainerName,
+			GraphPrinter::Settings::CategoryName,
+			GraphPrinter::Settings::SectionName
 		);
 	}
 }

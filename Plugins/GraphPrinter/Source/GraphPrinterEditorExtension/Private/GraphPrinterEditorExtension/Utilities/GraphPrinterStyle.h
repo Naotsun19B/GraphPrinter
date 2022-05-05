@@ -15,7 +15,7 @@ enum class EGraphPrinterStyleIconType : uint8
 	PluginIcon,
 };
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	/**
 	 * A class that manages the slate icon used by this plugin.

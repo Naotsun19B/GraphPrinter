@@ -6,7 +6,7 @@
 #include "Styling/SlateStyleRegistry.h"
 #include "Textures/SlateIcon.h"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	namespace IconSize
 	{
@@ -24,7 +24,7 @@ namespace GraphPrinterEditorExtension
 	{
 		FString StyleContentRoot;
 		{
-			const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(GraphPrinterGlobals::PluginName.ToString());
+			const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(GraphPrinter::PluginName.ToString());
 			check(Plugin.IsValid());
 			StyleContentRoot = FPaths::ConvertRelativePathToFull(
 				Plugin->GetBaseDir() / TEXT("Resources")

@@ -6,7 +6,7 @@
 
 class SGraphEditorImpl;
 
-namespace GraphPrinterCore
+namespace GraphPrinter
 {
 	// A structure of notification item handles that can indirectly manipulate SNotificationItem.
 	struct FNotificationHandle

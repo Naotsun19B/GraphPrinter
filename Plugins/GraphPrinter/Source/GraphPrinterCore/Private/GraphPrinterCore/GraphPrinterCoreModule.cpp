@@ -4,7 +4,7 @@
 #include "Modules/ModuleManager.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
 
-namespace GraphPrinterCore
+namespace GraphPrinter
 {
 	class FGraphPrinterCoreModule : public IModuleInterface
 	{
@@ -28,4 +28,4 @@ namespace GraphPrinterCore
 	}
 }
 
-IMPLEMENT_MODULE(GraphPrinterCore::FGraphPrinterCoreModule, GraphPrinter)
+IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterCoreModule, GraphPrinter)

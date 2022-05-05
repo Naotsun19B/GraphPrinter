@@ -9,7 +9,7 @@
 #include "DesktopPlatformModule.h"
 #include "SGraphEditorImpl.h"
 
-namespace GraphPrinterCore
+namespace GraphPrinter
 {
 	FNotificationHandle::FNotificationHandle(const TSharedPtr<SNotificationItem>& InNotificationItem)
 		: NotificationItem(InNotificationItem)

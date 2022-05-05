@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Runtime/Launch/Resources/Version.h"
 
-namespace GraphPrinterGlobals
+namespace GraphPrinter
 {
 	// The name of this plugin.
 	static const FName PluginName = TEXT("GraphPrinter");

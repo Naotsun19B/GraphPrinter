@@ -6,7 +6,7 @@
 
 // #TODO: Calls the functions implemented in GraphPrinterCore module.
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 	void FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard()
@@ -39,7 +39,7 @@ namespace GraphPrinterEditorExtension
 
 	void FGraphPrinterCommandActions::OpenExportDestinationFolder()
 	{
-		GraphPrinterCore::FGraphPrinterUtils::OpenFolderWithExplorer(
+		FGraphPrinterUtils::OpenFolderWithExplorer(
 			UGraphPrinterSettings::Get().OutputDirectory.Path
 		);
 	}

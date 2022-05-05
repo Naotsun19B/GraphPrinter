@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	/**
 	 * A class that adds a menu that performs plugin functions to the tool menu of the Graph Editor.

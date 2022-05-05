@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	/**
 	 * A class that defines the function executed from the shortcut key.

@@ -8,7 +8,7 @@
 
 #define LOCTEXT_NAMESPACE "ToolMenuExtender"
 
-namespace GraphPrinterEditorExtension
+namespace GraphPrinter
 {
 	void FToolMenuExtender::Register()
 	{
