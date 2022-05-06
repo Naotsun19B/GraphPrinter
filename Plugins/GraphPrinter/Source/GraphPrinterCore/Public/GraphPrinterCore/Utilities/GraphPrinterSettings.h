@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GraphPrinterCore/Types/PrintWidgetOptions.h"
 #include "GraphPrinterSettings.generated.h"
 
 enum TextureFilter;
 enum class EDesiredImageFormat : uint8;
+class UWidgetPrinter;
 
 /**
  * Editor settings for this plugin.
@@ -58,8 +60,12 @@ public:
 
 	// Directory path where the image file is output.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
-	FDirectoryPath OutputDirectory;
+	FDirectoryPath OutputDirectory;	
 
+	// Classes that prints widgets such as the graph editor.
+	UPROPERTY(EditAnywhere, Config, Category = "Widget Printer")
+	TArray<TSubclassOf<UWidgetPrinter>> WidgetPrinterClasses;
+	
 	// Whether to hide the combo button that performs the function of the plugin in the toolbar of the asset editor.
 	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))
 	bool bHideToolbarComboButton;
@@ -82,6 +88,12 @@ public:
 
 	// Open the settings menu for this plugin.
 	static void OpenSettings();
+
+	// Generate FPrintGraphOptions from the editor preferences.
+	GraphPrinter::FPrintWidgetOptions GeneratePrintGraphOptions() const;
+
+	// Returns a list of printer instances sorted by priority.
+	TArray<UWidgetPrinter*> GetWidgetPrinters() const;
 	
 protected:
 	// UObject interface.
@@ -93,4 +105,5 @@ protected:
 	void ModifyFormat();
 	void ModifyCompressionQuality();
 	void ModifyMaxImageSize();
+	void ModifyWidgetPrinterClasses();
 };

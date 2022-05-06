@@ -23,6 +23,7 @@ public class GraphPrinterCore : ModuleRules
 			{
 				"Core",
 				"InputCore",
+				"ImageWriteQueue",
 			}
 		);
 			
@@ -34,7 +35,6 @@ public class GraphPrinterCore : ModuleRules
 				"Slate",
 				"SlateCore",
 				"MainFrame",
-				"ImageWriteQueue",
 				"DesktopPlatform",
 
 				"GraphPrinterGlobals",

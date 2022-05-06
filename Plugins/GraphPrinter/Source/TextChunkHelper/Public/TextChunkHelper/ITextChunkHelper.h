@@ -19,7 +19,7 @@ namespace TextChunkHelper
 	{
 	public:
 		// The name of the module for this plugin.
-		static const FName PluginModuleName;
+		TEXTCHUNKHELPER_API static const FName PluginModuleName;
 		
 	public:
 		// Returns singleton instance, loading the module on demand if needed.

@@ -1,39 +1,50 @@
 // Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
+#include "GraphPrinterCore/IGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
-
-// #TODO: Calls the functions implemented in GraphPrinterCore module.
 
 namespace GraphPrinter
 {
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 	void FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CopyGraphWithAllNodesToClipboard"));
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::All;
+		Options.ExportMethod = EExportMethod::Clipboard;
+		IGraphPrinter::Get().PrintWidget(Options);
 	}
 
 	void FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CopyGraphWithSelectedNodesToClipboard"));
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::Selected;
+		Options.ExportMethod = EExportMethod::Clipboard;
+		IGraphPrinter::Get().PrintWidget(Options);
 	}
 #endif
 
 	void FGraphPrinterCommandActions::PrintGraphWithAllNodes()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PrintGraphWithAllNodes"));
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::All;
+		Options.ExportMethod = EExportMethod::ImageFile;
+		IGraphPrinter::Get().PrintWidget(Options);
 	}
 
 	void FGraphPrinterCommandActions::PrintGraphWithSelectedNodes()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PrintGraphWithSelectedNodes"));
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::Selected;
+		Options.ExportMethod = EExportMethod::ImageFile;
+		IGraphPrinter::Get().PrintWidget(Options);
 	}
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 	void FGraphPrinterCommandActions::RestoreNodesFromPngFile()
 	{
-		UE_LOG(LogTemp, Warning, TEXT("RestoreNodesFromPngFile"));
+		IGraphPrinter::Get().RestoreWidget();
 	}
 #endif
 
