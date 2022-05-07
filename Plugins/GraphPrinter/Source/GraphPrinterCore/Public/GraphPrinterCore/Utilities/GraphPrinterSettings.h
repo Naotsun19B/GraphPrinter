@@ -9,7 +9,6 @@
 
 enum TextureFilter;
 enum class EDesiredImageFormat : uint8;
-class UWidgetPrinter;
 
 /**
  * Editor settings for this plugin.
@@ -61,10 +60,6 @@ public:
 	// Directory path where the image file is output.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
 	FDirectoryPath OutputDirectory;	
-
-	// Classes that prints widgets such as the graph editor.
-	UPROPERTY(EditAnywhere, Config, Category = "Widget Printer")
-	TArray<TSubclassOf<UWidgetPrinter>> WidgetPrinterClasses;
 	
 	// Whether to hide the combo button that performs the function of the plugin in the toolbar of the asset editor.
 	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))
@@ -92,9 +87,6 @@ public:
 	// Generate FPrintGraphOptions from the editor preferences.
 	GraphPrinter::FPrintWidgetOptions GeneratePrintGraphOptions() const;
 
-	// Returns a list of printer instances sorted by priority.
-	TArray<UWidgetPrinter*> GetWidgetPrinters() const;
-	
 protected:
 	// UObject interface.
 	virtual void PostInitProperties() override;
@@ -105,5 +97,4 @@ protected:
 	void ModifyFormat();
 	void ModifyCompressionQuality();
 	void ModifyMaxImageSize();
-	void ModifyWidgetPrinterClasses();
 };

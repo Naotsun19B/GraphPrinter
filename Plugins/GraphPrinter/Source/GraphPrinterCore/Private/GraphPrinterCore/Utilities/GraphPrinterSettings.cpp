@@ -1,8 +1,6 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/WidgetPrinter/WidgetPrinter.h"
-#include "GraphPrinterCore/WidgetPrinter/GenericGraphPrinter.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "ISettingsModule.h"
 #include "ImageWriteTypes.h"
@@ -53,8 +51,6 @@ UGraphPrinterSettings::UGraphPrinterSettings()
 			GraphPrinter::PluginName.ToString()
 		)
 	);
-
-	WidgetPrinterClasses.Add(UGenericGraphPrinter::StaticClass());
 }
 
 void UGraphPrinterSettings::Register()
@@ -122,24 +118,6 @@ GraphPrinter::FPrintWidgetOptions UGraphPrinterSettings::GeneratePrintGraphOptio
 	return Options;
 }
 
-TArray<UWidgetPrinter*> UGraphPrinterSettings::GetWidgetPrinters() const
-{
-	TArray<UWidgetPrinter*> Instances;
-	Instances.Reserve(WidgetPrinterClasses.Num());
-
-	for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
-	{
-		if (!IsValid(WidgetPrinterClass))
-		{
-			continue;
-		}
-
-		Instances.Add(Cast<UWidgetPrinter>(WidgetPrinterClass->GetDefaultObject()));
-	}
-	
-	return Instances;
-}
-
 void UGraphPrinterSettings::PostInitProperties()
 {
 	Super::PostInitProperties();
@@ -157,7 +135,6 @@ void UGraphPrinterSettings::PostInitProperties()
 	ModifyFormat();
 	ModifyCompressionQuality();
 	ModifyMaxImageSize();
-	ModifyWidgetPrinterClasses();
 }
 
 void UGraphPrinterSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -183,11 +160,6 @@ void UGraphPrinterSettings::PostEditChangeProperty(FPropertyChangedEvent& Proper
 	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, MaxImageSize))
 	{
 		ModifyMaxImageSize();
-	}
-
-	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UGraphPrinterSettings, WidgetPrinterClasses))
-	{
-		ModifyWidgetPrinterClasses();
 	}
 }
 
@@ -221,39 +193,6 @@ void UGraphPrinterSettings::ModifyMaxImageSize()
 	{
 		MaxImageSize.Y = 0.f;
 	}
-}
-
-void UGraphPrinterSettings::ModifyWidgetPrinterClasses()
-{
-	TArray<TSubclassOf<UWidgetPrinter>> NoElementDuplicate;
-	for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
-	{
-		if (!NoElementDuplicate.Contains(WidgetPrinterClass))
-		{
-			NoElementDuplicate.Add(WidgetPrinterClass);
-		}
-	}
-	WidgetPrinterClasses = NoElementDuplicate;
-	
-	WidgetPrinterClasses.Sort(
-		[](const TSubclassOf<UWidgetPrinter>& Lhs, const TSubclassOf<UWidgetPrinter>& Rhs) -> bool
-		{
-			auto GetPriority = [](const TSubclassOf<UWidgetPrinter>& Class) -> int32
-			{
-				if (IsValid(Class))
-				{
-					if (const auto* Instance = Cast<UWidgetPrinter>(Class->GetDefaultObject()))
-					{
-						return Instance->GetPriority();
-					}
-				}
-				
-				return TNumericLimits<int32>::Min();
-			};
-
-			return (GetPriority(Lhs) < GetPriority(Rhs));
-		}
-	);
 }
 
 #undef LOCTEXT_NAMESPACE

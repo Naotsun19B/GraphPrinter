@@ -7,8 +7,6 @@ public class GraphPrinterCore : ModuleRules
 {
 	public GraphPrinterCore(ReadOnlyTargetRules Target) : base(Target)
 	{
-		OptimizeCode = CodeOptimization.Never;
-		
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PrivateIncludePaths.AddRange(

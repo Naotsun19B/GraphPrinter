@@ -4,7 +4,7 @@
 
 void UGenericGraphPrinter::PrintWidget(const GraphPrinter::FPrintWidgetOptions& Options)
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("UGenericGraphPrinter::PrintWidget"));
 }
 
 bool UGenericGraphPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const
@@ -15,7 +15,7 @@ bool UGenericGraphPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOption
 #ifdef WITH_TEXT_CHUNK_HELPER
 void UGenericGraphPrinter::RestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options)
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("UGenericGraphPrinter::RestoreWidget"));
 }
 
 bool UGenericGraphPrinter::CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const

@@ -22,23 +22,40 @@ namespace GraphPrinter
 		virtual void RestoreWidget(const FRestoreWidgetOptions& Options) override;
 #endif
 		// End of IGraphPrinter interface.
-	};
 
+	private:
+		// Called when the hot reload is complete.
+		void HandleOnReloadComplete(EReloadCompleteReason ReloadCompleteReason);
+		
+		// Collect instances of inherited classes of all existing UWidgetPrinter class.
+		void CollectWidgetPrinters();
+		
+	private:
+		// Instances of inherited classes of all existing UWidgetPrinter class.
+		TArray<UWidgetPrinter*> WidgetPrinters;
+	};
+	
 	void FGraphPrinterCoreModule::StartupModule()
 	{
 		// Register settings.
 		UGraphPrinterSettings::Register();
+
+		// Collect widget printers and try to recollect them at hot reload.
+		CollectWidgetPrinters();
+		FCoreUObjectDelegates::ReloadCompleteDelegate.AddRaw(this, &FGraphPrinterCoreModule::HandleOnReloadComplete);
 	}
 
 	void FGraphPrinterCoreModule::ShutdownModule()
 	{
+		FCoreUObjectDelegates::ReloadCompleteDelegate.RemoveAll(this);
+		WidgetPrinters.Reset();
+		
 		// Unregister settings.
 		UGraphPrinterSettings::Unregister();
 	}
 
 	void FGraphPrinterCoreModule::PrintWidget(const FPrintWidgetOptions& Options)
 	{
-		const TArray<UWidgetPrinter*>& WidgetPrinters = UGraphPrinterSettings::Get().GetWidgetPrinters();
 		for (const auto& WidgetPrinter : WidgetPrinters)
 		{
 			if (IsValid(WidgetPrinter))
@@ -55,7 +72,6 @@ namespace GraphPrinter
 #ifdef WITH_TEXT_CHUNK_HELPER
 	void FGraphPrinterCoreModule::RestoreWidget(const FRestoreWidgetOptions& Options)
 	{
-		const TArray<UWidgetPrinter*>& WidgetPrinters = UGraphPrinterSettings::Get().GetWidgetPrinters();
 		for (const auto& WidgetPrinter : WidgetPrinters)
 		{
 			if (IsValid(WidgetPrinter))
@@ -69,6 +85,54 @@ namespace GraphPrinter
 		}
 	}
 #endif
+
+	void FGraphPrinterCoreModule::HandleOnReloadComplete(EReloadCompleteReason ReloadCompleteReason)
+	{
+		CollectWidgetPrinters();
+	}
+
+	void FGraphPrinterCoreModule::CollectWidgetPrinters()
+	{
+		for (const auto* Class : TObjectRange<UClass>())
+		{
+			if (!IsValid(Class))
+			{
+				continue;
+			}
+			
+			if (!Class->IsChildOf(UWidgetPrinter::StaticClass()))
+			{
+				continue;
+			}
+			
+			if (Class->HasAnyClassFlags(CLASS_Abstract))
+			{
+				continue;
+			}
+			
+			if (auto* WidgetPrinter = Cast<UWidgetPrinter>(Class->GetDefaultObject()))
+			{
+				WidgetPrinters.Add(WidgetPrinter);
+			}
+		}
+		
+		TArray<UWidgetPrinter*> NoElementDuplicate;
+		for (const auto& WidgetPrinter : WidgetPrinters)
+		{
+			if (!NoElementDuplicate.Contains(WidgetPrinter))
+			{
+				NoElementDuplicate.Add(WidgetPrinter);
+			}
+		}
+		WidgetPrinters = NoElementDuplicate;
+	
+		WidgetPrinters.Sort(
+			[](const UWidgetPrinter& Lhs, const UWidgetPrinter& Rhs) -> bool
+			{
+				return (Lhs.GetPriority() < Rhs.GetPriority());
+			}
+		);
+	}
 }
 
 IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterCoreModule, GraphPrinter)
