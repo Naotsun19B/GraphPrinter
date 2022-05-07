@@ -29,10 +29,13 @@ public class GraphPrinterCore : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
+				"UMG",
 				"Slate",
 				"SlateCore",
+				"Engine",
+				"UnrealEd",
 				"MainFrame",
+				"RenderCore",
 				"DesktopPlatform",
 
 				"GraphPrinterGlobals",
@@ -40,12 +43,15 @@ public class GraphPrinterCore : ModuleRules
                 "ClipboardImageExtension",
             }
 		);
-
-        // To use SGraphEditorImpl.
+		
         PublicIncludePaths.AddRange(
             new string[]
             {
-                Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
+	            // To use SGraphEditorImpl.
+	            Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
+				
+	            // To use SDockingTabStack.
+	            Path.Combine(EngineDirectory, "Source", "Runtime", "Slate", "Private"),
             }
         );
 	}

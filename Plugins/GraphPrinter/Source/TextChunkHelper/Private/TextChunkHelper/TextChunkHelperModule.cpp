@@ -12,6 +12,8 @@
 
 namespace TextChunkHelper
 {
+	const FName ITextChunkHelper::PluginModuleName = TEXT("TextChunkHelper");
+	
 	class FTextChunkHelperModule : public ITextChunkHelper
 	{
 	public:

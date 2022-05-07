@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GraphPrinterCore/WidgetPrinter/WidgetPrinter.h"
+#include "GraphPrinterCore/Types/OneWayBool.h"
 #include "GenericGraphPrinter.generated.h"
+
+class SGraphEditorImpl;
+class UTextureRenderTarget2D;
 
 /**
  * A general-purpose printer class for the graph editor.
@@ -16,12 +20,125 @@ class GRAPHPRINTERCORE_API UGenericGraphPrinter : public UWidgetPrinter
 
 public:
 	// UWidgetPrinter interface.
-	virtual void PrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) override;
+	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) override;
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
 #ifdef WITH_TEXT_CHUNK_HELPER
-	virtual void RestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) override;
+	virtual void RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options) override;
 	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const override;
 #endif
 	virtual int32 GetPriority() const override;
 	// End of UWidgetPrinter interface.
+
+protected:
+	// Returns the graph editor to print or restore.
+	virtual TSharedPtr<SGraphEditorImpl> FindGraphEditor(const TSharedPtr<SWidget>& TargetWidget) const;
+	
+	// Calculate the range and view location to use when drawing the graph editor.
+	virtual bool CalculateGraphDrawSizeAndViewLocation(
+		FVector2D& DrawSize, 
+		FVector2D& ViewLocation, 
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const GraphPrinter::FPrintWidgetOptions& Options
+	) const;
+
+	// Performs processing before shooting the graph editor.
+	virtual void PrePrintGraphEditor(
+		FVector2D& PreviousViewLocation, 
+		float& PreviousZoomAmount,
+		FGraphPanelSelectionSet& NodesToPrint,
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const FVector2D& DrawSize,
+		const FVector2D& ViewLocation,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+	
+	// Returns whether the graph editor is drawable.
+	virtual bool CanPrintGraphEditor(
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const FVector2D& DrawSize,
+		const FVector2D& ViewLocation,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	) const;
+
+	// Draw the graph editor on the render target.
+	virtual UTextureRenderTarget2D* DrawGraphToRenderTarget(
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const FVector2D& DrawSize,
+		const FVector2D& ViewLocation,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+	
+	// Performs processing after shooting the graph editor.
+	virtual void PostPrintGraphEditor(
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const FVector2D& PreviousViewLocation, 
+		float PreviousZoomAmount,
+		const FGraphPanelSelectionSet& PreviousSelectedNodes,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+	// Prepare for copying to the clipboard.
+	virtual void PrepareCopyToClipboard(GraphPrinter::FPrintWidgetOptions& Options);
+#endif
+
+	// Create a file path from options.
+	virtual FString CreateFilename(
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const GraphPrinter::FPrintWidgetOptions& Options
+	) const;
+
+	// Returns the title of the graph being edited in the graph editor.
+	virtual FString GetGraphTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor) const;
+
+	// Export the render target that draws the graph editor to image file.
+	virtual void ExportRenderTargetToImageFile(
+		UTextureRenderTarget2D* RenderTarget,
+		const FString& Filename,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+	// Copy the image file that draws the graph editor to clipboard.
+	virtual bool CopyImageFileToClipboard(
+		const FString& Filename,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+#endif
+
+#ifdef WITH_TEXT_CHUNK_HELPER
+	// Write the drawn node information to the text chunk.
+	virtual bool WriteNodeInfoToTextChunk(
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const FString& Filename,
+		const FGraphPanelSelectionSet& NodesToPrint,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+
+	// Read information from the text chunk and restore the node.
+	virtual bool RestoreNodesFromTextChunk(
+		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
+		const FString& Filename,
+		const GraphPrinter::FRestoreWidgetOptions& Options
+	);
+#endif
+	
+protected:
+	// Number of attempts to draw the widget on the render target.
+	// The drawing result may be corrupted once.
+	// Probably if draw twice, the drawing result will not be corrupted.
+	static constexpr int32 DrawTimes = 2;
+
+	// The number of times to re-output as a countermeasure against the whitish image
+	// that is output for the first time after starting the engine.
+	static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
+	GraphPrinter::FOneWayBool IsFirstOutput = true;
+
+#ifdef WITH_TEXT_CHUNK_HELPER
+	// Key used when writing to a text chunk of a png file.
+	static const FString PngTextChunkKey;
+
+	// The beginning of the node information.
+	static const FString NodeInfoHeader;
+#endif
 };

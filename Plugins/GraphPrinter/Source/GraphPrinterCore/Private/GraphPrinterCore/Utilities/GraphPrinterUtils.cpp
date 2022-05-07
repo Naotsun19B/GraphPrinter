@@ -1,13 +1,20 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterCore/Utilities/CastSlateWidget.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Misc/Paths.h"
 #include "HAL/PlatformProcess.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "DesktopPlatformModule.h"
+#include "Framework/Docking/TabManager.h"
+#include "Widgets/Docking/SDockTab.h"
+#include "Framework/Docking/SDockingTabStack.h"
 #include "SGraphEditorImpl.h"
+#include "Widgets/SOverlay.h"
+#include "Widgets/Text/STextBlock.h"
 
 namespace GraphPrinter
 {
@@ -55,6 +62,12 @@ namespace GraphPrinter
 	FNotificationInteraction::FNotificationInteraction(const FText& InText, const FText& InTooltip, const FSimpleDelegate& InCallback)
 		: FNotificationInteraction(EInteractionType::Button, InText, InTooltip, InCallback)
 	{
+	}
+
+	namespace GraphPrinterUtilsConstant
+	{
+		// The name of the minimap widget class.
+		static const FName GraphMinimapClassName = TEXT("SGraphMinimap");
 	}
 
 	constexpr FGraphPrinterUtils::ECompletionState FGraphPrinterUtils::CS_Pending	= SNotificationItem::ECompletionState::CS_Pending;
@@ -193,5 +206,221 @@ namespace GraphPrinter
 		OutKeyEvent = KeyEvent;
 
 		return true;
+	}
+
+	FString FGraphPrinterUtils::GetImageFileExtension(const EDesiredImageFormat ImageFormat)
+	{
+#if BEFORE_UE_4_21
+		if (UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDesiredImageFormat"), true))
+		{
+			const FString& Extension = EnumPtr->GetNameStringByIndex(static_cast<int32>(ImageFormat));
+			return FString::Printf(TEXT(".%s"), *Extension.ToLower());
+		}
+#else
+		if (const UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
+		{
+			const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
+			FString UnusedString;
+			FString Extension;
+			if (EnumString.Split(TEXT("::"), &UnusedString, &Extension))
+			{
+				Extension = Extension.ToLower();
+				return FString::Printf(TEXT(".%s"), *Extension);
+			}
+		}
+#endif
+	
+		checkNoEntry();
+		return {};
+	}
+
+	void FGraphPrinterUtils::EnumerateChildWidgets(
+		TSharedPtr<SWidget> SearchTarget,
+		TFunction<bool(const TSharedPtr<SWidget> ChildWidget)> Predicate
+	)
+	{
+		if (!SearchTarget.IsValid())
+		{
+			return;
+		}
+
+		FChildren* Children = SearchTarget->GetChildren();
+		if (Children == nullptr)
+		{
+			return;
+		}
+
+		for (int32 Index = 0; Index < Children->Num(); Index++)
+		{
+			TSharedPtr<SWidget> ChildWidget = Children->GetChildAt(Index);
+			if (ChildWidget.IsValid())
+			{
+				if (Predicate(ChildWidget))
+				{
+					EnumerateChildWidgets(ChildWidget, Predicate);
+				}
+			}
+		}
+	}
+
+	void FGraphPrinterUtils::EnumerateParentWidgets(
+		TSharedPtr<SWidget> SearchTarget,
+		TFunction<bool(const TSharedPtr<SWidget> ParentWidget)> Predicate
+	)
+	{
+		if (!SearchTarget.IsValid())
+		{
+			return;
+		}
+			
+		const TSharedPtr<SWidget> ParentWidget = SearchTarget->GetParentWidget();
+		if (!ParentWidget.IsValid())
+		{
+			return;
+		}
+
+		if (Predicate(ParentWidget))
+		{
+			EnumerateParentWidgets(ParentWidget, Predicate);
+		}
+	}
+
+	TSharedPtr<SDockingTabStack> FGraphPrinterUtils::FindNearestParentDockingTabStack(TSharedPtr<SDockTab> SearchTarget)
+	{
+		TSharedPtr<SDockingTabStack> FoundDockingTabStack = nullptr;
+		
+		EnumerateParentWidgets(
+			SearchTarget,
+			[&FoundDockingTabStack](const TSharedPtr<SWidget> ParentWidget) -> bool
+			{
+				const TSharedPtr<SDockingTabStack> DockingTabStack = GP_CAST_SLATE_WIDGET(SDockingTabStack, ParentWidget);
+				if (DockingTabStack.IsValid())
+				{
+					FoundDockingTabStack = DockingTabStack;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundDockingTabStack;
+	}
+
+	TSharedPtr<SGraphEditorImpl> FGraphPrinterUtils::FindNearestChildGraphEditor(TSharedPtr<SWidget> SearchTarget)
+	{
+		TSharedPtr<SGraphEditorImpl> FoundGraphEditor = nullptr;
+		
+		EnumerateChildWidgets(
+			SearchTarget,
+			[&FoundGraphEditor](const TSharedPtr<SWidget> ChildWidget) -> bool
+			{
+				const TSharedPtr<SGraphEditorImpl> GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, ChildWidget);
+				if (GraphEditor.IsValid())
+				{
+					FoundGraphEditor = GraphEditor;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundGraphEditor;
+	}
+
+	TSharedPtr<SGraphEditorImpl> FGraphPrinterUtils::GetActiveGraphEditor()
+	{
+		const TSharedRef<FGlobalTabmanager> GlobalTabManager = FGlobalTabmanager::Get();
+		const TSharedPtr<SDockTab> ActiveTab = GlobalTabManager->GetActiveTab();
+		if (!ActiveTab.IsValid())
+		{
+			return nullptr;
+		}
+	
+		const TSharedPtr<SDockingTabStack> DockingTabStack = FindNearestParentDockingTabStack(ActiveTab);
+		if (!DockingTabStack.IsValid())
+		{
+			return nullptr;
+		}
+
+		return FindNearestChildGraphEditor(DockingTabStack);
+	}
+
+	TSharedPtr<SWidget> FGraphPrinterUtils::FindNearestChildMinimap(TSharedPtr<SWidget> SearchTarget)
+	{
+		TSharedPtr<SWidget> FoundMinimap = nullptr;
+		
+		EnumerateChildWidgets(
+			SearchTarget,
+			[&FoundMinimap](const TSharedPtr<SWidget> ChildWidget) -> bool
+			{
+				const TSharedPtr<SWidget> Minimap = Private::CastSlateWidget<SWidget>(
+					ChildWidget,
+					GraphPrinterUtilsConstant::GraphMinimapClassName
+				);
+				if (Minimap.IsValid())
+				{
+					FoundMinimap = Minimap;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundMinimap;
+	}
+
+	TSharedPtr<SOverlay> FGraphPrinterUtils::FindNearestChildOverlay(TSharedPtr<SWidget> SearchTarget)
+	{
+		TSharedPtr<SOverlay> FoundOverlay = nullptr;
+		
+		EnumerateChildWidgets(
+			SearchTarget,
+			[&FoundOverlay](const TSharedPtr<SWidget> ChildWidget) -> bool
+			{
+				const TSharedPtr<SOverlay> Overlay = GP_CAST_SLATE_WIDGET(SOverlay, ChildWidget);
+				if (Overlay.IsValid())
+				{
+					FoundOverlay = Overlay;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundOverlay;
+	}
+
+	TArray<TSharedPtr<STextBlock>> FGraphPrinterUtils::GetVisibleChildTextBlocks(TSharedPtr<SWidget> SearchTarget)
+	{
+		if (!SearchTarget.IsValid())
+		{
+			return {};
+		}
+
+		FChildren* Children = SearchTarget->GetChildren();
+		if (Children == nullptr)
+		{
+			return {};
+		}
+
+		TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks;
+		for (int32 Index = 0; Index < Children->Num(); Index++)
+		{
+			const TSharedPtr<SWidget> ChildWidget = Children->GetChildAt(Index);
+			TSharedPtr<STextBlock> TextBlock = GP_CAST_SLATE_WIDGET(STextBlock, ChildWidget);
+			if (TextBlock.IsValid())
+			{
+				if (TextBlock->GetVisibility().IsVisible())
+				{
+					VisibleChildTextBlocks.Add(TextBlock);
+				}
+			}
+		}
+		
+		return VisibleChildTextBlocks;
 	}
 }

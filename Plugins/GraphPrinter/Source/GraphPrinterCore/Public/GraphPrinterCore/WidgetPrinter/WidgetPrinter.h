@@ -18,14 +18,14 @@ class GRAPHPRINTERCORE_API UWidgetPrinter : public UObject
 
 public:
 	// Draw and export the widget with arguments.
-	virtual void PrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) PURE_VIRTUAL(UWidgetPrinterBase::PrintWidget, ; );
+	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) PURE_VIRTUAL(UWidgetPrinterBase::PrintWidget, ; );
 	
 	// Returns whether the target widget can be printed.
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const PURE_VIRTUAL(UWidgetPrinterBase::CanPrintWidget, return false; );
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 	// Restore the state of the widget from the image file.
-	virtual void RestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) PURE_VIRTUAL(UWidgetPrinterBase::RestoreWidget, ; );
+	virtual void RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options) PURE_VIRTUAL(UWidgetPrinterBase::RestoreWidget, ; );
 
 	// Returns whether the target widget can be restored.
 	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const PURE_VIRTUAL(UWidgetPrinterBase::CanRestoreWidget, return false; );
