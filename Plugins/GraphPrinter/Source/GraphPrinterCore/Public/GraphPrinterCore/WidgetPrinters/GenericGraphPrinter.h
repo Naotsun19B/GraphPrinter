@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterCore/WidgetPrinter/WidgetPrinter.h"
+#include "GraphPrinterCore/WidgetPrinters/WidgetPrinter.h"
 #include "GraphPrinterCore/Types/OneWayBool.h"
 #include "GenericGraphPrinter.generated.h"
 

@@ -1,6 +1,6 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/WidgetPrinter/IWidgetPrinterRegistry.h"
+#include "GraphPrinterCore/WidgetPrinters/IWidgetPrinterRegistry.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Interfaces/IMainFrameModule.h"
 

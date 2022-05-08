@@ -2,7 +2,7 @@
 
 #include "GraphPrinterCore/IGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/WidgetPrinter/IWidgetPrinterRegistry.h"
+#include "GraphPrinterCore/WidgetPrinters/IWidgetPrinterRegistry.h"
 
 namespace GraphPrinter
 {

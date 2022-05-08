@@ -1,6 +1,6 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/WidgetPrinter/GenericGraphPrinter.h"
+#include "GraphPrinterCore/WidgetPrinters/GenericGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
