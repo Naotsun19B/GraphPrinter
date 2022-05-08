@@ -33,10 +33,16 @@ namespace GraphPrinter
 
 		// Draw and export the widget with arguments.
 		virtual void PrintWidget(const FPrintWidgetOptions& Options) = 0;
+
+		// Returns whether the command to print the widget can be executed.
+		virtual bool CanPrintWidget(const FPrintWidgetOptions& Options) = 0;
 		
 #ifdef WITH_TEXT_CHUNK_HELPER
 		// Restore the state of the widget from the image file.
 		virtual void RestoreWidget(const FRestoreWidgetOptions& Options = FRestoreWidgetOptions()) = 0;
+
+		// Returns whether the command to restore the widget can be executed.
+		virtual bool CanRestoreWidget(const FRestoreWidgetOptions& Options = FRestoreWidgetOptions()) = 0;
 #endif
 	};
 }

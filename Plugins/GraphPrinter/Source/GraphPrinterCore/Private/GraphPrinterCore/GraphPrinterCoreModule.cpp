@@ -2,7 +2,6 @@
 
 #include "GraphPrinterCore/IGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
 #include "GraphPrinterCore/WidgetPrinter/WidgetPrinter.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
@@ -26,12 +25,20 @@ namespace GraphPrinter
 
 		// IGraphPrinter interface.
 		virtual void PrintWidget(const FPrintWidgetOptions& Options) override;
+		virtual bool CanPrintWidget(const FPrintWidgetOptions& Options) override;
 #ifdef WITH_TEXT_CHUNK_HELPER
 		virtual void RestoreWidget(const FRestoreWidgetOptions& Options) override;
+		virtual bool CanRestoreWidget(const FRestoreWidgetOptions& Options) override;
 #endif
 		// End of IGraphPrinter interface.
 
 	private:
+		// Execution confirmation function used internally.
+		UWidgetPrinter* FindAvailableWidgetPrinter(const FPrintWidgetOptions& Options) const;
+#ifdef WITH_TEXT_CHUNK_HELPER
+		UWidgetPrinter* FindAvailableWidgetPrinter(const FRestoreWidgetOptions& Options) const;
+#endif
+		
 		// Called when the hot reload is complete.
 #if BEFORE_UE_5_00
 		void HandleOnReloadComplete(EReloadCompleteReason ReloadCompleteReason);
@@ -46,7 +53,7 @@ namespace GraphPrinter
 		// Instances of inherited classes of all existing UWidgetPrinter class.
 		TArray<UWidgetPrinter*> WidgetPrinters;
 	};
-	
+
 	void FGraphPrinterCoreModule::StartupModule()
 	{
 		// Register settings.
@@ -78,26 +85,50 @@ namespace GraphPrinter
 
 	void FGraphPrinterCoreModule::PrintWidget(const FPrintWidgetOptions& Options)
 	{
+		if (UWidgetPrinter* FoundWidgetPrinter = FindAvailableWidgetPrinter(Options))
+		{
+			FoundWidgetPrinter->PrintWidget(Options);
+		}
+	}
+
+	bool FGraphPrinterCoreModule::CanPrintWidget(const FPrintWidgetOptions& Options)
+	{
+		return IsValid(FindAvailableWidgetPrinter(Options));
+	}
+
+#ifdef WITH_TEXT_CHUNK_HELPER
+	void FGraphPrinterCoreModule::RestoreWidget(const FRestoreWidgetOptions& Options)
+	{
+		if (UWidgetPrinter* FoundWidgetPrinter = FindAvailableWidgetPrinter(Options))
+		{
+			FoundWidgetPrinter->RestoreWidget(Options);
+		}
+	}
+
+	bool FGraphPrinterCoreModule::CanRestoreWidget(const FRestoreWidgetOptions& Options)
+	{
+		return IsValid(FindAvailableWidgetPrinter(Options));
+	}
+#endif
+
+	UWidgetPrinter* FGraphPrinterCoreModule::FindAvailableWidgetPrinter(const FPrintWidgetOptions& Options) const
+	{
 		for (const auto& WidgetPrinter : WidgetPrinters)
 		{
 			if (IsValid(WidgetPrinter))
 			{
 				if (WidgetPrinter->CanPrintWidget(Options))
 				{
-					WidgetPrinter->PrintWidget(Options);
-					return;
+					return WidgetPrinter;
 				}
 			}
 		}
 
-		FGraphPrinterUtils::ShowNotification(
-			LOCTEXT("NotFoundWidgetToPrint", "The tab that contains the printable widget is not selected."),
-			FGraphPrinterUtils::CS_Fail
-		);
+		return nullptr;
 	}
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-	void FGraphPrinterCoreModule::RestoreWidget(const FRestoreWidgetOptions& Options)
+	UWidgetPrinter* FGraphPrinterCoreModule::FindAvailableWidgetPrinter(const FRestoreWidgetOptions& Options) const
 	{
 		for (const auto& WidgetPrinter : WidgetPrinters)
 		{
@@ -105,16 +136,12 @@ namespace GraphPrinter
 			{
 				if (WidgetPrinter->CanRestoreWidget(Options))
 				{
-					WidgetPrinter->RestoreWidget(Options);
-					return;
+					return WidgetPrinter;
 				}
 			}
 		}
 
-		FGraphPrinterUtils::ShowNotification(
-			LOCTEXT("NotFoundWidgetToRestore", "The tab that contains the restorable widget is not selected."),
-			FGraphPrinterUtils::CS_Fail
-		);
+		return nullptr;
 	}
 #endif
 

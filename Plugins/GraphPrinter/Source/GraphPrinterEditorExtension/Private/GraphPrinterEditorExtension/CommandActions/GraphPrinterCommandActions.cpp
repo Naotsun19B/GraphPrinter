@@ -4,6 +4,7 @@
 #include "GraphPrinterCore/IGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
+#include "Misc/Paths.h"
 
 namespace GraphPrinter
 {
@@ -16,12 +17,28 @@ namespace GraphPrinter
 		IGraphPrinter::Get().PrintWidget(Options);
 	}
 
+	bool FGraphPrinterCommandActions::CanCopyGraphWithAllNodesToClipboard()
+	{
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::All;
+		Options.ExportMethod = EExportMethod::Clipboard;
+		return IGraphPrinter::Get().CanPrintWidget(Options);
+	}
+
 	void FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard()
 	{
 		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
 		Options.PrintScope = EPrintScope::Selected;
 		Options.ExportMethod = EExportMethod::Clipboard;
 		IGraphPrinter::Get().PrintWidget(Options);
+	}
+
+	bool FGraphPrinterCommandActions::CanCopyGraphWithSelectedNodesToClipboard()
+	{
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::Selected;
+		Options.ExportMethod = EExportMethod::Clipboard;
+		return IGraphPrinter::Get().CanPrintWidget(Options);
 	}
 #endif
 
@@ -33,6 +50,14 @@ namespace GraphPrinter
 		IGraphPrinter::Get().PrintWidget(Options);
 	}
 
+	bool FGraphPrinterCommandActions::CanPrintGraphWithAllNodes()
+	{
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::All;
+		Options.ExportMethod = EExportMethod::ImageFile;
+		return IGraphPrinter::Get().CanPrintWidget(Options);
+	}
+
 	void FGraphPrinterCommandActions::PrintGraphWithSelectedNodes()
 	{
 		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
@@ -41,10 +66,23 @@ namespace GraphPrinter
 		IGraphPrinter::Get().PrintWidget(Options);
 	}
 
+	bool FGraphPrinterCommandActions::CanPrintGraphWithSelectedNodes()
+	{
+		FPrintWidgetOptions Options = UGraphPrinterSettings::Get().GeneratePrintGraphOptions();
+		Options.PrintScope = EPrintScope::Selected;
+		Options.ExportMethod = EExportMethod::ImageFile;
+		return IGraphPrinter::Get().CanPrintWidget(Options);
+	}
+
 #ifdef WITH_TEXT_CHUNK_HELPER
 	void FGraphPrinterCommandActions::RestoreNodesFromPngFile()
 	{
 		IGraphPrinter::Get().RestoreWidget();
+	}
+
+	bool FGraphPrinterCommandActions::CanExecuteRestoreWidget()
+	{
+		return IGraphPrinter::Get().CanRestoreWidget();
 	}
 #endif
 
@@ -53,6 +91,11 @@ namespace GraphPrinter
 		FGraphPrinterUtils::OpenFolderWithExplorer(
 			UGraphPrinterSettings::Get().OutputDirectory.Path
 		);
+	}
+
+	bool FGraphPrinterCommandActions::CanOpenExportDestinationFolder()
+	{
+		return FPaths::DirectoryExists(UGraphPrinterSettings::Get().OutputDirectory.Path);
 	}
 
 	void FGraphPrinterCommandActions::OpenPluginSettings()

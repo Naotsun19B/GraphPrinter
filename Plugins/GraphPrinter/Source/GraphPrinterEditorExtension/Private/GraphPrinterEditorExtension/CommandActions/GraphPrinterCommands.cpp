@@ -103,35 +103,41 @@ namespace GraphPrinter
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		CommandBindings->MapAction(
 			CopyGraphWithAllNodesToClipboard,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard)
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanCopyGraphWithAllNodesToClipboard)
 		);
 
 		CommandBindings->MapAction(
 			CopyGraphWithSelectedNodesToClipboard,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard)
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanCopyGraphWithSelectedNodesToClipboard)
 		);
 #endif
 	
 		CommandBindings->MapAction(
 			PrintGraphWithAllNodes,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintGraphWithAllNodes)
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintGraphWithAllNodes),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanPrintGraphWithAllNodes)
 		);
 
 		CommandBindings->MapAction(
 			PrintGraphWithSelectedNodes,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintGraphWithSelectedNodes)
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintGraphWithSelectedNodes),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanPrintGraphWithSelectedNodes)
 		);
 	
 #ifdef WITH_TEXT_CHUNK_HELPER
 		CommandBindings->MapAction(
 			RestoreNodesFromPngFile,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::RestoreNodesFromPngFile)
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::RestoreNodesFromPngFile),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanExecuteRestoreWidget)
 		);
 #endif
 
 		CommandBindings->MapAction(
 			OpenExportDestinationFolder,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::OpenExportDestinationFolder)
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::OpenExportDestinationFolder),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanOpenExportDestinationFolder)
 		);
 
 		CommandBindings->MapAction(
