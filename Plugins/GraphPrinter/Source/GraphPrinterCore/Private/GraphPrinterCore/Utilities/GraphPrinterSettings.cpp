@@ -34,6 +34,7 @@ UGraphPrinterSettings::UGraphPrinterSettings()
 	, bUseGamma(true)
 	, Padding(100.f)
 	, MaxImageSize(15000.f, 15000.f)
+	, RenderingScale(1.f)
 	, bCanOverwriteFileWhenExport(false)
 	, bHideToolbarComboButton(false)
 {
@@ -112,6 +113,7 @@ GraphPrinter::FPrintWidgetOptions UGraphPrinterSettings::GeneratePrintGraphOptio
 	Options.bUseGamma = bUseGamma;
 	Options.Padding = Padding;
 	Options.MaxImageSize = MaxImageSize;
+	Options.RenderingScale = RenderingScale;
 	Options.ImageWriteOptions.bOverwriteFile = bCanOverwriteFileWhenExport;
 	Options.OutputDirectoryPath = OutputDirectory.Path;
 	

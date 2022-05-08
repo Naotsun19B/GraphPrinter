@@ -51,6 +51,10 @@ namespace GraphPrinter
 		// If set it too high, you may run out of video memory and crash.
 		FVector2D MaxImageSize;
 
+		// If the scale for drawing the graph is 0.5, it will be drawn at half the resolution.
+		// Decrease the value if you want to draw a graph larger than MaxImageSize.
+		float RenderingScale;
+		
 		// Texture filtering mode to use when outputting.
 		TEnumAsByte<TextureFilter> FilteringMode;
 
@@ -77,6 +81,7 @@ namespace GraphPrinter
 			, bUseGamma(true)
 			, Padding(0.f)
 			, MaxImageSize(FVector2D::ZeroVector)
+			, RenderingScale(0.f)
 			, FilteringMode(TextureFilter::TF_Default)
 			, bDrawOnlyGraph(false)
 			, TargetWidget(nullptr)

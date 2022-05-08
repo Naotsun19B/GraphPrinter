@@ -53,6 +53,11 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	FVector2D MaxImageSize;
 
+	// If the scale for drawing the graph is 0.5, it will be drawn at half the resolution.
+	// Decrease the value if you want to draw a graph larger than MaxImageSize.
+	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (ClampMin = 0.1f, ClampMax = 1.f, UIMin = 0.1f, UIMax = 1.f))
+	float RenderingScale;
+
 	// Whether to overwrite the image if it already exists when export.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
 	bool bCanOverwriteFileWhenExport;

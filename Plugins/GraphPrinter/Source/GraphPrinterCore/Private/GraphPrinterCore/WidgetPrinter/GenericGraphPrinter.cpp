@@ -429,7 +429,13 @@ UTextureRenderTarget2D* UGenericGraphPrinter::DrawGraphToRenderTarget(
 	// Since the drawing result may be corrupted the first time, draw multiple times.
 	for (int32 Count = 0; Count < DrawTimes; Count++)
 	{
-		WidgetRenderer->DrawWidget(RenderTarget, GraphEditor.ToSharedRef(), DrawSize, 0.f, false);
+		WidgetRenderer->DrawWidget(
+			RenderTarget,
+			GraphEditor.ToSharedRef(),
+			Options.RenderingScale,
+			DrawSize,
+			0.f
+		);
 		FlushRenderingCommands();
 	}
 
