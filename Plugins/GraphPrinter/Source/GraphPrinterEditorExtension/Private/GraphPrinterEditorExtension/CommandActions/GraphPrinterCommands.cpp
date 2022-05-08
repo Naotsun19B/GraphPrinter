@@ -93,9 +93,8 @@ namespace GraphPrinter
 			return;
 		}
 		bIsBound = true;
-
-		IMainFrameModule& MainFrame = FModuleManager::LoadModuleChecked<IMainFrameModule>(TEXT("MainFrame"));
-		const TSharedRef<FUICommandList>& MainFrameCommandBindings = MainFrame.GetMainFrameCommandBindings();
+		
+		const TSharedRef<FUICommandList>& MainFrameCommandBindings = IMainFrameModule::Get().GetMainFrameCommandBindings();
 
 		MainFrameCommandBindings->Append(CommandBindings);
 

@@ -282,7 +282,7 @@ bool UGenericGraphPrinter::CanRestoreWidget(const GraphPrinter::FRestoreWidgetOp
 
 int32 UGenericGraphPrinter::GetPriority() const
 {
-	return 0;
+	return GenericGraphPrinterPrinter;
 }
 
 TSharedPtr<SGraphEditorImpl> UGenericGraphPrinter::FindGraphEditor(const TSharedPtr<SWidget>& TargetWidget) const
@@ -674,6 +674,8 @@ bool UGenericGraphPrinter::RestoreNodesFromTextChunk(
 	return true;
 }
 #endif
+
+GraphPrinter::FOneWayBool UGenericGraphPrinter::IsFirstOutput = true;
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 const FString UGenericGraphPrinter::PngTextChunkKey = TEXT("GraphEditor");

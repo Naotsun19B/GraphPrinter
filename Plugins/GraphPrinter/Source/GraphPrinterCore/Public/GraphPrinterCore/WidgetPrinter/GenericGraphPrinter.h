@@ -19,6 +19,13 @@ class GRAPHPRINTERCORE_API UGenericGraphPrinter : public UWidgetPrinter
 	GENERATED_BODY()
 
 public:
+	// The priority of this widget printer.
+	static constexpr int32 GenericGraphPrinterPrinter = 0;
+	
+public:
+	// Destructor.
+	virtual ~UGenericGraphPrinter() override = default;
+	
 	// UWidgetPrinter interface.
 	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) override;
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
@@ -132,7 +139,7 @@ protected:
 	// The number of times to re-output as a countermeasure against the whitish image
 	// that is output for the first time after starting the engine.
 	static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
-	GraphPrinter::FOneWayBool IsFirstOutput = true;
+	static GraphPrinter::FOneWayBool IsFirstOutput;
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 	// Key used when writing to a text chunk of a png file.

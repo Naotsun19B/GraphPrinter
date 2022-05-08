@@ -333,18 +333,26 @@ namespace GraphPrinter
 	{
 		const TSharedRef<FGlobalTabmanager> GlobalTabManager = FGlobalTabmanager::Get();
 		const TSharedPtr<SDockTab> ActiveTab = GlobalTabManager->GetActiveTab();
-		if (!ActiveTab.IsValid())
+		if (ActiveTab.IsValid())
 		{
-			return nullptr;
-		}
-	
-		const TSharedPtr<SDockingTabStack> DockingTabStack = FindNearestParentDockingTabStack(ActiveTab);
-		if (!DockingTabStack.IsValid())
-		{
-			return nullptr;
+			const TSharedPtr<SDockingTabStack> DockingTabStack = FindNearestParentDockingTabStack(ActiveTab);
+			if (DockingTabStack.IsValid())
+			{
+				TSharedPtr<SGraphEditorImpl> GraphEditor = FindNearestChildGraphEditor(DockingTabStack);
+				if (GraphEditor.IsValid())
+				{
+					return GraphEditor;
+				}
+			}
 		}
 
-		return FindNearestChildGraphEditor(DockingTabStack);
+		const TSharedPtr<SWindow> ActiveWindow = FSlateApplication::Get().GetActiveTopLevelWindow();
+		if (ActiveWindow.IsValid())
+		{
+			return FindNearestChildGraphEditor(ActiveWindow);
+		}
+
+		return nullptr;
 	}
 
 	TSharedPtr<SWidget> FGraphPrinterUtils::FindNearestChildMinimap(TSharedPtr<SWidget> SearchTarget)
