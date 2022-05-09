@@ -1,6 +1,6 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "ReferenceViewerPrinter/WidgetPrinters/ReferenceViewerPrinter.h"
+#include "GraphPrinter/WidgetPrinters/ReferenceViewerPrinter.h"
 #include "SGraphEditorImpl.h"
 #include "ReferenceViewer/EdGraph_ReferenceViewer.h"
 

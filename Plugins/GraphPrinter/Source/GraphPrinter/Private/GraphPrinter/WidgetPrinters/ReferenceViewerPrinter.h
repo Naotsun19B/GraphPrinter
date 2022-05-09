@@ -10,7 +10,7 @@
  * A class of graph printers dedicated to reference viewers.
  */
 UCLASS()
-class REFERENCEVIEWERPRINTER_API UReferenceViewerPrinter : public UGenericGraphPrinter
+class UReferenceViewerPrinter : public UGenericGraphPrinter
 {
 	GENERATED_BODY()
 	
