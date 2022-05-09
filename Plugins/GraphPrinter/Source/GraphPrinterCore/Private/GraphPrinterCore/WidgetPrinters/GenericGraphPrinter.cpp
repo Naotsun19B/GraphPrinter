@@ -2,8 +2,9 @@
 
 #include "GraphPrinterCore/WidgetPrinters/GenericGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterCore/Utilities/WidgetPrinterUtils.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "SGraphEditorImpl.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Slate/WidgetRenderer.h"
@@ -289,10 +290,10 @@ TSharedPtr<SGraphEditorImpl> UGenericGraphPrinter::FindGraphEditor(const TShared
 {
 	if (TargetWidget.IsValid())
 	{
-		return GraphPrinter::FGraphPrinterUtils::FindNearestChildGraphEditor(TargetWidget);
+		return GraphPrinter::FWidgetPrinterUtils::FindNearestChildGraphEditor(TargetWidget);
 	}
 	
-	return GraphPrinter::FGraphPrinterUtils::GetActiveGraphEditor();
+	return GraphPrinter::FWidgetPrinterUtils::GetActiveGraphEditor();
 }
 
 bool UGenericGraphPrinter::CalculateGraphDrawSizeAndViewLocation(
@@ -374,7 +375,7 @@ UTextureRenderTarget2D* UGenericGraphPrinter::DrawGraphToRenderTarget(
 )
 {
 	// If there is a minimap, hide it only while drawing.
-	const TSharedPtr<SWidget> Minimap = GraphPrinter::FGraphPrinterUtils::FindNearestChildMinimap(GraphEditor);
+	const TSharedPtr<SWidget> Minimap = GraphPrinter::FWidgetPrinterUtils::FindNearestChildMinimap(GraphEditor);
 	TOptional<EVisibility> PreviousMinimapVisibility;
 	if (Minimap.IsValid())
 	{
@@ -395,8 +396,8 @@ UTextureRenderTarget2D* UGenericGraphPrinter::DrawGraphToRenderTarget(
 	TMap<TSharedPtr<STextBlock>, EVisibility> PreviousChildTextBlockVisibilities;
 	if (Options.bDrawOnlyGraph)
 	{
-		const TSharedPtr<SOverlay> Overlay = GraphPrinter::FGraphPrinterUtils::FindNearestChildOverlay(GraphEditor);
-		TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks = GraphPrinter::FGraphPrinterUtils::GetVisibleChildTextBlocks(Overlay);
+		const TSharedPtr<SOverlay> Overlay = GraphPrinter::FWidgetPrinterUtils::FindNearestChildOverlay(GraphEditor);
+		TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks = GraphPrinter::FWidgetPrinterUtils::GetVisibleChildTextBlocks(Overlay);
 		for (const TSharedPtr<STextBlock>& VisibleChildTextBlock : VisibleChildTextBlocks)
 		{
 			if (VisibleChildTextBlock.IsValid())
@@ -510,7 +511,7 @@ FString UGenericGraphPrinter::CreateFilename(
 	FString Filename = FPaths::ConvertRelativePathToFull(
 		FPaths::Combine(Options.OutputDirectoryPath, GetGraphTitle(GraphEditor))
 	);
-	const FString& Extension = GraphPrinter::FGraphPrinterUtils::GetImageFileExtension(Options.ImageWriteOptions.Format);
+	const FString& Extension = GraphPrinter::FWidgetPrinterUtils::GetImageFileExtension(Options.ImageWriteOptions.Format);
 
 	FText ValidatePathErrorText;
 	if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
@@ -586,13 +587,6 @@ bool UGenericGraphPrinter::WriteNodeInfoToTextChunk(
 	const GraphPrinter::FPrintWidgetOptions& Options
 )
 {
-	// Make a shortcut key event for copy operation.
-	FKeyEvent KeyEvent;
-	if (!GraphPrinter::FGraphPrinterUtils::GetKeyEventFromUICommandInfo(FGenericCommands::Get().Copy, KeyEvent))
-	{
-		return false;
-	}
-
 	FString ExportedText;
 	FEdGraphUtilities::ExportNodesToText(NodesToPrint, ExportedText);
 	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))

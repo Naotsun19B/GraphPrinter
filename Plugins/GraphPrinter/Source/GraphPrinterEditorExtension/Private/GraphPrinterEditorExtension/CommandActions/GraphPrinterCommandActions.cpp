@@ -1,9 +1,9 @@
 // Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "GraphPrinterCore/IGraphPrinter.h"
 #include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterUtils.h"
 #include "Misc/Paths.h"
 
 namespace GraphPrinter

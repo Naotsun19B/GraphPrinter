@@ -36,7 +36,6 @@ public class GraphPrinterCore : ModuleRules
 				"UnrealEd",
 				"MainFrame",
 				"RenderCore",
-				"DesktopPlatform",
 
 				"GraphPrinterGlobals",
                 "TextChunkHelper",

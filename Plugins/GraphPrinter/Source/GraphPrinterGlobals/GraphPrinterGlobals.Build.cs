@@ -16,6 +16,16 @@ public class GraphPrinterGlobals : ModuleRules
 			}
 		);
 		
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				"Slate",
+				"SlateCore",
+				"MainFrame",
+				"DesktopPlatform",
+			}
+		);
+		
 		// To use version macros.
 		PublicIncludePaths.AddRange(
 			new string[]
