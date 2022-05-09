@@ -1,15 +1,14 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/WidgetPrinters/GenericGraphPrinter.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/Utilities/WidgetPrinterUtils.h"
+#include "GraphPrinter/WidgetPrinters/GenericGraphPrinter.h"
+#include "GraphPrinter/Utilities/GraphPrinterSettings.h"
+#include "GraphPrinter/Utilities/WidgetPrinterUtils.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "SGraphEditorImpl.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Slate/WidgetRenderer.h"
 #include "HAL/FileManager.h"
-#include "Framework/Commands/GenericCommands.h"
 #include "EdGraphUtilities.h"
 
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION

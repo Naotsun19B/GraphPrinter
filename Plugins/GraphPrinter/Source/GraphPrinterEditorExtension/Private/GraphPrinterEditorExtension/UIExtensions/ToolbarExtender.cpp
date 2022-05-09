@@ -3,7 +3,7 @@
 #include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
+#include "GraphPrinter/Utilities/GraphPrinterSettings.h"
 #include "Toolkits/AssetEditorToolkit.h"
 
 #define LOCTEXT_NAMESPACE "ToolbarExtender"

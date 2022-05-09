@@ -1,14 +1,14 @@
 // Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/IGraphPrinter.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
-#include "GraphPrinterCore/WidgetPrinters/IWidgetPrinterRegistry.h"
+#include "GraphPrinter/IGraphPrinter.h"
+#include "GraphPrinter/Utilities/GraphPrinterSettings.h"
+#include "GraphPrinter/WidgetPrinters/IWidgetPrinterRegistry.h"
 
 namespace GraphPrinter
 {
-	const FName IGraphPrinter::PluginModuleName = TEXT("GraphPrinterCore");
+	const FName IGraphPrinter::PluginModuleName = TEXT("GraphPrinter");
 	
-	class FGraphPrinterCoreModule : public IGraphPrinter
+	class FGraphPrinterModule : public IGraphPrinter
 	{
 	public:
 		// IModuleInterface interface.
@@ -26,7 +26,7 @@ namespace GraphPrinter
 		// End of IGraphPrinter interface.
 	};
 
-	void FGraphPrinterCoreModule::StartupModule()
+	void FGraphPrinterModule::StartupModule()
 	{
 		// Register settings.
 		UGraphPrinterSettings::Register();
@@ -35,7 +35,7 @@ namespace GraphPrinter
 		IWidgetPrinterRegistry::Register();
 	}
 
-	void FGraphPrinterCoreModule::ShutdownModule()
+	void FGraphPrinterModule::ShutdownModule()
 	{
 		// Unregister widget printer registry.
 		IWidgetPrinterRegistry::Unregister();
@@ -44,7 +44,7 @@ namespace GraphPrinter
 		UGraphPrinterSettings::Unregister();
 	}
 
-	void FGraphPrinterCoreModule::PrintWidget(const FPrintWidgetOptions& Options)
+	void FGraphPrinterModule::PrintWidget(const FPrintWidgetOptions& Options)
 	{
 		if (UWidgetPrinter* FoundWidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 		{
@@ -52,13 +52,13 @@ namespace GraphPrinter
 		}
 	}
 
-	bool FGraphPrinterCoreModule::CanPrintWidget(const FPrintWidgetOptions& Options)
+	bool FGraphPrinterModule::CanPrintWidget(const FPrintWidgetOptions& Options)
 	{
 		return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
 	}
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-	void FGraphPrinterCoreModule::RestoreWidget(const FRestoreWidgetOptions& Options)
+	void FGraphPrinterModule::RestoreWidget(const FRestoreWidgetOptions& Options)
 	{
 		if (UWidgetPrinter* FoundWidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 		{
@@ -66,11 +66,11 @@ namespace GraphPrinter
 		}
 	}
 
-	bool FGraphPrinterCoreModule::CanRestoreWidget(const FRestoreWidgetOptions& Options)
+	bool FGraphPrinterModule::CanRestoreWidget(const FRestoreWidgetOptions& Options)
 	{
 		return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
 	}
 #endif
 }
 
-IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterCoreModule, GraphPrinter)
+IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterModule, GraphPrinter)

@@ -1,6 +1,6 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/WidgetPrinters/IWidgetPrinterRegistry.h"
+#include "GraphPrinter/WidgetPrinters/IWidgetPrinterRegistry.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Interfaces/IMainFrameModule.h"
 
@@ -54,7 +54,7 @@ namespace GraphPrinter
 		FCoreUObjectDelegates::ReloadCompleteDelegate.AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnReloadComplete);
 #else
 		IHotReloadInterface& HotReloadInterface = FModuleManager::LoadModuleChecked<IHotReloadInterface>(TEXT("HotReload"));
-		HotReloadInterface.OnHotReload().AddRaw(this, &FGraphPrinterCoreModule::HandleOnHotReload);
+		HotReloadInterface.OnHotReload().AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnHotReload);
 #endif
 	}
 

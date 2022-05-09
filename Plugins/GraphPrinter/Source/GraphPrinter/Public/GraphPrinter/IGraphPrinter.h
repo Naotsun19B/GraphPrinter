@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-#include "GraphPrinterCore/Types/PrintWidgetOptions.h"
-#include "GraphPrinterCore/Types/RestoreWidgetOptions.h"
+#include "GraphPrinter/Types/PrintWidgetOptions.h"
+#include "GraphPrinter/Types/RestoreWidgetOptions.h"
 
 namespace GraphPrinter
 {
@@ -16,7 +16,7 @@ namespace GraphPrinter
 	{
 	public:
 		// The name of the module for this plugin.
-		GRAPHPRINTERCORE_API static const FName PluginModuleName;
+		GRAPHPRINTER_API static const FName PluginModuleName;
 		
 	public:
 		// Returns singleton instance, loading the module on demand if needed.

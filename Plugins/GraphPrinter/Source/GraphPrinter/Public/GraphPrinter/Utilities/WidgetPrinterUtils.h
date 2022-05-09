@@ -15,7 +15,7 @@ namespace GraphPrinter
 	/**
 	 * Misc utility functions used in widget printer classes.
 	 */
-	class GRAPHPRINTERCORE_API FWidgetPrinterUtils
+	class GRAPHPRINTER_API FWidgetPrinterUtils
 	{
 	public:
 		// Get the extension by the format of the image file.

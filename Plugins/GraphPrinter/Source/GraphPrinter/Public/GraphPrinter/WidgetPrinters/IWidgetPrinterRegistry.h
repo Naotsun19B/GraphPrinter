@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterCore/WidgetPrinters/WidgetPrinter.h"
+#include "GraphPrinter/WidgetPrinters/WidgetPrinter.h"
 
 namespace GraphPrinter
 {
 	/**
 	 * A class that allows you to collect and search widget printers.
 	 */
-	class GRAPHPRINTERCORE_API IWidgetPrinterRegistry
+	class GRAPHPRINTER_API IWidgetPrinterRegistry
 	{
 	public:
 		// Register-Unregister and instance getter this class.

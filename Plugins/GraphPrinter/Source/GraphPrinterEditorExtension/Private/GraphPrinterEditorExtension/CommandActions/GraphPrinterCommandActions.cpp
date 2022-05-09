@@ -2,8 +2,8 @@
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
-#include "GraphPrinterCore/IGraphPrinter.h"
-#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
+#include "GraphPrinter/IGraphPrinter.h"
+#include "GraphPrinter/Utilities/GraphPrinterSettings.h"
 #include "Misc/Paths.h"
 
 namespace GraphPrinter

@@ -25,7 +25,7 @@ public class ReferenceViewerPrinter : ModuleRules
 				"AssetManagerEditor",
 
 				"GraphPrinterGlobals",
-				"GraphPrinterCore",
+				"GraphPrinter",
 			}
 		);
 	}

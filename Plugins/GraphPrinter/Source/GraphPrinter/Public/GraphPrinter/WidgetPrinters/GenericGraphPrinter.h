@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterCore/WidgetPrinters/WidgetPrinter.h"
-#include "GraphPrinterCore/Types/OneWayBool.h"
+#include "GraphPrinter/WidgetPrinters/WidgetPrinter.h"
+#include "GraphPrinter/Types/OneWayBool.h"
 #include "GenericGraphPrinter.generated.h"
 
 class SGraphEditorImpl;
@@ -14,7 +14,7 @@ class UTextureRenderTarget2D;
  * A general-purpose printer class for the graph editor.
  */
 UCLASS()
-class GRAPHPRINTERCORE_API UGenericGraphPrinter : public UWidgetPrinter
+class GRAPHPRINTER_API UGenericGraphPrinter : public UWidgetPrinter
 {
 	GENERATED_BODY()
 

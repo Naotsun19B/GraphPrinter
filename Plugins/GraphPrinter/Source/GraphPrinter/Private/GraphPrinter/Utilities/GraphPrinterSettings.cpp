@@ -1,6 +1,6 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/Utilities/GraphPrinterSettings.h"
+#include "GraphPrinter/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "ISettingsModule.h"
 #include "ImageWriteTypes.h"

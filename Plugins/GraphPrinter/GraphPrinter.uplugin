@@ -27,7 +27,7 @@
 			]
 		},
 		{
-			"Name": "GraphPrinterCore",
+			"Name": "GraphPrinter",
 			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [

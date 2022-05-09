@@ -1,7 +1,7 @@
 ﻿// Copyright 2020-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterCore/Utilities/WidgetPrinterUtils.h"
-#include "GraphPrinterCore/Utilities/CastSlateWidget.h"
+#include "GraphPrinter/Utilities/WidgetPrinterUtils.h"
+#include "GraphPrinter/Utilities/CastSlateWidget.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Framework/Docking/TabManager.h"
 #include "Widgets/Docking/SDockTab.h"

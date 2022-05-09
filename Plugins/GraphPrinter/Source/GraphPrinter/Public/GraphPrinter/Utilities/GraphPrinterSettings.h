@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "GraphPrinterCore/Types/PrintWidgetOptions.h"
+#include "GraphPrinter/Types/PrintWidgetOptions.h"
 #include "GraphPrinterSettings.generated.h"
 
 enum TextureFilter;
@@ -14,7 +14,7 @@ enum class EDesiredImageFormat : uint8;
  * Editor settings for this plugin.
  */
 UCLASS(Config = Editor)
-class GRAPHPRINTERCORE_API UGraphPrinterSettings : public UObject
+class GRAPHPRINTER_API UGraphPrinterSettings : public UObject
 {
 	GENERATED_BODY()
 	

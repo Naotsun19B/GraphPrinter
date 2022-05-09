@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "GraphPrinterCore/Types/PrintWidgetOptions.h"
-#include "GraphPrinterCore/Types/RestoreWidgetOptions.h"
+#include "GraphPrinter/Types/PrintWidgetOptions.h"
+#include "GraphPrinter/Types/RestoreWidgetOptions.h"
 #include "WidgetPrinter.generated.h"
 
 /**
  * A Class that prints widgets such as the graph editor.
  */
 UCLASS(Abstract)
-class GRAPHPRINTERCORE_API UWidgetPrinter : public UObject
+class GRAPHPRINTER_API UWidgetPrinter : public UObject
 {
 	GENERATED_BODY()
 

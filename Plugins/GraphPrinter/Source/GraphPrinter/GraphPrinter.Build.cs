@@ -3,9 +3,9 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class GraphPrinterCore : ModuleRules
+public class GraphPrinter : ModuleRules
 {
-	public GraphPrinterCore(ReadOnlyTargetRules Target) : base(Target)
+	public GraphPrinter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 

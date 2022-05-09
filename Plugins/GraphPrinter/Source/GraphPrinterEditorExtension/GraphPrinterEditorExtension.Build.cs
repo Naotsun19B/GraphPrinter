@@ -27,7 +27,7 @@ public class GraphPrinterEditorExtension : ModuleRules
 				"Projects",
 
 				"GraphPrinterGlobals",
-                "GraphPrinterCore",
+                "GraphPrinter",
                 "TextChunkHelper",
                 "ClipboardImageExtension",
 			}
