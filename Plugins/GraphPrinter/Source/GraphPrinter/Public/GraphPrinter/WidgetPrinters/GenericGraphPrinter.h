@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GraphPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "GraphPrinter/Types/OneWayBool.h"
 #include "GenericGraphPrinter.generated.h"
 
 class SGraphEditorImpl;
@@ -131,16 +130,6 @@ protected:
 #endif
 	
 protected:
-	// Number of attempts to draw the widget on the render target.
-	// The drawing result may be corrupted once.
-	// Probably if draw twice, the drawing result will not be corrupted.
-	static constexpr int32 DrawTimes = 2;
-
-	// The number of times to re-output as a countermeasure against the whitish image
-	// that is output for the first time after starting the engine.
-	static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
-	static GraphPrinter::FOneWayBool IsFirstOutput;
-
 #ifdef WITH_TEXT_CHUNK_HELPER
 	// Key used when writing to a text chunk of a png file.
 	static const FString PngTextChunkKey;

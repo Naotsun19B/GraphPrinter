@@ -7,7 +7,6 @@
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "SGraphEditorImpl.h"
 #include "Engine/TextureRenderTarget2D.h"
-#include "Slate/WidgetRenderer.h"
 #include "HAL/FileManager.h"
 #include "EdGraphUtilities.h"
 
@@ -33,6 +32,16 @@ void UGenericGraphPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options
 			GraphPrinter::FGraphPrinterUtils::CS_Fail
 		);
 		return;
+	}
+
+	// If the restore function cannot be used, the node information will not be embedded.
+	{
+		GraphPrinter::FRestoreWidgetOptions RestoreWidgetOptions;
+		RestoreWidgetOptions.TargetWidget = Options.TargetWidget;
+		if (!CanRestoreWidget(RestoreWidgetOptions))
+		{
+			Options.bIsIncludeNodeInfoInImageFile = false;
+		}
 	}
 
 	// Holds the node selected by the user for printing and then restoring.
@@ -407,39 +416,11 @@ UTextureRenderTarget2D* UGenericGraphPrinter::DrawGraphToRenderTarget(
 		}
 	}
 	
-	FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(Options.bUseGamma, false);
-	if (WidgetRenderer == nullptr)
-	{
-		UE_LOG(LogGraphPrinter, Error, TEXT("Widget Renderer could not be generated."));
-		return nullptr;
-	}
-
-	UTextureRenderTarget2D* RenderTarget = FWidgetRenderer::CreateTargetFor(DrawSize, Options.FilteringMode, Options.bUseGamma);
-	if (!IsValid(RenderTarget))
-	{
-		UE_LOG(LogGraphPrinter, Error, TEXT("Failed to generate RenderTarget."));
-		return nullptr;
-	}
-	if (Options.bUseGamma)
-	{
-		RenderTarget->bForceLinearGamma = true;
-		RenderTarget->UpdateResourceImmediate(true);
-	}
-
-	// Since the drawing result may be corrupted the first time, draw multiple times.
-	for (int32 Count = 0; Count < DrawTimes; Count++)
-	{
-		WidgetRenderer->DrawWidget(
-			RenderTarget,
-			GraphEditor.ToSharedRef(),
-			Options.RenderingScale,
-			DrawSize,
-			0.f
-		);
-		FlushRenderingCommands();
-	}
-
-	BeginCleanup(WidgetRenderer);
+	UTextureRenderTarget2D* RenderTarget = DrawWidgetToRenderTarget(
+		GraphEditor,
+		DrawSize,
+		Options
+	);
 
 	// Restores the visibility of the title bar,
 	// zoom magnification text, and graph type text.
@@ -667,8 +648,6 @@ bool UGenericGraphPrinter::RestoreNodesFromTextChunk(
 	return true;
 }
 #endif
-
-GraphPrinter::FOneWayBool UGenericGraphPrinter::IsFirstOutput = true;
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 const FString UGenericGraphPrinter::PngTextChunkKey = TEXT("GraphEditor");

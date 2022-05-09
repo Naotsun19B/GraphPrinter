@@ -6,7 +6,10 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphPrinter/Types/PrintWidgetOptions.h"
 #include "GraphPrinter/Types/RestoreWidgetOptions.h"
+#include "GraphPrinter/Types/OneWayBool.h"
 #include "WidgetPrinter.generated.h"
+
+class SWidget;
 
 /**
  * A Class that prints widgets such as the graph editor.
@@ -34,4 +37,23 @@ public:
 	// Returns the printer priority.
 	// Check if the printer can be executed from the one with the highest priority.
 	virtual int32 GetPriority() const PURE_VIRTUAL(UWidgetPrinterBase::GetPriority, return 0; );
+	
+protected:
+	// Draw the widget on the render target.
+	virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget(
+		const TSharedPtr<SWidget>& Widget,
+		const FVector2D& DrawSize,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+
+protected:
+	// Number of attempts to draw the widget on the render target.
+	// The drawing result may be corrupted once.
+	// Probably if draw twice, the drawing result will not be corrupted.
+	static constexpr int32 DrawTimes = 2;
+
+	// The number of times to re-output as a countermeasure against the whitish image
+	// that is output for the first time after starting the engine.
+	static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
+	static GraphPrinter::FOneWayBool IsFirstOutput;
 };

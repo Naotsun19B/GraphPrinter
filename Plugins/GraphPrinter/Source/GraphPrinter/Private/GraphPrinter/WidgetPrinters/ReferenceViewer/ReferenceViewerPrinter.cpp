@@ -1,8 +1,26 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinter/WidgetPrinters/ReferenceViewerPrinter.h"
+#include "GraphPrinter/WidgetPrinters/ReferenceViewer/ReferenceViewerPrinter.h"
 #include "SGraphEditorImpl.h"
 #include "ReferenceViewer/EdGraph_ReferenceViewer.h"
+
+bool UReferenceViewerPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const
+{
+	const TSharedPtr<SGraphEditorImpl> GraphEditor = FindGraphEditor(Options.TargetWidget);
+	if (GraphEditor.IsValid())
+	{
+		return IsValid(Cast<UEdGraph_ReferenceViewer>(GraphEditor->GetCurrentGraph()));
+	}
+
+	return false;
+}
+
+#ifdef WITH_TEXT_CHUNK_HELPER
+bool UReferenceViewerPrinter::CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const
+{
+	return false;
+}
+#endif
 
 int32 UReferenceViewerPrinter::GetPriority() const
 {
