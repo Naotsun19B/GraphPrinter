@@ -6,6 +6,7 @@
 #include "Framework/Docking/TabManager.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Framework/Docking/SDockingTabStack.h"
+#include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 #include "SGraphEditorImpl.h"
 #include "Widgets/SOverlay.h"
 #include "Widgets/Text/STextBlock.h"
@@ -95,7 +96,7 @@ namespace GraphPrinter
 		}
 	}
 
-	TSharedPtr<SDockingTabStack> FWidgetPrinterUtils::FindNearestParentDockingTabStack(TSharedPtr<SDockTab> SearchTarget)
+	TSharedPtr<SDockingTabStack> FWidgetPrinterUtils::FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget)
 	{
 		TSharedPtr<SDockingTabStack> FoundDockingTabStack = nullptr;
 		
@@ -115,6 +116,28 @@ namespace GraphPrinter
 		);
 
 		return FoundDockingTabStack;
+	}
+
+	TSharedPtr<SStandaloneAssetEditorToolkitHost> FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(TSharedPtr<SWidget> SearchTarget)
+	{
+		TSharedPtr<SStandaloneAssetEditorToolkitHost> FoundStandaloneAssetEditorToolkitHost = nullptr;
+		
+		EnumerateParentWidgets(
+			SearchTarget,
+			[&FoundStandaloneAssetEditorToolkitHost](const TSharedPtr<SWidget> ParentWidget) -> bool
+			{
+				const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = GP_CAST_SLATE_WIDGET(SStandaloneAssetEditorToolkitHost, ParentWidget);
+				if (StandaloneAssetEditorToolkitHost.IsValid())
+				{
+					FoundStandaloneAssetEditorToolkitHost = StandaloneAssetEditorToolkitHost;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundStandaloneAssetEditorToolkitHost;
 	}
 
 	TSharedPtr<SGraphEditorImpl> FWidgetPrinterUtils::FindNearestChildGraphEditor(TSharedPtr<SWidget> SearchTarget)

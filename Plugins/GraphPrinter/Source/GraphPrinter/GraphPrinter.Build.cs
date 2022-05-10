@@ -52,6 +52,9 @@ public class GraphPrinter : ModuleRules
 				
 	            // To use SDockingTabStack.
 	            Path.Combine(EngineDirectory, "Source", "Runtime", "Slate", "Private"),
+	            
+	            // To use SStandaloneAssetEditorToolkitHost.
+	            Path.Combine(EngineDirectory, "Source", "Editor", "UnrealEd", "Private"),
             }
         );
 	}

@@ -22,9 +22,6 @@ public:
 	static constexpr int32 GenericGraphPrinterPrinter = 0;
 	
 public:
-	// Destructor.
-	virtual ~UGenericGraphPrinter() override = default;
-	
 	// UWidgetPrinter interface.
 	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) override;
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
@@ -33,6 +30,7 @@ public:
 	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const override;
 #endif
 	virtual int32 GetPriority() const override;
+	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const override;
 	// End of UWidgetPrinter interface.
 
 protected:
@@ -58,14 +56,6 @@ protected:
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
 	
-	// Returns whether the graph editor is drawable.
-	virtual bool CanPrintGraphEditor(
-		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
-		const FVector2D& DrawSize,
-		const FVector2D& ViewLocation,
-		const GraphPrinter::FPrintWidgetOptions& Options
-	) const;
-
 	// Draw the graph editor on the render target.
 	virtual UTextureRenderTarget2D* DrawGraphToRenderTarget(
 		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
@@ -82,35 +72,6 @@ protected:
 		const FGraphPanelSelectionSet& PreviousSelectedNodes,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-	// Prepare for copying to the clipboard.
-	virtual void PrepareCopyToClipboard(GraphPrinter::FPrintWidgetOptions& Options);
-#endif
-
-	// Create a file path from options.
-	virtual FString CreateFilename(
-		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
-		const GraphPrinter::FPrintWidgetOptions& Options
-	) const;
-
-	// Returns the title of the graph being edited in the graph editor.
-	virtual FString GetGraphTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor) const;
-
-	// Export the render target that draws the graph editor to image file.
-	virtual void ExportRenderTargetToImageFile(
-		UTextureRenderTarget2D* RenderTarget,
-		const FString& Filename,
-		const GraphPrinter::FPrintWidgetOptions& Options
-	);
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-	// Copy the image file that draws the graph editor to clipboard.
-	virtual bool CopyImageFileToClipboard(
-		const FString& Filename,
-		const GraphPrinter::FPrintWidgetOptions& Options
-	);
-#endif
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 	// Write the drawn node information to the text chunk.

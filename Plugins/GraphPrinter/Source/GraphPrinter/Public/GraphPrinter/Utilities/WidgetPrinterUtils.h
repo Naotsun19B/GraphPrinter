@@ -6,8 +6,8 @@
 #include "ImageWriteTypes.h"
 
 class SWidget;
-class SDockTab;
 class SDockingTabStack;
+class SStandaloneAssetEditorToolkitHost;
 class SGraphEditorImpl;
 
 namespace GraphPrinter
@@ -36,7 +36,10 @@ namespace GraphPrinter
 		);
 
 		// Find the docking tab stack that contains the specified dock tab.
-		static TSharedPtr<SDockingTabStack> FindNearestParentDockingTabStack(TSharedPtr<SDockTab> SearchTarget);
+		static TSharedPtr<SDockingTabStack> FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget);
+		
+		// Returns the toolkit host of the Asset Editor that contains the specified tab.
+		static TSharedPtr<SStandaloneAssetEditorToolkitHost> FindNearestParentStandaloneAssetEditorToolkitHost(TSharedPtr<SWidget> SearchTarget);
 		
 		// Find the widget that is the graph editor and nearest child of SearchTarget.
 		static TSharedPtr<SGraphEditorImpl> FindNearestChildGraphEditor(TSharedPtr<SWidget> SearchTarget);

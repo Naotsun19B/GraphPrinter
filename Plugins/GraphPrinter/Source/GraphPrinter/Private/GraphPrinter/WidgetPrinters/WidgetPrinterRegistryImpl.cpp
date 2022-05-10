@@ -156,11 +156,14 @@ namespace GraphPrinter
 				return (Lhs.GetPriority() > Rhs.GetPriority());
 			}
 		);
-
+		
 		UE_LOG(LogGraphPrinter, Log, TEXT("---------- Registered Widget Printer Classes ----------"));
 		for (const auto& WidgetPrinter : WidgetPrinters)
 		{
-			UE_LOG(LogGraphPrinter, Log, TEXT("%s : Priority = %d"), *GetNameSafe(WidgetPrinter), WidgetPrinter->GetPriority());
+			if (IsValid(WidgetPrinter))
+			{
+				UE_LOG(LogGraphPrinter, Log, TEXT("%s : Priority = %d"), *GetNameSafe(WidgetPrinter->GetClass()), WidgetPrinter->GetPriority());
+			}
 		}
 		UE_LOG(LogGraphPrinter, Log, TEXT("-------------------------------------------------------"));
 	}

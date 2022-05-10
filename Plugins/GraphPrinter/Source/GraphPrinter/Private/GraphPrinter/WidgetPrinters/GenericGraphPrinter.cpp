@@ -3,6 +3,7 @@
 #include "GraphPrinter/WidgetPrinters/GenericGraphPrinter.h"
 #include "GraphPrinter/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinter/Utilities/WidgetPrinterUtils.h"
+#include "GraphPrinter/Utilities/CastSlateWidget.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "SGraphEditorImpl.h"
@@ -10,15 +11,28 @@
 #include "HAL/FileManager.h"
 #include "EdGraphUtilities.h"
 
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-#include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"
-#endif
-
 #ifdef WITH_TEXT_CHUNK_HELPER
 #include "TextChunkHelper/ITextChunkHelper.h"
 #endif
 
 #define LOCTEXT_NAMESPACE "GenericGraphPrinter"
+
+FString UGenericGraphPrinter::GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const
+{
+	const TSharedPtr<SGraphEditorImpl>& GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, Widget);
+	if (GraphEditor.IsValid())
+	{
+		if (const UEdGraph* Graph = GraphEditor->GetCurrentGraph())
+		{
+			if (const UObject* Outer = Graph->GetOuter())
+			{
+				return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
+			}
+		}
+	}
+
+	return TEXT("InvalidGraphEditor");
+}
 
 void UGenericGraphPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options)
 {
@@ -77,11 +91,11 @@ void UGenericGraphPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options
 		Options
 	);
 
-	const bool bIsBelowMaxDrawSize = CanPrintGraphEditor(GraphEditor, DrawSize, ViewLocation, Options);
+	const bool bIsPrintableSize = IsPrintableSize(GraphEditor, DrawSize, Options);
 
 	// Draw the graph editor on the render target.
 	UTextureRenderTarget2D* RenderTarget = nullptr;
-	if (bIsBelowMaxDrawSize)
+	if (bIsPrintableSize)
 	{
 		RenderTarget = DrawGraphToRenderTarget(GraphEditor, DrawSize, ViewLocation, Options);
 	}
@@ -94,7 +108,7 @@ void UGenericGraphPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options
 		Options
 	);
 
-	if (!bIsBelowMaxDrawSize)
+	if (!bIsPrintableSize)
 	{
 		const FText& Message = FText::FromString(FString::Printf(
 			TEXT("%s / %s\nThe drawing range is too wide.\nIf necessary, change the maximum size from the editor settings."),
@@ -190,20 +204,6 @@ void UGenericGraphPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options
 	
 	// Export the render target in the specified file format.
 	ExportRenderTargetToImageFile(RenderTarget, Filename, Options);
-
-	// As a symptomatic treatment for the problem that the first image output after startup is whitish,
-	// the first output is re-output as many times as NumberOfRedrawsWhenFirstTime.
-	if (IsFirstOutput.GetValue())
-	{
-		for (int32 Count = 0; Count < NumberOfReOutputWhenFirstTime; Count++)
-		{
-			FImageWriteOptions ImageWriteOptions = Options.ImageWriteOptions;
-			ImageWriteOptions.bOverwriteFile = true;
-			ImageWriteOptions.NativeOnComplete = nullptr;
-			UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, ImageWriteOptions);
-			IsFirstOutput.Switch();
-		}	
-	}
 }
 
 bool UGenericGraphPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const
@@ -356,25 +356,6 @@ void UGenericGraphPrinter::PrePrintGraphEditor(
 	GraphEditor->ClearSelectionSet();
 }
 
-bool UGenericGraphPrinter::CanPrintGraphEditor(
-	const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
-	const FVector2D& DrawSize,
-	const FVector2D& ViewLocation,
-	const GraphPrinter::FPrintWidgetOptions& Options
-) const
-{
-	// Check draw size.
-	if (Options.MaxImageSize > FVector2D::ZeroVector)
-	{
-		if (DrawSize.X > Options.MaxImageSize.X || DrawSize.Y > Options.MaxImageSize.Y)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
 UTextureRenderTarget2D* UGenericGraphPrinter::DrawGraphToRenderTarget(
 	const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
 	const FVector2D& DrawSize,
@@ -471,93 +452,6 @@ void UGenericGraphPrinter::PostPrintGraphEditor(
 		}
 	}
 }
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-void UGenericGraphPrinter::PrepareCopyToClipboard(GraphPrinter::FPrintWidgetOptions& Options)
-{
-	// When copying to the clipboard, set the image format so that it can be copied.
-	if (Options.ExportMethod == GraphPrinter::EExportMethod::Clipboard)
-	{
-		Options.ImageWriteOptions.Format = ClipboardImageExtension::FClipboardImageExtension::GetCopyableImageFormat();
-	}
-}
-#endif
-
-FString UGenericGraphPrinter::CreateFilename(
-	const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
-	const GraphPrinter::FPrintWidgetOptions& Options
-) const
-{
-	FString Filename = FPaths::ConvertRelativePathToFull(
-		FPaths::Combine(Options.OutputDirectoryPath, GetGraphTitle(GraphEditor))
-	);
-	const FString& Extension = GraphPrinter::FWidgetPrinterUtils::GetImageFileExtension(Options.ImageWriteOptions.Format);
-
-	FText ValidatePathErrorText;
-	if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
-	{
-		GraphPrinter::FGraphPrinterUtils::ShowNotification(ValidatePathErrorText, GraphPrinter::FGraphPrinterUtils::CS_Fail);
-		return FString();
-	}
-
-	// If the file cannot be overwritten, add a number after the file name.
-	if (!Options.ImageWriteOptions.bOverwriteFile)
-	{
-		if (IFileManager::Get().FileExists(*FString(Filename + Extension)))
-		{
-			auto CombineFilenameAndIndex = [](const FString& Filename, int32 Index) -> FString
-			{
-				return FString::Printf(TEXT("%s_%d"), *Filename, Index);
-			};
-
-			int32 Index = 0;
-			while (Index < TNumericLimits<int32>().Max())
-			{
-				const FString& FilenameWithExtension = CombineFilenameAndIndex(Filename, Index) + Extension;
-				if (!IFileManager::Get().FileExists(*FilenameWithExtension))
-				{
-					break;
-				}
-				Index++;
-			}
-			Filename = CombineFilenameAndIndex(Filename, Index);
-		}
-	}
-
-	return (Filename + Extension);
-}
-
-FString UGenericGraphPrinter::GetGraphTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor) const
-{
-	if (const UEdGraph* Graph = GraphEditor->GetCurrentGraph())
-	{
-		if (const UObject* Outer = Graph->GetOuter())
-		{
-			return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
-		}
-	}
-
-	return TEXT("InvalidGraphEditor");
-}
-
-void UGenericGraphPrinter::ExportRenderTargetToImageFile(
-	UTextureRenderTarget2D* RenderTarget,
-	const FString& Filename,
-	const GraphPrinter::FPrintWidgetOptions& Options
-)
-{
-	UImageWriteBlueprintLibrary::ExportToDisk(RenderTarget, Filename, Options.ImageWriteOptions);
-}
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-bool UGenericGraphPrinter::CopyImageFileToClipboard(
-	const FString& Filename,
-	const GraphPrinter::FPrintWidgetOptions& Options
-)
-{
-	return ClipboardImageExtension::FClipboardImageExtension::ClipboardCopy(Filename);
-}
-#endif
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 bool UGenericGraphPrinter::WriteNodeInfoToTextChunk(

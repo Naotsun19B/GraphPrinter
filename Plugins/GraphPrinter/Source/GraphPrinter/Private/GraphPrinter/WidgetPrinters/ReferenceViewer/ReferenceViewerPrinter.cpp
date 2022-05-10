@@ -1,6 +1,7 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinter/WidgetPrinters/ReferenceViewer/ReferenceViewerPrinter.h"
+#include "GraphPrinter/Utilities/CastSlateWidget.h"
 #include "SGraphEditorImpl.h"
 #include "ReferenceViewer/EdGraph_ReferenceViewer.h"
 
@@ -27,16 +28,20 @@ int32 UReferenceViewerPrinter::GetPriority() const
 	return ReferenceViewerPrinterPrinter;
 }
 
-FString UReferenceViewerPrinter::GetGraphTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor) const
+FString UReferenceViewerPrinter::GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const
 {
-	if (const auto* ReferenceViewerGraph = Cast<UEdGraph_ReferenceViewer>(GraphEditor->GetCurrentGraph()))
+	const TSharedPtr<SGraphEditorImpl>& GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, Widget);
+	if (GraphEditor.IsValid())
 	{
-		const TArray<FAssetIdentifier>& Assets = ReferenceViewerGraph->GetCurrentGraphRootIdentifiers();
-		if (Assets.IsValidIndex(0))
+		if (const auto* ReferenceViewerGraph = Cast<UEdGraph_ReferenceViewer>(GraphEditor->GetCurrentGraph()))
 		{
-			return FString::Printf(TEXT("ReferenceViewer_%s"), *FPaths::GetBaseFilename(Assets[0].PackageName.ToString()));
+			const TArray<FAssetIdentifier>& Assets = ReferenceViewerGraph->GetCurrentGraphRootIdentifiers();
+			if (Assets.IsValidIndex(0))
+			{
+				return FString::Printf(TEXT("ReferenceViewer_%s"), *FPaths::GetBaseFilename(Assets[0].PackageName.ToString()));
+			}
 		}
 	}
 
 	return TEXT("InvalidReferenceViewer");
-} 
+}

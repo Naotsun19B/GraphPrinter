@@ -39,12 +39,48 @@ public:
 	virtual int32 GetPriority() const PURE_VIRTUAL(UWidgetPrinterBase::GetPriority, return 0; );
 	
 protected:
+	// Returns whether the widget size is drawable.
+	virtual bool IsPrintableSize(
+		const TSharedPtr<SWidget>& Widget, 
+		const FVector2D& DrawSize,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	) const;
+	
 	// Draw the widget on the render target.
 	virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget(
 		const TSharedPtr<SWidget>& Widget,
 		const FVector2D& DrawSize,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
+
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+	// Prepare for copying to the clipboard.
+	virtual void PrepareCopyToClipboard(GraphPrinter::FPrintWidgetOptions& Options);
+#endif
+
+	// Create a file path from options.
+	virtual FString CreateFilename(
+		const TSharedPtr<SWidget>& Widget, 
+		const GraphPrinter::FPrintWidgetOptions& Options
+	) const;
+	
+	// Returns the title of the widget.
+	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const;
+	
+	// Export the render target that draws the graph editor to image file.
+	virtual void ExportRenderTargetToImageFile(
+		UTextureRenderTarget2D* RenderTarget,
+		const FString& Filename,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+	// Copy the image file that draws the graph editor to clipboard.
+	virtual bool CopyImageFileToClipboard(
+		const FString& Filename,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+#endif
 
 protected:
 	// Number of attempts to draw the widget on the render target.

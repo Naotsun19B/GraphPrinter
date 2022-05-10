@@ -25,9 +25,6 @@ public:
 	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const override;
 #endif
 	virtual int32 GetPriority() const override;
+	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const override;
 	// End of UWidgetPrinter interface.
-	
-	// UGenericGraphPrinter interface.
-	virtual FString GetGraphTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor) const override;
-	// End of UGenericGraphPrinter interface.
 };
