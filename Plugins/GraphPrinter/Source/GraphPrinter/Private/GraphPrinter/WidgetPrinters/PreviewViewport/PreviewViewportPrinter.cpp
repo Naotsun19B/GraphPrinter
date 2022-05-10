@@ -14,55 +14,23 @@
 
 #define LOCTEXT_NAMESPACE "PreviewViewportPrinter"
 
-UTextureRenderTarget2D* UPreviewViewportPrinter::GetPrintResult(
+UTextureRenderTarget2D* UPreviewViewportPrinter::GetRenderedPreviewViewport(
 	const TSharedPtr<SWidget>& TargetWidget,
 	const GraphPrinter::FPrintWidgetOptions& Options
 )
 {
-	auto* This = GetMutableDefault<UPreviewViewportPrinter>();
-	if (!TargetWidget.IsValid() || !IsValid(This))
-	{
-		return nullptr;
-	}
-
-	EVisibility PreviousVisibility;
-	This->PrePrintPreviewViewport(PreviousVisibility, TargetWidget, Options);
-
-	FVector2D DrawSize;
-	{
-		const FGeometry& Geometry =
-#if BEFORE_UE_4_23
-			TargetWidget->GetCachedGeometry();
-#else
-			TargetWidget->GetTickSpaceGeometry();
-#endif
-
-		DrawSize = Geometry.GetAbsoluteSize();
-	}
+	GraphPrinter::FPrintWidgetOptions OptionWithTargetWidget = Options;
+	OptionWithTargetWidget.TargetWidget = TargetWidget;
 	
-	const bool bIsPrintableSize = This->IsPrintableSize(TargetWidget, DrawSize, Options);
-
-	UTextureRenderTarget2D* RenderTarget = nullptr;
-	if (bIsPrintableSize)
-	{
-		RenderTarget = This->DrawWidgetToRenderTarget(
-			TargetWidget,
-			DrawSize,
-			Options
-		);
-	}
-
-	This->PostPrintPreviewViewport(TargetWidget, PreviousVisibility, Options);
-
-	return RenderTarget;
+	TSharedPtr<SWidget> UnusePreviewViewport;
+	return GetRenderedPreviewViewportInternal(UnusePreviewViewport, OptionWithTargetWidget);
 }
 
 void UPreviewViewportPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options)
 {
-	const TSharedPtr<SWidget> PreviewViewport = FindPreviewViewport(Options.TargetWidget);
-
-	UTextureRenderTarget2D* RenderTarget = GetPrintResult(PreviewViewport, Options);
-	if (!IsValid(RenderTarget))
+	TSharedPtr<SWidget> PreviewViewport;
+	UTextureRenderTarget2D* RenderTarget = GetRenderedPreviewViewportInternal(PreviewViewport, Options);
+	if (!IsValid(RenderTarget) || !PreviewViewport.IsValid())
 	{
 		return;
 	}
@@ -175,6 +143,55 @@ FString UPreviewViewportPrinter::GetWidgetTitle(const TSharedPtr<SWidget>& Widge
 	}
 	
 	return TEXT("PreviewViewport");
+}
+
+UTextureRenderTarget2D* UPreviewViewportPrinter::GetRenderedPreviewViewportInternal(
+	TSharedPtr<SWidget>& PreviewViewport,
+	const GraphPrinter::FPrintWidgetOptions& Options
+)
+{
+	auto* This = GetMutableDefault<UPreviewViewportPrinter>();
+	if (!IsValid(This))
+	{
+		return nullptr;
+	}
+
+	PreviewViewport = This->FindPreviewViewport(Options.TargetWidget);
+	if (!PreviewViewport.IsValid())
+	{
+		return nullptr;
+	}
+
+	EVisibility PreviousVisibility;
+	This->PrePrintPreviewViewport(PreviousVisibility, PreviewViewport, Options);
+
+	FVector2D DrawSize;
+	{
+		const FGeometry& Geometry =
+#if BEFORE_UE_4_23
+			PreviewViewport->GetCachedGeometry();
+#else
+			PreviewViewport->GetTickSpaceGeometry();
+#endif
+
+		DrawSize = Geometry.GetAbsoluteSize();
+	}
+	
+	const bool bIsPrintableSize = This->IsPrintableSize(PreviewViewport, DrawSize, Options);
+
+	UTextureRenderTarget2D* RenderTarget = nullptr;
+	if (bIsPrintableSize)
+	{
+		RenderTarget = This->DrawWidgetToRenderTarget(
+			PreviewViewport,
+			DrawSize,
+			Options
+		);
+	}
+
+	This->PostPrintPreviewViewport(PreviewViewport, PreviousVisibility, Options);
+
+	return RenderTarget;
 }
 
 TSharedPtr<SWidget> UPreviewViewportPrinter::FindPreviewViewport(const TSharedPtr<SWidget>& TargetWidget) const

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "GraphPrinter/Types/PrintWidgetOptions.h"
+#include "GraphPrinter/Types/MaterialGraphExportMethod.h"
 #include "GraphPrinterSettings.generated.h"
 
 enum TextureFilter;
@@ -65,6 +66,10 @@ public:
 	// Directory path where the image file is output.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
 	FDirectoryPath OutputDirectory;	
+
+	// How to output a graph in the material editor.
+	UPROPERTY(EditAnywhere, Config, Category = "Material Editor")
+	EMaterialGraphExportMethod MaterialGraphExportMethod;
 	
 	// Whether to hide the combo button that performs the function of the plugin in the toolbar of the asset editor.
 	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))

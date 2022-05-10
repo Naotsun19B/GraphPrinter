@@ -23,5 +23,7 @@ public:
 	// UWidgetPrinter interface.
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
 	virtual int32 GetPriority() const override;
+	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const override;
+	virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget(const TSharedPtr<SWidget>& Widget, const FVector2D& DrawSize, const GraphPrinter::FPrintWidgetOptions& Options) override;
 	// End of UWidgetPrinter interface.
 };

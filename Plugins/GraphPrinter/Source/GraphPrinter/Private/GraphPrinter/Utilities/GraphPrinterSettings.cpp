@@ -36,6 +36,7 @@ UGraphPrinterSettings::UGraphPrinterSettings()
 	, MaxImageSize(15000.f, 15000.f)
 	, RenderingScale(1.f)
 	, bCanOverwriteFileWhenExport(false)
+	, MaterialGraphExportMethod(EMaterialGraphExportMethod::CombinePreviewAndGraph)
 	, bHideToolbarComboButton(false)
 {
 #ifdef WITH_TEXT_CHUNK_HELPER
@@ -116,6 +117,7 @@ GraphPrinter::FPrintWidgetOptions UGraphPrinterSettings::GeneratePrintGraphOptio
 	Options.RenderingScale = RenderingScale;
 	Options.ImageWriteOptions.bOverwriteFile = bCanOverwriteFileWhenExport;
 	Options.OutputDirectoryPath = OutputDirectory.Path;
+	Options.MaterialGraphExportMethod = MaterialGraphExportMethod;
 	
 	return Options;
 }

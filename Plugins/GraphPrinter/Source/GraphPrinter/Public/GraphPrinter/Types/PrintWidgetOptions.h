@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ImageWriteBlueprintLibrary.h"
+#include "GraphPrinter/Types/MaterialGraphExportMethod.h"
 
 namespace GraphPrinter
 {
@@ -25,6 +26,8 @@ namespace GraphPrinter
 	
 	/**
 	 * An optional structure to specify when printing the widget.
+	 * #TODO: Since parameters specific to the graph editor and material editor are also included,
+	 * #TODO: it may be better to make it a UObject so that the inherited destination can have unique parameters.
 	 */
 	struct FPrintWidgetOptions
 	{
@@ -66,6 +69,9 @@ namespace GraphPrinter
 
 		// Directory path where the image file is output.
 		FString OutputDirectoryPath;
+		
+		// How to output a graph in the material editor.
+		EMaterialGraphExportMethod MaterialGraphExportMethod;
 
 		// Used when you want to specify the widget to print as an argument.
 		TSharedPtr<SWidget> TargetWidget;
@@ -84,6 +90,7 @@ namespace GraphPrinter
 			, RenderingScale(0.f)
 			, FilteringMode(TextureFilter::TF_Default)
 			, bDrawOnlyGraph(false)
+			, MaterialGraphExportMethod(EMaterialGraphExportMethod::GraphOnly)
 			, TargetWidget(nullptr)
 		{
 			ImageWriteOptions.bAsync = true;

@@ -20,7 +20,7 @@ public:
 
 public:
 	// Specify the widget to be searched and get the drawing result of the preview viewport.
-	static UTextureRenderTarget2D* GetPrintResult(
+	static UTextureRenderTarget2D* GetRenderedPreviewViewport(
 		const TSharedPtr<SWidget>& TargetWidget,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
@@ -37,6 +37,12 @@ public:
 	// End of UWidgetPrinter interface.
 
 protected:
+	// The version of GetRenderedPreviewViewport used internally.
+	static UTextureRenderTarget2D* GetRenderedPreviewViewportInternal(
+		TSharedPtr<SWidget>& PreviewViewport,
+		const GraphPrinter::FPrintWidgetOptions& Options
+	);
+	
 	// Returns the preview viewport to print.
 	virtual TSharedPtr<SWidget> FindPreviewViewport(const TSharedPtr<SWidget>& TargetWidget) const;
 
