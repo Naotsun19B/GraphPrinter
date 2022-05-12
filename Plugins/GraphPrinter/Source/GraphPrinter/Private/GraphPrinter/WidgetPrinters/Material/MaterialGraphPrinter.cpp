@@ -30,11 +30,17 @@ FString UMaterialGraphPrinter::GetWidgetTitle(const TSharedPtr<SWidget>& Widget)
 	const TSharedPtr<SGraphEditorImpl>& GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, Widget);
 	if (GraphEditor.IsValid())
 	{
-		if (const UEdGraph* Graph = GraphEditor->GetCurrentGraph())
+		if (const auto* MaterialGraph = Cast<UMaterialGraph>(GraphEditor->GetCurrentGraph()))
 		{
-			if (const UObject* Outer = Graph->GetOuter())
+			if (const UMaterial* Material = MaterialGraph->Material.Get())
 			{
-				return Outer->GetName();
+				FString GraphName = TEXT("MaterialGraph");
+				if (MaterialGraph->RootNode.IsNull())
+				{
+					GraphName = MaterialGraph->GetName();
+				}
+				
+				return FString::Printf(TEXT("%s-%s"), *Material->GetName(), *GraphName);
 			}
 		}
 	}
