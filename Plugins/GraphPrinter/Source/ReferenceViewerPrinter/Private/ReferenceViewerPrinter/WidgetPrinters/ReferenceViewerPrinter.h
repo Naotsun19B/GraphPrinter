@@ -10,7 +10,7 @@
  * A class of graph printers dedicated to reference viewers.
  */
 UCLASS()
-class UReferenceViewerPrinter : public UGenericGraphPrinter
+class REFERENCEVIEWERPRINTER_API UReferenceViewerPrinter : public UGenericGraphPrinter
 {
 	GENERATED_BODY()
 	
@@ -21,9 +21,6 @@ public:
 public:
 	// UWidgetPrinter interface.
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
-#ifdef WITH_TEXT_CHUNK_HELPER
-	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const override;
-#endif
 	virtual int32 GetPriority() const override;
 	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const override;
 	// End of UWidgetPrinter interface.

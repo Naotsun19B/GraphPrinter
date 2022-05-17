@@ -22,22 +22,20 @@ class GRAPHPRINTER_API UWidgetPrinter : public UObject
 
 public:
 	// Draw and export the widget with arguments.
-	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) PURE_VIRTUAL(UWidgetPrinterBase::PrintWidget, ; );
+	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options);
 	
 	// Returns whether the target widget can be printed.
-	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const PURE_VIRTUAL(UWidgetPrinterBase::CanPrintWidget, return false; );
-
-#ifdef WITH_TEXT_CHUNK_HELPER
+	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const;
+	
 	// Restore the state of the widget from the image file.
-	virtual void RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options) PURE_VIRTUAL(UWidgetPrinterBase::RestoreWidget, ; );
+	virtual void RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options);
 
 	// Returns whether the target widget can be restored.
-	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const PURE_VIRTUAL(UWidgetPrinterBase::CanRestoreWidget, return false; );
-#endif
+	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const;
 	
 	// Returns the printer priority.
 	// Check if the printer can be executed from the one with the highest priority.
-	virtual int32 GetPriority() const PURE_VIRTUAL(UWidgetPrinterBase::GetPriority, return 0; );
+	virtual int32 GetPriority() const PURE_VIRTUAL(UWidgetPrinter::GetPriority, return 0; );
 	
 protected:
 	// Returns whether the widget size is drawable.
@@ -53,11 +51,9 @@ protected:
 		const FVector2D& DrawSize,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+	
 	// Prepare for copying to the clipboard.
 	virtual void PrepareCopyToClipboard(GraphPrinter::FPrintWidgetOptions& Options);
-#endif
 
 	// Create a file path from options.
 	virtual FString CreateFilename(
@@ -74,14 +70,12 @@ protected:
 		const FString& Filename,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+	
 	// Copy the image file that draws the graph editor to clipboard.
 	virtual bool CopyImageFileToClipboard(
 		const FString& Filename,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
-#endif
 
 protected:
 	// Number of attempts to draw the widget on the render target.

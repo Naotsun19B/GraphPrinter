@@ -212,9 +212,9 @@ bool UGenericGraphPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOption
 	return GraphEditor.IsValid();
 }
 
-#ifdef WITH_TEXT_CHUNK_HELPER
 void UGenericGraphPrinter::RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options)
 {
+#ifdef WITH_TEXT_CHUNK_HELPER
 	const TSharedPtr<SGraphEditorImpl> GraphEditor = FindGraphEditor(Options.TargetWidget);
 
 	// If don't have an active graph editor, end here.
@@ -280,14 +280,18 @@ void UGenericGraphPrinter::RestoreWidget(GraphPrinter::FRestoreWidgetOptions Opt
 			GraphPrinter::FGraphPrinterUtils::CS_Fail
 		);
 	}
+#endif
 }
 
 bool UGenericGraphPrinter::CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const
 {
+#ifdef WITH_TEXT_CHUNK_HELPER
 	const TSharedPtr<SGraphEditorImpl> GraphEditor = FindGraphEditor(Options.TargetWidget);
 	return GraphEditor.IsValid();
-}
+#else
+	return false;
 #endif
+}
 
 int32 UGenericGraphPrinter::GetPriority() const
 {
@@ -453,7 +457,6 @@ void UGenericGraphPrinter::PostPrintGraphEditor(
 	}
 }
 
-#ifdef WITH_TEXT_CHUNK_HELPER
 bool UGenericGraphPrinter::WriteNodeInfoToTextChunk(
 	const TSharedPtr<SGraphEditorImpl>& GraphEditor,
 	const FString& Filename,
@@ -461,6 +464,7 @@ bool UGenericGraphPrinter::WriteNodeInfoToTextChunk(
 	const GraphPrinter::FPrintWidgetOptions& Options
 )
 {
+#ifdef WITH_TEXT_CHUNK_HELPER
 	FString ExportedText;
 	FEdGraphUtilities::ExportNodesToText(NodesToPrint, ExportedText);
 	if (!FEdGraphUtilities::CanImportNodesFromText(GraphEditor->GetCurrentGraph(), ExportedText))
@@ -478,6 +482,9 @@ bool UGenericGraphPrinter::WriteNodeInfoToTextChunk(
 		return false;
 	}
 	return TextChunk->Write(MapToWrite);
+#else
+	return false;
+#endif
 }
 
 bool UGenericGraphPrinter::RestoreNodesFromTextChunk(
@@ -486,6 +493,7 @@ bool UGenericGraphPrinter::RestoreNodesFromTextChunk(
 	const GraphPrinter::FRestoreWidgetOptions& Options
 )
 {
+#ifdef WITH_TEXT_CHUNK_HELPER
 	// Read data from png file using helper class.
 	TMap<FString, FString> MapToRead;
 	const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(Filename);
@@ -540,8 +548,10 @@ bool UGenericGraphPrinter::RestoreNodesFromTextChunk(
 	FEdGraphUtilities::ImportNodesFromText(GraphEditor->GetCurrentGraph(), TextToImport, UnuseImportedNodeSet);
 
 	return true;
-}
+#else
+	return false;
 #endif
+}
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 const FString UGenericGraphPrinter::PngTextChunkKey = TEXT("GraphEditor");

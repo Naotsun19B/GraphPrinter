@@ -1,6 +1,6 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinter/WidgetPrinters/PreviewViewport/PreviewViewportPrinter.h"
+#include "PreviewViewportPrinter/WidgetPrinters/PreviewViewportPrinter.h"
 #include "GraphPrinter/Utilities/WidgetPrinterUtils.h"
 #include "GraphPrinter/Utilities/CastSlateWidget.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
@@ -107,17 +107,6 @@ bool UPreviewViewportPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOpt
 	const TSharedPtr<SWidget> PreviewViewport = FindPreviewViewport(Options.TargetWidget);
 	return PreviewViewport.IsValid();
 }
-
-#ifdef WITH_TEXT_CHUNK_HELPER
-void UPreviewViewportPrinter::RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options)
-{
-}
-
-bool UPreviewViewportPrinter::CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const
-{
-	return false;
-}
-#endif
 
 int32 UPreviewViewportPrinter::GetPriority() const
 {

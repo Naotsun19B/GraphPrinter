@@ -19,10 +19,8 @@ namespace GraphPrinter
 		// IGraphPrinter interface.
 		virtual void PrintWidget(const FPrintWidgetOptions& Options) override;
 		virtual bool CanPrintWidget(const FPrintWidgetOptions& Options) override;
-#ifdef WITH_TEXT_CHUNK_HELPER
 		virtual void RestoreWidget(const FRestoreWidgetOptions& Options) override;
 		virtual bool CanRestoreWidget(const FRestoreWidgetOptions& Options) override;
-#endif
 		// End of IGraphPrinter interface.
 	};
 
@@ -56,8 +54,7 @@ namespace GraphPrinter
 	{
 		return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
 	}
-
-#ifdef WITH_TEXT_CHUNK_HELPER
+	
 	void FGraphPrinterModule::RestoreWidget(const FRestoreWidgetOptions& Options)
 	{
 		if (UWidgetPrinter* FoundWidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
@@ -70,7 +67,6 @@ namespace GraphPrinter
 	{
 		return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
 	}
-#endif
 }
 
 IMPLEMENT_MODULE(GraphPrinter::FGraphPrinterModule, GraphPrinter)

@@ -1,9 +1,9 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "GraphPrinter/WidgetPrinters/Material/MaterialGraphPrinter.h"
-#include "GraphPrinter/WidgetPrinters/PreviewViewport/PreviewViewportPrinter.h"
+#include "MaterialGraphPrinter/WidgetPrinters/MaterialGraphPrinter.h"
 #include "GraphPrinter/Utilities/WidgetPrinterUtils.h"
 #include "GraphPrinter/Utilities/CastSlateWidget.h"
+#include "PreviewViewportPrinter/WidgetPrinters/PreviewViewportPrinter.h"
 #include "SGraphEditorImpl.h"
 #include "MaterialGraph/MaterialGraph.h"
 #include "Engine/TextureRenderTarget2D.h"
@@ -123,12 +123,12 @@ UTextureRenderTarget2D* UMaterialGraphPrinter::DrawWidgetToRenderTarget(
 		FMath::Max(RenderedPreviewViewport->SizeY, RenderedGraph->SizeY)
 	);
 
-	GraphPrinter::FPrintWidgetOptions ToggledGamma = Options;
-	ToggledGamma.bUseGamma = !ToggledGamma.bUseGamma;
+	GraphPrinter::FPrintWidgetOptions GammaLess = Options;
+	GammaLess.bUseGamma = false;
 	
 	return Super::DrawWidgetToRenderTarget(
 		CombinedWidget,
 		CombinedSize,
-		ToggledGamma
+		GammaLess
 	);
 }

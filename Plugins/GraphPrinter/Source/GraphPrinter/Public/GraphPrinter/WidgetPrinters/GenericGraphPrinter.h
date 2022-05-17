@@ -26,10 +26,8 @@ public:
 	// UWidgetPrinter interface.
 	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) override;
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
-#ifdef WITH_TEXT_CHUNK_HELPER
 	virtual void RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options) override;
 	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const override;
-#endif
 	virtual int32 GetPriority() const override;
 	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const override;
 	// End of UWidgetPrinter interface.
@@ -73,8 +71,7 @@ protected:
 		const FGraphPanelSelectionSet& PreviousSelectedNodes,
 		const GraphPrinter::FPrintWidgetOptions& Options
 	);
-
-#ifdef WITH_TEXT_CHUNK_HELPER
+	
 	// Write the drawn node information to the text chunk.
 	virtual bool WriteNodeInfoToTextChunk(
 		const TSharedPtr<SGraphEditorImpl>& GraphEditor, 
@@ -89,10 +86,9 @@ protected:
 		const FString& Filename,
 		const GraphPrinter::FRestoreWidgetOptions& Options
 	);
-#endif
-	
-protected:
+
 #ifdef WITH_TEXT_CHUNK_HELPER
+protected:
 	// Key used when writing to a text chunk of a png file.
 	static const FString PngTextChunkKey;
 

@@ -11,7 +11,7 @@
  * Print the preview window along with the graph editor.
  */
 UCLASS()
-class UMaterialGraphPrinter : public UGenericGraphPrinter
+class MATERIALGRAPHPRINTER_API UMaterialGraphPrinter : public UGenericGraphPrinter
 {
 	GENERATED_BODY()
 

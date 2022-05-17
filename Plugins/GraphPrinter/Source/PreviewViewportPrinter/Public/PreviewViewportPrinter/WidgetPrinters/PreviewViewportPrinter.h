@@ -10,7 +10,7 @@
  * A class of graph printers dedicated to preview viewport in materials, animation blueprints, etc.
  */
 UCLASS()
-class UPreviewViewportPrinter : public UWidgetPrinter
+class PREVIEWVIEWPORTPRINTER_API UPreviewViewportPrinter : public UWidgetPrinter
 {
 	GENERATED_BODY()
 
@@ -28,10 +28,6 @@ public:
 	// UWidgetPrinter interface.
 	virtual void PrintWidget(GraphPrinter::FPrintWidgetOptions Options) override;
 	virtual bool CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const override;
-#ifdef WITH_TEXT_CHUNK_HELPER
-	virtual void RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options) override;
-	virtual bool CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const override;
-#endif
 	virtual int32 GetPriority() const override;
 	virtual FString GetWidgetTitle(const TSharedPtr<SWidget>& Widget) const override;
 	// End of UWidgetPrinter interface.

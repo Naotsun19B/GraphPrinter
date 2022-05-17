@@ -12,6 +12,24 @@
 #include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"
 #endif
 
+void UWidgetPrinter::PrintWidget(GraphPrinter::FPrintWidgetOptions Options)
+{
+}
+
+bool UWidgetPrinter::CanPrintWidget(const GraphPrinter::FPrintWidgetOptions& Options) const
+{
+	return false;
+}
+
+void UWidgetPrinter::RestoreWidget(GraphPrinter::FRestoreWidgetOptions Options)
+{
+}
+
+bool UWidgetPrinter::CanRestoreWidget(const GraphPrinter::FRestoreWidgetOptions& Options) const
+{
+	return false;
+}
+
 bool UWidgetPrinter::IsPrintableSize(
 	const TSharedPtr<SWidget>& Widget,
 	const FVector2D& DrawSize,
@@ -73,16 +91,16 @@ UTextureRenderTarget2D* UWidgetPrinter::DrawWidgetToRenderTarget(
 	return RenderTarget;
 }
 
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 void UWidgetPrinter::PrepareCopyToClipboard(GraphPrinter::FPrintWidgetOptions& Options)
 {
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 	// When copying to the clipboard, set the image format so that it can be copied.
 	if (Options.ExportMethod == GraphPrinter::EExportMethod::Clipboard)
 	{
 		Options.ImageWriteOptions.Format = ClipboardImageExtension::FClipboardImageExtension::GetCopyableImageFormat();
 	}
-}
 #endif
+}
 
 FString UWidgetPrinter::CreateFilename(
 	const TSharedPtr<SWidget>& Widget,
@@ -156,14 +174,16 @@ void UWidgetPrinter::ExportRenderTargetToImageFile(
 	}
 }
 
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 bool UWidgetPrinter::CopyImageFileToClipboard(
 	const FString& Filename,
 	const GraphPrinter::FPrintWidgetOptions& Options
 )
 {
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 	return ClipboardImageExtension::FClipboardImageExtension::ClipboardCopy(Filename);
-}
+#else
+	return false;
 #endif
+}
 
 GraphPrinter::FOneWayBool UWidgetPrinter::IsFirstOutput = true;

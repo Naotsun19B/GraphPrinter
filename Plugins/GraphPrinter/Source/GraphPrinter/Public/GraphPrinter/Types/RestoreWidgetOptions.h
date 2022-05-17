@@ -7,7 +7,6 @@
 
 class SWidget;
 
-#ifdef WITH_TEXT_CHUNK_HELPER
 namespace GraphPrinter
 {
 	/**
@@ -55,4 +54,3 @@ namespace GraphPrinter
 		TOptional<FString> SourceImageFilePath;
 	};
 }
-#endif
