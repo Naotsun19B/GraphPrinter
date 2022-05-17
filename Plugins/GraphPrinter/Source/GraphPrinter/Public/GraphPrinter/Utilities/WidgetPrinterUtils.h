@@ -6,9 +6,11 @@
 #include "ImageWriteTypes.h"
 
 class SWidget;
+class SOverlay;
+class STextBlock;
+class SGraphEditorImpl;
 class SDockingTabStack;
 class SStandaloneAssetEditorToolkitHost;
-class SGraphEditorImpl;
 
 namespace GraphPrinter
 {

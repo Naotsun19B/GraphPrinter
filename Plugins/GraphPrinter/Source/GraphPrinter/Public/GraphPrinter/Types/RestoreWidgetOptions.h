@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Misc/Paths.h"
 
+class SWidget;
+
 #ifdef WITH_TEXT_CHUNK_HELPER
 namespace GraphPrinter
 {

@@ -3,6 +3,8 @@
 #include "GraphPrinter/WidgetPrinters/IWidgetPrinterRegistry.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Interfaces/IMainFrameModule.h"
+#include "UObject/Class.h"
+#include "UObject/UObjectIterator.h"
 
 #if !BEFORE_UE_5_00
 #include "Misc/HotReloadInterface.h"

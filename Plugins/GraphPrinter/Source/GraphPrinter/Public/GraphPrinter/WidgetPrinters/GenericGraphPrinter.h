@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GraphPrinter/WidgetPrinters/WidgetPrinter.h"
+#include "GraphEditor.h"
 #include "GenericGraphPrinter.generated.h"
 
 class SGraphEditorImpl;

@@ -6,6 +6,7 @@
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "Slate/WidgetRenderer.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "HAL/FileManager.h"
 
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 #include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"

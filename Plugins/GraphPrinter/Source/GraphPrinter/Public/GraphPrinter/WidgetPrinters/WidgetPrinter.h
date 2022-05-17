@@ -10,6 +10,7 @@
 #include "WidgetPrinter.generated.h"
 
 class SWidget;
+class UTextureRenderTarget2D;
 
 /**
  * A Class that prints widgets such as the graph editor.

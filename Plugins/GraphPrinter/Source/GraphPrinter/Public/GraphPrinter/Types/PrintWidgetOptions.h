@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/Texture.h"
 #include "ImageWriteBlueprintLibrary.h"
 #include "GraphPrinter/Types/MaterialGraphExportMethod.h"
+
+class SWidget;
 
 namespace GraphPrinter
 {

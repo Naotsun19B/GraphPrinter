@@ -7,9 +7,11 @@
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet2/DebuggerCommands.h"
+#include "HAL/FileManager.h"
 #include "Framework/Docking/TabManager.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 #include "Framework/Docking/SDockingTabStack.h"
+#include "Widgets/Docking/SDockTab.h"
 #include "SGraphEditorImpl.h"
 
 #define LOCTEXT_NAMESPACE "PreviewViewportPrinter"
