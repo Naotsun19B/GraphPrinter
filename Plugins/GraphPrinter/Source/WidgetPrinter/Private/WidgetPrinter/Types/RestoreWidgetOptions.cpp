@@ -10,9 +10,25 @@ URestoreWidgetOptions::URestoreWidgetOptions()
 	: DialogTitle(TEXT("Select the png file that contains the widget info"))
 	, DefaultPath(UGraphPrinterSettings::Get().OutputDirectory.Path)
 	, DefaultFile(TEXT(""))
-	, TargetWidget(nullptr)
+	, SearchTarget(nullptr)
 {
 	SetFileTypesFromImageFormat(EDesiredImageFormat::PNG);
+}
+
+URestoreWidgetOptions* URestoreWidgetOptions::Duplicate(const TSubclassOf<URestoreWidgetOptions>& DestinationClass) const
+{
+	auto* Destination = NewObject<URestoreWidgetOptions>(GetTransientPackage(), DestinationClass);
+	if (IsValid(Destination))
+	{
+		Destination->DialogTitle = DialogTitle;
+		Destination->DefaultPath = DefaultPath;
+		Destination->DefaultFile = DefaultFile;
+		Destination->FileTypes = FileTypes;
+		Destination->SearchTarget = SearchTarget;
+		Destination->SourceImageFilePath = SourceImageFilePath;
+	}
+
+	return Destination;
 }
 
 FString URestoreWidgetOptions::GetSourceImageFilePath() const

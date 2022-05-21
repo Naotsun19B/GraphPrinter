@@ -21,6 +21,16 @@ public:
 	// Constructor.
 	URestoreWidgetOptions();
 
+	// Creates and returns a duplicate as the specified option class.
+	virtual URestoreWidgetOptions* Duplicate(const TSubclassOf<URestoreWidgetOptions>& DestinationClass) const;
+	template<class TRestoreOptions>
+	TRestoreOptions* Duplicate()
+	{
+		static_assert(TIsDerivedFrom<TRestoreOptions, URestoreWidgetOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of URestoreWidgetOptions.");
+
+		return Cast<TRestoreOptions>(Duplicate(TRestoreOptions::StaticClass()));
+	}
+
 	// Returns the path of the image file that will be the source to restore.
 	// Do not call when no valid value is set.
 	FString GetSourceImageFilePath() const;
@@ -48,7 +58,7 @@ public:
 	FString FileTypes;
 	
 	// Used when you want to specify the widget to print as an argument.
-	TSharedPtr<SWidget> TargetWidget;
+	TSharedPtr<SWidget> SearchTarget;
 
 private:
 	// The path of the image file that will be the source to restore.

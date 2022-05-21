@@ -38,6 +38,16 @@ public:
 public:
 	// Constructor.
 	UPrintWidgetOptions();
+
+	// Creates and returns a duplicate as the specified option class.
+	virtual UPrintWidgetOptions* Duplicate(const TSubclassOf<UPrintWidgetOptions>& DestinationClass) const;
+	template<class TPrintOptions>
+	TPrintOptions* Duplicate()
+	{
+		static_assert(TIsDerivedFrom<TPrintOptions, UPrintWidgetOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintWidgetOptions.");
+
+		return Cast<TPrintOptions>(Duplicate(TPrintOptions::StaticClass()));
+	}
 	
 public:
 	// The type of node range to print.
@@ -76,5 +86,5 @@ public:
 	FString OutputDirectoryPath;
 
 	// Used when you want to specify the widget to print as an argument.
-	TSharedPtr<SWidget> TargetWidget;
+	TSharedPtr<SWidget> SearchTarget;
 };

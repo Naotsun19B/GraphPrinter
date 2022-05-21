@@ -10,7 +10,7 @@ namespace GraphPrinter
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 	void FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
@@ -20,7 +20,7 @@ namespace GraphPrinter
 
 	bool FGraphPrinterCommandActions::CanCopyGraphWithAllNodesToClipboard()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
@@ -32,7 +32,7 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
@@ -42,7 +42,7 @@ namespace GraphPrinter
 
 	bool FGraphPrinterCommandActions::CanCopyGraphWithSelectedNodesToClipboard()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
         {
             Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
             Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
@@ -55,7 +55,7 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::PrintGraphWithAllNodes()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
@@ -65,7 +65,7 @@ namespace GraphPrinter
 
 	bool FGraphPrinterCommandActions::CanPrintGraphWithAllNodes()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
@@ -77,7 +77,7 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::PrintGraphWithSelectedNodes()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
@@ -87,7 +87,7 @@ namespace GraphPrinter
 
 	bool FGraphPrinterCommandActions::CanPrintGraphWithSelectedNodes()
 	{
-		if (auto* Options = NewObject<UPrintWidgetOptions>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
@@ -100,12 +100,20 @@ namespace GraphPrinter
 #ifdef WITH_TEXT_CHUNK_HELPER
 	void FGraphPrinterCommandActions::RestoreNodesFromPngFile()
 	{
-		IWidgetPrinterRegistry::Get().RestoreWidget(NewObject<URestoreWidgetOptions>());
+		if (auto* Options = CreateDefaultRestoreOptions<UWidgetPrinter>())
+		{
+			IWidgetPrinterRegistry::Get().RestoreWidget(Options);
+		}
 	}
 
 	bool FGraphPrinterCommandActions::CanExecuteRestoreWidget()
 	{
-		return IWidgetPrinterRegistry::Get().CanRestoreWidget(NewObject<URestoreWidgetOptions>());;
+		if (auto* Options = CreateDefaultRestoreOptions<UWidgetPrinter>())
+		{
+			return IWidgetPrinterRegistry::Get().CanRestoreWidget(Options);
+		}
+
+		return false;
 	}
 #endif
 

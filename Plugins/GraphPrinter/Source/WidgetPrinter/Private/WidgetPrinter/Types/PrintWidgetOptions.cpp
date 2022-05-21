@@ -11,12 +11,33 @@ UPrintWidgetOptions::UPrintWidgetOptions()
 	, bUseGamma(true)
 	, Padding(0.f)
 	, MaxImageSize(FVector2D::ZeroVector)
-	, RenderingScale(0.f)
+	, RenderingScale(1.f)
 	, FilteringMode(TextureFilter::TF_Default)
-	, TargetWidget(nullptr)
+	, SearchTarget(nullptr)
 {
 	ImageWriteOptions.bAsync = true;
 	ImageWriteOptions.bOverwriteFile = false;
 	ImageWriteOptions.CompressionQuality = 0;
 	ImageWriteOptions.Format = EDesiredImageFormat::PNG;
+}
+
+UPrintWidgetOptions* UPrintWidgetOptions::Duplicate(const TSubclassOf<UPrintWidgetOptions>& DestinationClass) const
+{
+	auto* Destination = NewObject<UPrintWidgetOptions>(GetTransientPackage(), DestinationClass);
+	if (IsValid(Destination))
+	{
+		Destination->PrintScope = PrintScope;
+		Destination->ExportMethod = ExportMethod;
+		Destination->bIsIncludeNodeInfoInImageFile = bIsIncludeNodeInfoInImageFile;
+		Destination->bUseGamma = bUseGamma;
+		Destination->Padding = Padding;
+		Destination->MaxImageSize = MaxImageSize;
+		Destination->RenderingScale = RenderingScale;
+		Destination->FilteringMode = FilteringMode;
+		Destination->ImageWriteOptions = ImageWriteOptions;
+		Destination->OutputDirectoryPath = OutputDirectoryPath;
+		Destination->SearchTarget = SearchTarget;
+	}
+
+	return Destination;
 }
