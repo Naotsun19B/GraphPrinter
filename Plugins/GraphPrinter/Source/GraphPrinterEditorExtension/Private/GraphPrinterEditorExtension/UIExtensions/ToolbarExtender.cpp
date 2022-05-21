@@ -3,7 +3,6 @@
 #include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
-#include "GraphPrinter/Utilities/GraphPrinterSettings.h"
 #include "Toolkits/AssetEditorToolkit.h"
 
 #define LOCTEXT_NAMESPACE "ToolbarExtender"
@@ -50,7 +49,8 @@ namespace GraphPrinter
 
 	bool FToolbarExtender::ShouldExtendToolbar()
 	{
-		return !UGraphPrinterSettings::Get().bHideToolbarComboButton;
+		// #TODO: return !UGraphPrinterSettings::Get().bHideToolbarComboButton;
+		return true;
 	}
 
 	void FToolbarExtender::OnExtendToolbar(FToolBarBuilder& ToolBarBuilder)
