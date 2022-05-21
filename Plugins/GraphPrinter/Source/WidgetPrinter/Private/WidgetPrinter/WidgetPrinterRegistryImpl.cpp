@@ -47,8 +47,8 @@ namespace GraphPrinter
 		void CollectWidgetPrinters();
 		
 	private:
-		// Instances of inherited classes of all existing UWidgetPrinter class.
-		TArray<UWidgetPrinter*> WidgetPrinters;
+		// All existing classes that inherits from UWidgetPrinters.
+		TArray<TSubclassOf<UWidgetPrinter>> WidgetPrinterClasses;
 	};
 	
 	FWidgetPrinterRegistryImpl::FWidgetPrinterRegistryImpl()
@@ -73,7 +73,7 @@ namespace GraphPrinter
 		HotReloadInterface.OnHotReload().RemoveAll(this);
 #endif
 		
-		WidgetPrinters.Reset();
+		WidgetPrinterClasses.Reset();
 	}
 
 	void FWidgetPrinterRegistryImpl::PrintWidget(UPrintWidgetOptions* Options)
@@ -102,11 +102,16 @@ namespace GraphPrinter
 		return IsValid(FindAvailableWidgetPrinter(Options));
 	}
 
-	UWidgetPrinter* FWidgetPrinterRegistryImpl::FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const
+	UWidgetPrinter* FWidgetPrinterRegistryImpl::FindAvailableWidgetPrinter(UPrintWidgetOptions* Options) const
 	{
-		for (const auto& WidgetPrinter : WidgetPrinters)
+		for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
 		{
-			if (IsValid(WidgetPrinter))
+			if (!IsValid(WidgetPrinterClass))
+			{
+				continue;
+			}
+
+			if (auto* WidgetPrinter = NewObject<UWidgetPrinter>(GetTransientPackage(), WidgetPrinterClass))
 			{
 				if (WidgetPrinter->CanPrintWidget(Options))
 				{
@@ -120,9 +125,14 @@ namespace GraphPrinter
 	
 	UWidgetPrinter* FWidgetPrinterRegistryImpl::FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const
 	{
-		for (const auto& WidgetPrinter : WidgetPrinters)
+		for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
 		{
-			if (IsValid(WidgetPrinter))
+			if (!IsValid(WidgetPrinterClass))
+			{
+				continue;
+			}
+
+			if (auto* WidgetPrinter = NewObject<UWidgetPrinter>(GetTransientPackage(), WidgetPrinterClass))
 			{
 				if (WidgetPrinter->CanRestoreWidget(Options))
 				{
@@ -152,9 +162,9 @@ namespace GraphPrinter
 
 	void FWidgetPrinterRegistryImpl::CollectWidgetPrinters()
 	{
-		WidgetPrinters.Reset();
+		WidgetPrinterClasses.Reset();
 
-		for (const auto* Class : TObjectRange<UClass>())
+		for (auto* Class : TObjectRange<UClass>())
 		{
 			if (!IsValid(Class))
 			{
@@ -171,25 +181,22 @@ namespace GraphPrinter
 				continue;
 			}
 
-			if (auto* WidgetPrinter = Cast<UWidgetPrinter>(Class->GetDefaultObject()))
-			{
-				WidgetPrinters.Add(WidgetPrinter);
-			}
+			WidgetPrinterClasses.Add(Class);
 		}
 
-		WidgetPrinters.Sort(
-			[](const UWidgetPrinter& Lhs, const UWidgetPrinter& Rhs) -> bool
+		WidgetPrinterClasses.Sort(
+			[](const TSubclassOf<UWidgetPrinter>& Lhs, const TSubclassOf<UWidgetPrinter>& Rhs) -> bool
 			{
-				return (Lhs.GetPriority() > Rhs.GetPriority());
+				return (UWidgetPrinter::GetPriority(Lhs) > UWidgetPrinter::GetPriority(Rhs));
 			}
 		);
 		
 		UE_LOG(LogGraphPrinter, Log, TEXT("---------- Registered Widget Printer Classes ----------"));
-		for (const auto& WidgetPrinter : WidgetPrinters)
+		for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
 		{
-			if (IsValid(WidgetPrinter))
+			if (IsValid(WidgetPrinterClass))
 			{
-				UE_LOG(LogGraphPrinter, Log, TEXT("%s : Priority = %d"), *GetNameSafe(WidgetPrinter->GetClass()), WidgetPrinter->GetPriority());
+				UE_LOG(LogGraphPrinter, Log, TEXT("%s : Priority = %d"), *GetNameSafe(WidgetPrinterClass), UWidgetPrinter::GetPriority(WidgetPrinterClass));
 			}
 		}
 		UE_LOG(LogGraphPrinter, Log, TEXT("-------------------------------------------------------"));
