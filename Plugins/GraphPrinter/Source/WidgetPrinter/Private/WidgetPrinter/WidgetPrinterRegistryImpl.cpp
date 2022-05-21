@@ -22,17 +22,11 @@ namespace GraphPrinter
 		virtual ~FWidgetPrinterRegistryImpl() override;
 		
 		// IWidgetPrinterRegistry interface.
-		virtual void PrintWidget(UPrintWidgetOptions* Options) override;
-		virtual bool CanPrintWidget(UPrintWidgetOptions* Options) override;
-		virtual void RestoreWidget(URestoreWidgetOptions* Options) override;
-		virtual bool CanRestoreWidget(URestoreWidgetOptions* Options) override;
+		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const override;
+		virtual UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const override;
 		// End of IWidgetPrinterRegistry interface.
 	
 	private:
-		// Returns a widget printer that meets the criteria.
-		UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const;
-		UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const;
-		
 		// Called when the editor mainframe has been created.
 		void HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow);
 		
@@ -75,33 +69,7 @@ namespace GraphPrinter
 		
 		WidgetPrinterClasses.Reset();
 	}
-
-	void FWidgetPrinterRegistryImpl::PrintWidget(UPrintWidgetOptions* Options)
-	{
-		if (UWidgetPrinter* FoundWidgetPrinter = FindAvailableWidgetPrinter(Options))
-		{
-			FoundWidgetPrinter->PrintWidget(Options);
-		}
-	}
-
-	bool FWidgetPrinterRegistryImpl::CanPrintWidget(UPrintWidgetOptions* Options)
-	{
-		return IsValid(FindAvailableWidgetPrinter(Options));
-	}
 	
-	void FWidgetPrinterRegistryImpl::RestoreWidget(URestoreWidgetOptions* Options)
-	{
-		if (UWidgetPrinter* FoundWidgetPrinter = FindAvailableWidgetPrinter(Options))
-		{
-			FoundWidgetPrinter->RestoreWidget(Options);
-		}
-	}
-
-	bool FWidgetPrinterRegistryImpl::CanRestoreWidget(URestoreWidgetOptions* Options)
-	{
-		return IsValid(FindAvailableWidgetPrinter(Options));
-	}
-
 	UWidgetPrinter* FWidgetPrinterRegistryImpl::FindAvailableWidgetPrinter(UPrintWidgetOptions* Options) const
 	{
 		for (const auto& WidgetPrinterClass : WidgetPrinterClasses)

@@ -61,17 +61,12 @@ namespace GraphPrinter
 		}
 		virtual bool CanRestoreWidget() const override
 		{
-			if (!IsValid(PrintOptions))
+			if (!IsValid(RestoreOptions))
 			{
 				return false;
 			}
 			
-			if (ShouldAlwaysPrintAll() && PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::Selected)
-			{
-				return false;
-			}
-
-			const TSharedPtr<SGraphEditorImpl> GraphEditor = FindTargetWidget(PrintOptions->SearchTarget);
+			const TSharedPtr<SGraphEditorImpl> GraphEditor = FindTargetWidget(RestoreOptions->SearchTarget);
 			return GraphEditor.IsValid();
 		}
 		virtual TSharedPtr<SGraphEditorImpl> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override

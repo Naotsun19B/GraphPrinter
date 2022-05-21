@@ -21,7 +21,7 @@ namespace GraphPrinter
 	{
 	public:
 		// Get the extension by the format of the image file.
-		static FString GetImageFileExtension(EDesiredImageFormat ImageFormat);
+		static FString GetImageFileExtension(const EDesiredImageFormat ImageFormat, const bool bWithDot = true);
 
 		// Enumerate all widgets that are children of SearchTarget.
 		// if Predicate returns false, stop recursive process.

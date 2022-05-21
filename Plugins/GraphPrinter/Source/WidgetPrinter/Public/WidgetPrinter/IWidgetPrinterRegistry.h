@@ -21,16 +21,8 @@ namespace GraphPrinter
 		// Destructor.
 		virtual ~IWidgetPrinterRegistry() = default;
 		
-		// Draw and export the widget with arguments.
-		virtual void PrintWidget(UPrintWidgetOptions* Options) = 0;
-
-		// Returns whether the command to print the widget can be executed.
-		virtual bool CanPrintWidget(UPrintWidgetOptions* Options) = 0;
-		
-		// Restore the state of the widget from the image file.
-		virtual void RestoreWidget(URestoreWidgetOptions* Options) = 0;
-
-		// Returns whether the command to restore the widget can be executed.
-		virtual bool CanRestoreWidget(URestoreWidgetOptions* Options) = 0;
+		// Returns a widget printer that meets the criteria.
+		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const = 0;
+		virtual UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const = 0;
 	};
 }

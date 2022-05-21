@@ -54,7 +54,7 @@ bool URestoreWidgetOptions::HasValidSourceImageFilePath() const
 
 void URestoreWidgetOptions::SetFileTypesFromImageFormat(const EDesiredImageFormat ImageFormat)
 {
-	const FString FormatString = GraphPrinter::FWidgetPrinterUtils::GetImageFileExtension(ImageFormat);
+	const FString FormatString = GraphPrinter::FWidgetPrinterUtils::GetImageFileExtension(ImageFormat, false);
 	FileTypes = FString::Printf(
 		TEXT("%s Image (.%s)|*.%s"),
 		*FormatString.ToUpper(),
