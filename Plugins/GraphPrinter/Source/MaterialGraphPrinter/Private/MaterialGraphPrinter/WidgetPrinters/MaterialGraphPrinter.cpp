@@ -2,10 +2,29 @@
 
 #include "MaterialGraphPrinter/WidgetPrinters/MaterialGraphPrinter.h"
 #include "MaterialGraphPrinter/WidgetPrinters/InnerMaterialGraphPrinter.h"
+#include "MaterialGraphPrinter/Types/PrintMaterialGraphOptions.h"
+#include "MaterialGraphPrinter/Utilities/MaterialGraphPrinterSettings.h"
 
 int32 UMaterialGraphPrinter::GetPriority() const
 {
 	return MaterialGraphPrinterPriority;
+}
+
+UPrintWidgetOptions* UMaterialGraphPrinter::CreateDefaultPrintOptions() const
+{
+	if (UPrintWidgetOptions* PrintWidgetOptions = Super::CreateDefaultPrintOptions())
+	{
+		if (auto* PrintMaterialGraphOptions = PrintWidgetOptions->Duplicate<UPrintMaterialGraphOptions>())
+		{
+			auto& Settings = UMaterialGraphPrinterSettings::Get();
+			
+			PrintMaterialGraphOptions->MaterialGraphExportMethod = Settings.MaterialGraphExportMethod;
+
+			return PrintMaterialGraphOptions;
+		}
+	}
+
+	return nullptr;
 }
 
 TSharedRef<GraphPrinter::IInnerPrinter> UMaterialGraphPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const

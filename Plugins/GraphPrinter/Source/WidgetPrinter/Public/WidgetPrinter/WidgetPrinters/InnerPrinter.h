@@ -49,6 +49,13 @@ namespace GraphPrinter
 			const bool bUseGamma,
 			const float RenderingScale
 		);
+
+		// Export the render target that draws the graph editor to image file.
+		static void ExportRenderTargetToImageFileInternal(
+			UTextureRenderTarget2D* RenderTarget,
+			const FString& Filename,
+			const FImageWriteOptions& ImageWriteOptions
+		);
 		
 	protected:
 		// Number of attempts to draw the widget on the render target.
@@ -408,34 +415,11 @@ namespace GraphPrinter
 		// Export the render target that draws the graph editor to image file.
 		virtual void ExportRenderTargetToImageFile()
 		{
-			if (!WidgetPrinterParams.RenderTarget.IsValid())
-			{
-				return;
-			}
-			
-			UImageWriteBlueprintLibrary::ExportToDisk(
+			ExportRenderTargetToImageFileInternal(
 				WidgetPrinterParams.RenderTarget.Get(),
 				WidgetPrinterParams.Filename,
 				PrintOptions->ImageWriteOptions
 			);
-
-			// As a symptomatic treatment for the problem that the first image output after startup is whitish,
-			// the first output is re-output as many times as NumberOfRedrawsWhenFirstTime.
-			if (IsFirstOutput.GetValue())
-			{
-				for (int32 Count = 0; Count < NumberOfReOutputWhenFirstTime; Count++)
-				{
-					FImageWriteOptions ImageWriteOptions = PrintOptions->ImageWriteOptions;
-					ImageWriteOptions.bOverwriteFile = true;
-					ImageWriteOptions.NativeOnComplete = nullptr;
-					UImageWriteBlueprintLibrary::ExportToDisk(
-						WidgetPrinterParams.RenderTarget.Get(),
-						WidgetPrinterParams.Filename,
-						ImageWriteOptions
-					);
-					IsFirstOutput.Switch();
-				}	
-			}
 		}
 
 		// Called when the image file export process is complete.

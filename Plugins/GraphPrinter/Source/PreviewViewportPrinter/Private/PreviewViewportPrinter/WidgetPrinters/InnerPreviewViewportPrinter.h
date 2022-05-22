@@ -22,7 +22,7 @@ namespace GraphPrinter
 		using Super = TInnerPrinter<SGlobalPlayWorldActions, UPrintWidgetOptions, URestoreWidgetOptions>;
 
 		// Defines the event when receiving the drawing result without outputting the render target.
-		DECLARE_DELEGATE_OneParam(FOnPreviewViewportRendered, TStrongObjectPtr<UTextureRenderTarget2D> /* RenderTarget */);
+		DECLARE_DELEGATE_TwoParams(FOnPreviewViewportRendered, TStrongObjectPtr<UTextureRenderTarget2D> /* RenderTarget */, FString /* Filename */);
 		
 	public:
 		// Constructor.
@@ -121,7 +121,8 @@ namespace GraphPrinter
 			if (PreviewViewportPrinterParams.OnPreviewViewportRendered.IsBound())
 			{
 				PreviewViewportPrinterParams.OnPreviewViewportRendered.Execute(
-					WidgetPrinterParams.RenderTarget
+					WidgetPrinterParams.RenderTarget,
+					WidgetPrinterParams.Filename
 				);
 				
 				OnPrinterProcessingFinished.ExecuteIfBound();

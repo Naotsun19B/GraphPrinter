@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GenericGraphPrinter/WidgetPrinters/InnerGenericGraphPrinter.h"
+#include "MaterialGraphPrinter/Types/PrintMaterialGraphOptions.h"
 #include "MaterialGraph/MaterialGraph.h"
 #include "SGraphEditorImpl.h"
 #include "Framework/Docking/SDockingTabStack.h"
@@ -16,10 +17,10 @@ namespace GraphPrinter
 	 * An inner class with the ability to print and restore graph editors.
 	 */
 	class MATERIALGRAPHPRINTER_API FMaterialGraphPrinter
-		: public TGraphPrinter<UPrintGraphOptions, URestoreWidgetOptions>
+		: public TGraphPrinter<UPrintMaterialGraphOptions, URestoreWidgetOptions>
 	{
 	public:
-		using Super = TGraphPrinter<UPrintGraphOptions, URestoreWidgetOptions>;
+		using Super = TGraphPrinter<UPrintMaterialGraphOptions, URestoreWidgetOptions>;
 
 	public:
 		// Constructor.
@@ -51,33 +52,33 @@ namespace GraphPrinter
 				return nullptr;
 			}
 
-			//if (Options.MaterialGraphExportMethod == EMaterialGraphExportMethod::GraphOnly)
-			//{
-			//	return RenderedGraph;
-			//}
+			if (PrintOptions->MaterialGraphExportMethod == EMaterialGraphExportMethod::GraphOnly)
+			{
+				return RenderedGraph;
+			}
 
-			const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = GraphPrinter::FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);
+			const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);
 
-			//if (Options.MaterialGraphExportMethod == EMaterialGraphExportMethod::PreviewAndGraphSeparately)
-			//{
-			//	if (auto* PreviewViewportPrinter = GetMutableDefault<UPreviewViewportPrinter>())
-			//	{
-			//		GraphPrinter::FPrintWidgetOptions OptionWithTargetWidget = Options;
-			//		OptionWithTargetWidget.TargetWidget = StandaloneAssetEditorToolkitHost;
-			//		PreviewViewportPrinter->PrintWidget(OptionWithTargetWidget);
-			//		return RenderedGraph;
-			//	}
-			//}
-
-			UTextureRenderTarget2D* RenderedPreviewViewport = UPreviewViewportPrinter::GetRenderedPreviewViewport(PrintOptions);
-			if (!IsValid(RenderedPreviewViewport))
+			const UPreviewViewportPrinter::FRenderingResult RenderingResult = UPreviewViewportPrinter::GetRenderedPreviewViewport(PrintOptions);
+			if (!RenderingResult.IsValid())
 			{
 				return nullptr;
 			}
 
+			if (PrintOptions->MaterialGraphExportMethod == EMaterialGraphExportMethod::PreviewAndGraphSeparately)
+			{
+				ExportRenderTargetToImageFileInternal(
+					RenderingResult.RenderTarget.Get(),
+					RenderingResult.Filename,
+					PrintOptions->ImageWriteOptions
+				);
+				
+				return RenderedGraph;
+			}
+
 			// Re-render the widget that concatenates the two render targets.
 			const TSharedPtr<FSlateBrush> PreviewViewportBrush = MakeShared<FSlateBrush>();
-			PreviewViewportBrush->SetResourceObject(RenderedPreviewViewport);
+			PreviewViewportBrush->SetResourceObject(RenderingResult.RenderTarget.Get());
 			const TSharedPtr<FSlateBrush> GraphBrush = MakeShared<FSlateBrush>();
 			GraphBrush->SetResourceObject(RenderedGraph);
 
@@ -87,8 +88,8 @@ namespace GraphPrinter
 				.AutoWidth()
 				[
 					SNew(SBox)
-					.WidthOverride(RenderedPreviewViewport->SizeX)
-					.HeightOverride(RenderedPreviewViewport->SizeY)
+					.WidthOverride(RenderingResult.RenderTarget->SizeX)
+					.HeightOverride(RenderingResult.RenderTarget->SizeY)
 					[
 						SNew(SImage)
 						.Image(PreviewViewportBrush.Get())
@@ -110,8 +111,8 @@ namespace GraphPrinter
 			CombinedWidget->MarkPrepassAsDirty();
 
 			const FVector2D CombinedSize(
-				RenderedPreviewViewport->SizeX + RenderedGraph->SizeX,
-				FMath::Max(RenderedPreviewViewport->SizeY, RenderedGraph->SizeY)
+				RenderingResult.RenderTarget->SizeX + RenderedGraph->SizeX,
+				FMath::Max(RenderingResult.RenderTarget->SizeY, RenderedGraph->SizeY)
 			);
 			
 			auto* GammaLess = PrintOptions->Duplicate(UPrintWidgetOptions::StaticClass());
