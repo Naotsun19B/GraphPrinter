@@ -4,6 +4,11 @@
 
 namespace GraphPrinter
 {
+	void IInnerPrinter::SetOnRendered(const FOnRendered& InOnRendered)
+	{
+		OnRendered = InOnRendered;
+	}
+
 	UTextureRenderTarget2D* IInnerPrinter::DrawWidgetToRenderTargetInternal(
 		const TSharedRef<SWidget>& Widget,
 		const FVector2D& DrawSize,

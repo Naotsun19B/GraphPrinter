@@ -18,27 +18,10 @@ public:
 	// The priority of this widget printer.
 	static constexpr int32 PreviewViewportPrinterPriority = 200;
 
-	// Preview viewport rendering result.
-	struct FRenderingResult
-	{
-	public:
-		TStrongObjectPtr<UTextureRenderTarget2D> RenderTarget;
-		FString Filename;
-
-	public:
-		bool IsValid() const
-		{
-			return (RenderTarget.IsValid() && !Filename.IsEmpty());
-		}
-	};
-	
 public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
 	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	// End of UWidgetPrinter interface.
-
-	// Returns the drawing result of the preview viewport.
-	static FRenderingResult GetRenderedPreviewViewport(UPrintWidgetOptions* Options);
 };

@@ -25,6 +25,10 @@ namespace GraphPrinter
 	class WIDGETPRINTER_API IInnerPrinter
 	{
 	public:
+		// Defines the event when receiving the drawing result without outputting the render target.
+		DECLARE_DELEGATE_OneParam(FOnRendered, UWidgetPrinter::FRenderingResult /* RenderingResult */);
+		
+	public:
 		// Destructor.
 		virtual ~IInnerPrinter() = default;
 		
@@ -39,6 +43,9 @@ namespace GraphPrinter
 
 		// Returns whether the target widget can be restored.
 		virtual bool CanRestoreWidget() const = 0;
+
+		// Sets event when receiving the drawing result without outputting the render target.
+		void SetOnRendered(const FOnRendered& InOnRendered);
 
 	protected:
 		// Draw the widget on the render target.
@@ -58,6 +65,9 @@ namespace GraphPrinter
 		);
 		
 	protected:
+		// Event when receiving the drawing result without outputting the render target.
+		FOnRendered OnRendered;
+		
 		// Number of attempts to draw the widget on the render target.
 		// The drawing result may be corrupted once.
 		// Probably if draw twice, the drawing result will not be corrupted.
@@ -79,7 +89,8 @@ namespace GraphPrinter
 		static_assert(TIsDerivedFrom<TWidget, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
 		static_assert(TIsDerivedFrom<TPrintOptions, UPrintWidgetOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintWidgetOptions.");
 		static_assert(TIsDerivedFrom<TRestoreOptions, URestoreWidgetOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of URestoreWidgetOptions.");
-		
+	
+	public:
 		// Constructor.
 		explicit TInnerPrinter(
 			UPrintWidgetOptions* InPrintOptions,
@@ -415,11 +426,23 @@ namespace GraphPrinter
 		// Export the render target that draws the graph editor to image file.
 		virtual void ExportRenderTargetToImageFile()
 		{
-			ExportRenderTargetToImageFileInternal(
-				WidgetPrinterParams.RenderTarget.Get(),
-				WidgetPrinterParams.Filename,
-				PrintOptions->ImageWriteOptions
-			);
+			if (PrintOptions->ExportMethod == UPrintWidgetOptions::EExportMethod::RenderTarget)
+			{
+				UWidgetPrinter::FRenderingResult RenderingResult;
+				RenderingResult.DrawSize = WidgetPrinterParams.DrawSize;
+				RenderingResult.RenderTarget = WidgetPrinterParams.RenderTarget;
+				RenderingResult.Filename = WidgetPrinterParams.Filename;
+				OnRendered.ExecuteIfBound(RenderingResult);
+				OnPrinterProcessingFinished.ExecuteIfBound();
+			}
+			else
+			{
+				ExportRenderTargetToImageFileInternal(
+					WidgetPrinterParams.RenderTarget.Get(),
+					WidgetPrinterParams.Filename,
+					PrintOptions->ImageWriteOptions
+				);
+			}
 		}
 
 		// Called when the image file export process is complete.

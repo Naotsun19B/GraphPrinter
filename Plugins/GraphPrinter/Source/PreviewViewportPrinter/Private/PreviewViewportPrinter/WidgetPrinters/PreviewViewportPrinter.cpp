@@ -23,23 +23,3 @@ TSharedRef<GraphPrinter::IInnerPrinter> UPreviewViewportPrinter::CreateRestoreMo
 		OnPrinterProcessingFinished
 	);
 }
-
-UPreviewViewportPrinter::FRenderingResult UPreviewViewportPrinter::GetRenderedPreviewViewport(UPrintWidgetOptions* Options)
-{
-	auto* DefaultObject = GetDefault<UPreviewViewportPrinter>();
-	check(IsValid(DefaultObject));
-
-	FRenderingResult RenderingResult;
-	TSharedRef<GraphPrinter::IInnerPrinter> InnerPrinter = MakeShared<GraphPrinter::FPreviewViewportPrinter>(
-		Options,
-		GraphPrinter::FPreviewViewportPrinter::FOnPreviewViewportRendered::CreateLambda(
-			[&](TStrongObjectPtr<UTextureRenderTarget2D> RenderTarget, FString Filename)
-			{
-				RenderingResult.RenderTarget = RenderTarget;
-				RenderingResult.Filename = Filename;
-			}
-		)
-	);
-
-	return RenderingResult;
-}

@@ -105,6 +105,39 @@ URestoreWidgetOptions* UWidgetPrinter::CreateDefaultRestoreOptions() const
 	return RestoreOptions;
 }
 
+UWidgetPrinter::FRenderingResult UWidgetPrinter::GetRenderingResult(
+	const TSubclassOf<UWidgetPrinter>& PrinterClass,
+	UPrintWidgetOptions* Options
+)
+{
+	check(IsValid(Options));
+	if (!ensure(Options->ExportMethod == UPrintWidgetOptions::EExportMethod::RenderTarget))
+	{
+		return {};
+	}
+	
+	FRenderingResult ReturnValue;
+	if (auto* WidgetPrinter = NewObject<UWidgetPrinter>(GetTransientPackage(), PrinterClass))
+	{
+		WidgetPrinter->CachedPrintOptions = Options;
+		
+		const TSharedRef<GraphPrinter::IInnerPrinter> InnerPrinter = WidgetPrinter->CreatePrintModeInnerPrinter(
+			FSimpleDelegate::CreateUObject(WidgetPrinter, &UWidgetPrinter::CleanupPrinter)
+		);
+		InnerPrinter->SetOnRendered(
+			GraphPrinter::IInnerPrinter::FOnRendered::CreateLambda(
+				[&](FRenderingResult RenderingResult)
+				{
+					ReturnValue = RenderingResult;
+				}
+			)
+		);
+		InnerPrinter->PrintWidget();
+	}
+
+	return ReturnValue;
+}
+
 TSharedRef<GraphPrinter::IInnerPrinter> UWidgetPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FWidgetPrinter>(

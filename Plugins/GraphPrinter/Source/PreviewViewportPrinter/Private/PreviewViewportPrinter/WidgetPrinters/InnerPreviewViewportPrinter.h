@@ -20,10 +20,7 @@ namespace GraphPrinter
 	{
 	public:
 		using Super = TInnerPrinter<SGlobalPlayWorldActions, UPrintWidgetOptions, URestoreWidgetOptions>;
-
-		// Defines the event when receiving the drawing result without outputting the render target.
-		DECLARE_DELEGATE_TwoParams(FOnPreviewViewportRendered, TStrongObjectPtr<UTextureRenderTarget2D> /* RenderTarget */, FString /* Filename */);
-		
+	
 	public:
 		// Constructor.
 		FPreviewViewportPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
@@ -34,15 +31,7 @@ namespace GraphPrinter
 			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
 		{
 		}
-		FPreviewViewportPrinter(
-			UPrintWidgetOptions* InPrintOptions,
-			const FOnPreviewViewportRendered& InOnPreviewViewportRendered
-		)
-			: Super(InPrintOptions, {})
-		{
-			PreviewViewportPrinterParams.OnPreviewViewportRendered = InOnPreviewViewportRendered;
-		}
-
+		
 		// TInnerPrinter interface.
 		virtual TSharedPtr<SGlobalPlayWorldActions> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override
 		{
@@ -116,22 +105,6 @@ namespace GraphPrinter
 	
 			return TEXT("PreviewViewport");
 		}
-		virtual void ExportRenderTargetToImageFile() override
-		{
-			if (PreviewViewportPrinterParams.OnPreviewViewportRendered.IsBound())
-			{
-				PreviewViewportPrinterParams.OnPreviewViewportRendered.Execute(
-					WidgetPrinterParams.RenderTarget,
-					WidgetPrinterParams.Filename
-				);
-				
-				OnPrinterProcessingFinished.ExecuteIfBound();
-			}
-			else
-			{
-				Super::ExportRenderTargetToImageFile();
-			}
-		}
 		// End of TInnerPrinter interface.
 
 	protected:
@@ -140,9 +113,6 @@ namespace GraphPrinter
 		{
 			// Keep the original visibility to temporarily hide the viewport menu widget.
 			EVisibility PreviousVisibility;
-
-			// Event when receiving the drawing result without outputting the render target.
-			FOnPreviewViewportRendered OnPreviewViewportRendered;
 		};
 		FPreviewViewportPrinterParams PreviewViewportPrinterParams;
 	};

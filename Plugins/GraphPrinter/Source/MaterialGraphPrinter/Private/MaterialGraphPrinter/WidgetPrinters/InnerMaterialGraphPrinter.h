@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "GenericGraphPrinter/WidgetPrinters/InnerGenericGraphPrinter.h"
 #include "MaterialGraphPrinter/Types/PrintMaterialGraphOptions.h"
+#include "PreviewViewportPrinter/WidgetPrinters/PreviewViewportPrinter.h"
 #include "MaterialGraph/MaterialGraph.h"
 #include "SGraphEditorImpl.h"
 #include "Framework/Docking/SDockingTabStack.h"
-#include "PreviewViewportPrinter/WidgetPrinters/PreviewViewportPrinter.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 
 namespace GraphPrinter
@@ -57,9 +57,11 @@ namespace GraphPrinter
 				return RenderedGraph;
 			}
 
-			const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);
-
-			const UPreviewViewportPrinter::FRenderingResult RenderingResult = UPreviewViewportPrinter::GetRenderedPreviewViewport(PrintOptions);
+			auto* ToRenderTarget = PrintOptions->Duplicate(UPrintWidgetOptions::StaticClass());
+			ToRenderTarget->PrintScope = UPrintWidgetOptions::EPrintScope::All;
+			ToRenderTarget->ExportMethod = UPrintWidgetOptions::EExportMethod::RenderTarget;
+			ToRenderTarget->SearchTarget = FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);;
+			const UWidgetPrinter::FRenderingResult RenderingResult = GetRenderingResult<UPreviewViewportPrinter>(ToRenderTarget);
 			if (!RenderingResult.IsValid())
 			{
 				return nullptr;
@@ -115,14 +117,11 @@ namespace GraphPrinter
 				FMath::Max(RenderingResult.RenderTarget->SizeY, RenderedGraph->SizeY)
 			);
 			
-			auto* GammaLess = PrintOptions->Duplicate(UPrintWidgetOptions::StaticClass());
-			GammaLess->bUseGamma = false;
-			
 			return DrawWidgetToRenderTargetInternal(
 				CombinedWidget,
 				CombinedSize,
 				PrintOptions->FilteringMode,
-				PrintOptions->bUseGamma,
+				false, // If draw with gamma twice, it will be too bright, so gamma is not used here.
 				PrintOptions->RenderingScale
 			);
 		}

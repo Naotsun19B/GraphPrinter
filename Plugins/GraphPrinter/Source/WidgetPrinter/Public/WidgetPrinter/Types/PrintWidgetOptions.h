@@ -29,6 +29,7 @@ public:
 	// The type of output destination for the printed image.
 	enum class EExportMethod : uint8
 	{
+		RenderTarget,
 		ImageFile,
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		Clipboard,

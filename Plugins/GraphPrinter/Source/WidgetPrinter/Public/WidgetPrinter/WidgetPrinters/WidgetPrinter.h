@@ -23,6 +23,28 @@ class WIDGETPRINTER_API UWidgetPrinter : public UObject
 	GENERATED_BODY()
 
 public:
+	// The rendering result used when the export method is rendered as the render target.
+	struct FRenderingResult
+	{
+	public:
+		// The size of the image to output.
+		FVector2D DrawSize;
+
+		// A render target that holds the drawing results to be output.
+		TStrongObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
+		
+		// The full path of the output file.
+		FString Filename;
+
+	public:
+		// Returns whether this result is valid.
+		bool IsValid() const
+		{
+			return (RenderTarget.IsValid() && !Filename.IsEmpty());
+		}
+	};
+	
+public:
 	// Constructor.
 	UWidgetPrinter();
 	
@@ -46,7 +68,13 @@ public:
 	// Generates and returns an option class with the default settings applied.
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions() const;
 	virtual URestoreWidgetOptions* CreateDefaultRestoreOptions() const;
-	
+
+	// Returns the rendering result used when the export method is rendered as the render target.
+	static FRenderingResult GetRenderingResult(
+		const TSubclassOf<UWidgetPrinter>& PrinterClass,
+		UPrintWidgetOptions* Options
+	);
+
 protected:
 	// Generates and returns an inner class.
 	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
@@ -72,6 +100,7 @@ private:
 
 namespace GraphPrinter
 {
+	// Generates and returns an option class with the default settings applied.
 	template<class TPrinterClass>
 	static UPrintWidgetOptions* CreateDefaultPrintOptions()
 	{
@@ -102,5 +131,14 @@ namespace GraphPrinter
 		}
 
 		return nullptr;
+	}
+
+	// Returns the rendering result used when the export method is rendered as the render target.
+	template<class TPrinterClass>
+	static UWidgetPrinter::FRenderingResult GetRenderingResult(UPrintWidgetOptions* Options)
+	{
+		static_assert(TIsDerivedFrom<TPrinterClass, UWidgetPrinter>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UWidgetPrinter.");
+		
+		return UWidgetPrinter::GetRenderingResult(TPrinterClass::StaticClass(), Options);
 	}
 }
