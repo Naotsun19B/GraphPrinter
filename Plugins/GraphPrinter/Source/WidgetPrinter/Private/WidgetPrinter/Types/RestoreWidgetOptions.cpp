@@ -2,13 +2,13 @@
 
 #include "WidgetPrinter/Types/RestoreWidgetOptions.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
-#include "WidgetPrinter/Utilities/GraphPrinterSettings.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "Misc/Paths.h"
 #include "ImageWriteTypes.h"
 
 URestoreWidgetOptions::URestoreWidgetOptions()
 	: DialogTitle(TEXT("Select the png file that contains the widget info"))
-	, DefaultPath(UGraphPrinterSettings::Get().OutputDirectory.Path)
+	, DefaultPath(UWidgetPrinterSettings::Get().OutputDirectory.Path)
 	, DefaultFile(TEXT(""))
 	, SearchTarget(nullptr)
 {

@@ -19,8 +19,10 @@ public class GraphPrinterGlobals : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"CoreUObject",
 				"Slate",
 				"SlateCore",
+				"Settings",
 				"MainFrame",
 				"DesktopPlatform",
 			}

@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "GraphPrinterSettings.generated.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
+#include "WidgetPrinterSettings.generated.h"
 
 enum TextureFilter;
 enum class EDesiredImageFormat : uint8;
 
 /**
- * Editor settings for this plugin.
+ * A class that sets the default values for UPrintWidgetOptions from the editor preferences.
  */
-UCLASS(Config = Editor)
-class WIDGETPRINTER_API UGraphPrinterSettings : public UObject
+UCLASS()
+class WIDGETPRINTER_API UWidgetPrinterSettings : public UGraphPrinterSubSettings
 {
 	GENERATED_BODY()
 	
@@ -28,7 +28,7 @@ public:
 	EDesiredImageFormat Format;
 
 	// An image format specific compression setting. Either 0 (Default) or 1 (Uncompressed) for EXRs, or a value between 0 and 100.
-	UPROPERTY(Config, EditAnywhere, Category = "Image", meta = (UIMin = 0, UIMax = 100))
+	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0, UIMax = 100))
 	int32 CompressionQuality;
 
 	// Texture filtering mode to use when outputting.
@@ -68,17 +68,10 @@ protected:
 	
 public:
 	// Constructor.
-	UGraphPrinterSettings();
-	
-	// Register - unregister in the editor setting item.
-	static void Register();
-	static void Unregister();
+	UWidgetPrinterSettings();
 	
 	// Returns reference of this settings.
-	static const UGraphPrinterSettings& Get();
-
-	// Open the settings menu for this plugin.
-	static void OpenSettings();
+	static const UWidgetPrinterSettings& Get();
 
 protected:
 	// UObject interface.

@@ -2,7 +2,7 @@
 
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
 #include "WidgetPrinter/WidgetPrinters/InnerPrinter.h"
-#include "WidgetPrinter/Utilities/GraphPrinterSettings.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 
 namespace GraphPrinter
 {
@@ -100,7 +100,7 @@ UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions() const
 	auto* PrintOptions = NewObject<UPrintWidgetOptions>();
 	if (IsValid(PrintOptions))
 	{
-		auto& Settings = UGraphPrinterSettings::Get();
+		auto& Settings = UWidgetPrinterSettings::Get();
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 		PrintOptions->bIsIncludeNodeInfoInImageFile = Settings.bIsIncludeNodeInfoInImageFile;

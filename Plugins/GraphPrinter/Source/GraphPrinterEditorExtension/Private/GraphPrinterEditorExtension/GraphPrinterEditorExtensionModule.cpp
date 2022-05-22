@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
+#include "GraphPrinterEditorExtension/DetailCustomizations/GraphPrinterSubSettingsArrayDetail.h"
 #include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
 #include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtender.h"
-#include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 
 namespace GraphPrinter
 {
@@ -26,6 +27,9 @@ namespace GraphPrinter
 		// Register command actions.
 		FGraphPrinterCommands::Register();
 		FGraphPrinterCommands::Bind();
+
+		// Register detail customizations.
+		FGraphPrinterSubSettingsArrayDetail::Register();
 		
 		// Register UI extension.
 		FToolbarExtender::Register();
@@ -37,6 +41,9 @@ namespace GraphPrinter
 		// Unregister UI extension.
 		FToolMenuExtender::Unregister();
 		FToolbarExtender::Unregister();
+
+		// Unregister detail customizations.
+		FGraphPrinterSubSettingsArrayDetail::Unregister();
 		
 		// Unregister command actions.
 		FGraphPrinterCommands::Unregister();

@@ -2,7 +2,9 @@
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "WidgetPrinter/IWidgetPrinterRegistry.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "Misc/Paths.h"
 
 namespace GraphPrinter
@@ -139,19 +141,18 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::OpenExportDestinationFolder()
 	{
-		//FGraphPrinterUtils::OpenFolderWithExplorer(
-		//	UGraphPrinterSettings::Get().OutputDirectory.Path
-		//);
+		FGraphPrinterUtils::OpenFolderWithExplorer(
+			UWidgetPrinterSettings::Get().OutputDirectory.Path
+		);
 	}
 
 	bool FGraphPrinterCommandActions::CanOpenExportDestinationFolder()
 	{
-		//return FPaths::DirectoryExists(UGraphPrinterSettings::Get().OutputDirectory.Path);
-		return false;
+		return FPaths::DirectoryExists(UWidgetPrinterSettings::Get().OutputDirectory.Path);
 	}
 
 	void FGraphPrinterCommandActions::OpenPluginSettings()
 	{
-		//UGraphPrinterSettings::OpenSettings();
+		UGraphPrinterSettings::OpenSettings();
 	}
 }

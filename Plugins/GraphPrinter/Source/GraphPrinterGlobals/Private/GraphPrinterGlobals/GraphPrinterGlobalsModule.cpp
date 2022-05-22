@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 
 DEFINE_LOG_CATEGORY(LogGraphPrinter);
 
@@ -19,10 +20,14 @@ namespace GraphPrinter
 
 	void FGraphPrinterGlobalsModule::StartupModule()
 	{
+		// Register settings.
+		UGraphPrinterSettings::Register();
 	}
 
 	void FGraphPrinterGlobalsModule::ShutdownModule()
 	{
+		// Unregister settings.
+		UGraphPrinterSettings::Unregister();
 	}
 }
 
