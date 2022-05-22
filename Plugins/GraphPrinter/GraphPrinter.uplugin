@@ -49,6 +49,17 @@
 			]
 		},
 		{
+			"Name": "PreviewViewportPrinter",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
 			"Name": "GraphPrinterEditorExtension",
 			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "Default",

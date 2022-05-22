@@ -7,7 +7,7 @@
 
 int32 UGenericGraphPrinter::GetPriority() const
 {
-	return GenericGraphPrinterPrinter;
+	return GenericGraphPrinterPriority;
 }
 
 UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions() const

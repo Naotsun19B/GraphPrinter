@@ -4,25 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "GenericGraphPrinter.generated.h"
+#include "PreviewViewportPrinter.generated.h"
 
 /**
- * A general-purpose printer class for the graph editor.
+ * A class of graph printers dedicated to preview viewport in materials, animation blueprints, etc.
  */
 UCLASS()
-class GENERICGRAPHPRINTER_API UGenericGraphPrinter : public UWidgetPrinter
+class PREVIEWVIEWPORTPRINTER_API UPreviewViewportPrinter : public UWidgetPrinter
 {
 	GENERATED_BODY()
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 GenericGraphPrinterPriority = 0;
+	static constexpr int32 PreviewViewportPrinterPriority = 200;
 	
 public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
-	virtual UPrintWidgetOptions* CreateDefaultPrintOptions() const override;
 	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	// End of UWidgetPrinter interface.
+
+	// Returns the drawing result of the preview viewport.
+	static UTextureRenderTarget2D* GetRenderedPreviewViewport(UPrintWidgetOptions* Options);
 };
