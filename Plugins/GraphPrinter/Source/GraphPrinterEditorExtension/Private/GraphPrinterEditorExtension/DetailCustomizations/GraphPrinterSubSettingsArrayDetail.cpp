@@ -2,8 +2,10 @@
 
 #include "GraphPrinterEditorExtension/DetailCustomizations/GraphPrinterSubSettingsArrayDetail.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
-#include "DetailWidgetRow.h"
 #include "IDetailChildrenBuilder.h"
+#include "IDetailGroup.h"
+#include "DetailWidgetRow.h"
+#include "Widgets/Layout/SExpandableArea.h"
 
 namespace GraphPrinter
 {
@@ -60,14 +62,20 @@ namespace GraphPrinter
 			}
 		}
 		check(PropertyHandle.IsValid());
-		
+	}
+
+	void FGraphPrinterSubSettingsArrayDetail::CustomizeChildren(
+		TSharedRef<IPropertyHandle> InStructPropertyHandle,
+		IDetailChildrenBuilder& StructBuilder,
+		IPropertyTypeCustomizationUtils& StructCustomizationUtils
+	)
+	{
 		uint32 NumOfElements;
 		if (PropertyHandle->GetNumElements(NumOfElements) == FPropertyAccess::Fail)
 		{
 			return;
 		}
-
-		const TSharedRef<SVerticalBox> SubSettingsList = SNew(SVerticalBox);
+		
 		for (uint32 Index = 0; Index < NumOfElements; Index++)
 		{
 			const TSharedRef<IPropertyHandle> ElementHandle = PropertyHandle->GetElement(Index);
@@ -83,7 +91,7 @@ namespace GraphPrinter
 				continue;
 			}
 			
-			if (UObject* DefaultObject = Class->GetDefaultObject())
+			if (auto* DefaultObject = Cast<UGraphPrinterSubSettings>(Class->GetDefaultObject()))
 			{
 				FDetailsViewArgs DetailsViewArgs;
 				DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
@@ -96,48 +104,27 @@ namespace GraphPrinter
 				FPropertyEditorModule& PropertyEditorModule = GraphPrinterSubSettingsArrayDetailInternal::GetPropertyEditorModule();
 				TSharedRef<IDetailsView> DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
 				DetailsView->SetObject(DefaultObject);
-				
-				SubSettingsList->AddSlot()
-				.AutoHeight()
-				[
-					SNew(SVerticalBox)
-					//+ SVerticalBox::Slot()
-					//.MaxHeight(50.f)
-					//.VAlign(VAlign_Top)
-					//[
-					//	SNew(SBorder)
-					//	.BorderImage(FAppStyle::Get().GetBrush(TEXT("Brushes.Panel")))
-					//	.VAlign(VAlign_Center)
-					//	[
-					//		SNew(STextBlock)
-					//		.Text(FText::FromString(GetNameSafe(Class)))
-					//		.Font(FAppStyle::Get().GetFontStyle(TEXT("DetailsView.CategoryFontStyle")))
-					//		.TextStyle(FAppStyle::Get(), TEXT("DetailsView.CategoryTextStyle"))
-					//	]
-					//]
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.VAlign(VAlign_Fill)
+
+				const FText DetailsTitle = DefaultObject->GetDetailsTitle();
+				StructBuilder.AddGroup(
+					DefaultObject->GetFName(),
+					DetailsTitle
+				)
+				.HeaderRow()
+					.WholeRowContent()
+					.HAlign(HAlign_Fill)
 					[
-						DetailsView
-					]
-				];
+						SNew(SExpandableArea)
+						.AreaTitle(DetailsTitle)
+						.ToolTipText(Class->GetToolTipText())
+						.BorderImage(FAppStyle::Get().GetBrush(TEXT("DetailsView.CategoryTop")))
+						.Padding(FMargin(20.f, 0.f, 0.f, 0.f))
+						.BodyContent()
+						[
+							DetailsView
+						]
+					];
 			}
 		}
-		
-		HeaderRow
-			.ValueContent()
-			.HAlign(HAlign_Fill)
-			[
-				SubSettingsList
-			];
-	}
-
-	void FGraphPrinterSubSettingsArrayDetail::CustomizeChildren(
-		TSharedRef<IPropertyHandle> InStructPropertyHandle,
-		IDetailChildrenBuilder& StructBuilder,
-		IPropertyTypeCustomizationUtils& StructCustomizationUtils
-	)
-	{
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "GenericGraphPrinter/WidgetPrinters/GenericGraphPrinter.h"
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
+#include "GenericGraphPrinter/Utilities/GenericGraphPrinterSettings.h"
 #include "GenericGraphPrinter/WidgetPrinters/InnerGenericGraphPrinter.h"
 
 int32 UGenericGraphPrinter::GetPriority() const
@@ -15,8 +16,7 @@ UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions() const
 	{
 		if (auto* PrintGraphOptions = PrintWidgetOptions->Duplicate<UPrintGraphOptions>())
 		{
-			// #TODO: Get value from editor preference.
-			PrintGraphOptions->bDrawOnlyGraph = false;
+			PrintGraphOptions->bDrawOnlyGraph = UGenericGraphPrinterSettings::Get().bDrawOnlyGraph;
 
 			return PrintGraphOptions;
 		}

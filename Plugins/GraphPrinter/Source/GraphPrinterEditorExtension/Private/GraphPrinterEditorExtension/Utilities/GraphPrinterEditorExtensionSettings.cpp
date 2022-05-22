@@ -2,6 +2,8 @@
 
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterEditorExtensionSettings.h"
 
+#define LOCTEXT_NAMESPACE "GraphPrinterEditorExtensionSettings"
+
 UGraphPrinterEditorExtensionSettings::UGraphPrinterEditorExtensionSettings()
 	: bHideToolbarComboButton(false)
 {
@@ -13,3 +15,10 @@ const UGraphPrinterEditorExtensionSettings& UGraphPrinterEditorExtensionSettings
 	check(IsValid(Settings));
 	return *Settings;
 }
+
+FText UGraphPrinterEditorExtensionSettings::GetDetailsTitle() const
+{
+	return LOCTEXT("DetailsTitle", "Editor Extension");
+}
+
+#undef LOCTEXT_NAMESPACE

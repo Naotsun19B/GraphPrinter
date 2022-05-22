@@ -25,4 +25,8 @@ public:
 
 	// Returns reference of this settings.
 	static const UGraphPrinterEditorExtensionSettings& Get();
+	
+	// UGraphPrinterSubSettings interface.
+	virtual FText GetDetailsTitle() const override;
+	// End of UGraphPrinterSubSettings interface.
 };

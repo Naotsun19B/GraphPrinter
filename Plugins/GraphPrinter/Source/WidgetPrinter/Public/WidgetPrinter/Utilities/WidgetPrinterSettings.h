@@ -72,13 +72,17 @@ public:
 	
 	// Returns reference of this settings.
 	static const UWidgetPrinterSettings& Get();
-
-protected:
+	
 	// UObject interface.
 	virtual void PostInitProperties() override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	// End of UObject interface.
 
+	// UGraphPrinterSubSettings interface.
+	virtual FText GetDetailsTitle() const override;
+	// End of UGraphPrinterSubSettings interface.
+
+protected:
 	// Functions called when the value changes.
 	void ModifyFormat();
 	void ModifyCompressionQuality();

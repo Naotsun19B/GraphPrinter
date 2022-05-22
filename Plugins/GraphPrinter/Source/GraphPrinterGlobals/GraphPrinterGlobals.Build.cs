@@ -23,6 +23,7 @@ public class GraphPrinterGlobals : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Settings",
+				"SettingsEditor",
 				"MainFrame",
 				"DesktopPlatform",
 			}

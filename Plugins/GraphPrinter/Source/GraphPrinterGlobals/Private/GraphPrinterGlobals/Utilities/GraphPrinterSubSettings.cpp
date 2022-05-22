@@ -3,6 +3,7 @@
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "ISettingsEditorModule.h"
 
 void UGraphPrinterSubSettings::PostInitProperties()
 {
@@ -44,8 +45,20 @@ void UGraphPrinterSubSettings::PostEditChangeProperty(FPropertyChangedEvent& Pro
 		return;
 	}
 
+	// Properties are not saved because they are not directly registered in the editor preferences.
+	// Therefore, save it in the config file here.
 	if (Property->HasAnyPropertyFlags(CPF_Config))
 	{
 		UpdateSinglePropertyInConfigFile(Property, GetConfigFilename(this));
+	}
+
+	// The meta specifier ConfigRestartRequired cannot be used because it is not directly registered in the editor preferences.
+	// So a notification prompting you to restart is displayed from here instead.
+	if (Property->GetBoolMetaData(TEXT("ConfigRestartRequired")))
+	{
+		if (auto* SettingsEditorModule = FModuleManager::GetModulePtr<ISettingsEditorModule>(TEXT("SettingsEditor")))
+        {
+        	SettingsEditorModule->OnApplicationRestartRequired();
+        }
 	}
 }
