@@ -3,9 +3,9 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class GenericGraphPrinter : ModuleRules
+public class MaterialGraphPrinter : ModuleRules
 {
-	public GenericGraphPrinter(ReadOnlyTargetRules Target) : base(Target)
+	public MaterialGraphPrinter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -39,6 +39,8 @@ public class GenericGraphPrinter : ModuleRules
 
 				"GraphPrinterGlobals",
 				"WidgetPrinter",
+				"GenericGraphPrinter",
+				"PreviewViewportPrinter", 
                 "TextChunkHelper",
                 "ClipboardImageExtension",
             }

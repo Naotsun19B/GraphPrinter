@@ -14,23 +14,37 @@
 
 namespace GraphPrinter
 {
+#ifdef WITH_TEXT_CHUNK_HELPER
+	namespace TextChunkDefine
+	{
+		// Key used when writing to a text chunk of a png file.
+		static const FString PngTextChunkKey = TEXT("GraphEditor");
+
+		// The beginning of the node information.
+		static const FString NodeInfoHeader = TEXT("Begin Object");
+	}
+#endif
+	
 	/**
 	 * An inner class with the ability to print and restore graph editors.
 	 */
-	class GENERICGRAPHPRINTER_API FGenericGraphPrinter
-		: public TInnerPrinter<SGraphEditorImpl, UPrintGraphOptions, URestoreWidgetOptions>
+	template<class TPrintGraphOptions, class TRestoreOptions>
+	class TGraphPrinter
+		: public TInnerPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>
 	{
 	public:
-		using Super = TInnerPrinter<SGraphEditorImpl, UPrintGraphOptions, URestoreWidgetOptions>;
+		static_assert(TIsDerivedFrom<TPrintGraphOptions, UPrintGraphOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintGraphOptions.");
+		
+		using Super = TInnerPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>;
 		
 	public:
 		// Constructor.
-		FGenericGraphPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
+		TGraphPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 			: Super(InPrintOptions, InOnPrinterProcessingFinished)
 			, GenericGraphPrinterParams()
 		{
 		}
-		FGenericGraphPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
+		TGraphPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
 			, GenericGraphPrinterParams()
 		{
@@ -208,7 +222,7 @@ namespace GraphPrinter
 
 			// Write data to png file using helper class.
 			TMap<FString, FString> MapToWrite;
-			MapToWrite.Add(PngTextChunkKey, ExportedText);
+			MapToWrite.Add(TextChunkDefine::PngTextChunkKey, ExportedText);
 
 			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
 			if (!TextChunk.IsValid())
@@ -236,22 +250,22 @@ namespace GraphPrinter
 			}
 
 			// Find information on valid nodes.
-			if (!MapToRead.Contains(PngTextChunkKey))
+			if (!MapToRead.Contains(TextChunkDefine::PngTextChunkKey))
 			{
 				return false;
 			}
-			FString TextToImport = MapToRead[PngTextChunkKey];
+			FString TextToImport = MapToRead[TextChunkDefine::PngTextChunkKey];
 
 			// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
 			int32 StartPosition = 0;
 			const int32 TextLength = TextToImport.Len();
-			const int32 HeaderLength = NodeInfoHeader.Len();
+			const int32 HeaderLength = TextChunkDefine::NodeInfoHeader.Len();
 			for (int32 Index = 0; Index < TextLength - HeaderLength; Index++)
 			{
 				bool bIsMatch = true;
 				for (int32 Offset = 0; Offset < HeaderLength; Offset++)
 				{
-					if (TextToImport[Index + Offset] != NodeInfoHeader[Offset])
+					if (TextToImport[Index + Offset] != TextChunkDefine::NodeInfoHeader[Offset])
 					{
 						bIsMatch = false;
 					}
@@ -324,14 +338,21 @@ namespace GraphPrinter
 			FVector2D ViewLocation;
 		};
 		FGenericGraphPrinterParams GenericGraphPrinterParams;
+	};
 
-#ifdef WITH_TEXT_CHUNK_HELPER
-	protected:
-		// Key used when writing to a text chunk of a png file.
-		static const FString PngTextChunkKey;
-
-		// The beginning of the node information.
-		static const FString NodeInfoHeader;
-#endif
+	class GENERICGRAPHPRINTER_API FGenericGraphPrinter : public TGraphPrinter<UPrintGraphOptions, URestoreWidgetOptions>
+	{
+	public:
+		using Super = TGraphPrinter<UPrintGraphOptions, URestoreWidgetOptions>;
+		
+	public:
+		FGenericGraphPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
+			: Super(InPrintOptions, InOnPrinterProcessingFinished)
+		{
+		}
+		FGenericGraphPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
+			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
+		{
+		}
 	};
 }

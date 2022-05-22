@@ -4,5 +4,54 @@
 
 namespace GraphPrinter
 {
+	UTextureRenderTarget2D* IInnerPrinter::DrawWidgetToRenderTargetInternal(
+		const TSharedRef<SWidget>& Widget,
+		const FVector2D& DrawSize,
+		const TextureFilter FilteringMode,
+		const bool bUseGamma,
+		const float RenderingScale
+	)
+	{
+		FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(bUseGamma, false);
+		if (WidgetRenderer == nullptr)
+		{
+			UE_LOG(LogGraphPrinter, Error, TEXT("Widget Renderer could not be generated."));
+			return nullptr;
+		}
+
+		UTextureRenderTarget2D* RenderTarget = FWidgetRenderer::CreateTargetFor(
+			DrawSize,
+			FilteringMode,
+			bUseGamma
+		);
+		if (!IsValid(RenderTarget))
+		{
+			UE_LOG(LogGraphPrinter, Error, TEXT("Failed to generate RenderTarget."));
+			return nullptr;
+		}
+		if (bUseGamma)
+		{
+			RenderTarget->bForceLinearGamma = true;
+			RenderTarget->UpdateResourceImmediate(true);
+		}
+
+		// Since the drawing result may be corrupted the first time, draw multiple times.
+		for (int32 Count = 0; Count < DrawTimes; Count++)
+		{
+			WidgetRenderer->DrawWidget(
+				RenderTarget,
+				Widget,
+				RenderingScale,
+				DrawSize,
+				0.f
+			);
+			FlushRenderingCommands();
+		}
+
+		BeginCleanup(WidgetRenderer);
+
+		return RenderTarget;
+	}
+
 	FOneWayBool IInnerPrinter::IsFirstOutput = true;
 }

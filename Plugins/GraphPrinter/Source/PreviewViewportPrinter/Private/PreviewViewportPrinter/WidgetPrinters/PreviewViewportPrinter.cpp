@@ -31,7 +31,7 @@ UTextureRenderTarget2D* UPreviewViewportPrinter::GetRenderedPreviewViewport(UPri
 
 	UTextureRenderTarget2D* RenderedPreviewViewport = nullptr;
 	TSharedRef<GraphPrinter::IInnerPrinter> InnerPrinter = MakeShared<GraphPrinter::FPreviewViewportPrinter>(
-		DefaultObject->GetPrintOptions(),
+		Options,
 		GraphPrinter::FPreviewViewportPrinter::FOnPreviewViewportRendered::CreateLambda(
 			[&](TStrongObjectPtr<UTextureRenderTarget2D> RenderTarget)
 			{

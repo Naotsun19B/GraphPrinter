@@ -39,10 +39,6 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	bool bUseGamma;
 
-	// Wide margin when drawing the graph editor.
-	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0.f, ClampMin = 0.f))
-	float Padding;
-
 	// Set the maximum size of the output image. There is no limit at (0.f, 0.f).
 	// If set it too high, you may run out of video memory and crash.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")

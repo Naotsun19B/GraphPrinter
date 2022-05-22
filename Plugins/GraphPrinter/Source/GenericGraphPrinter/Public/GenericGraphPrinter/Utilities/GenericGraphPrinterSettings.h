@@ -15,6 +15,10 @@ class UGenericGraphPrinterSettings : public UGraphPrinterSubSettings
 	GENERATED_BODY()
 
 public:
+	// Wide margin when drawing the graph editor.
+	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0.f, ClampMin = 0.f))
+	float Padding;
+	
 	// Whether to hide the title bar of the graph editor and the text of the graph type in the lower right.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	bool bDrawOnlyGraph;

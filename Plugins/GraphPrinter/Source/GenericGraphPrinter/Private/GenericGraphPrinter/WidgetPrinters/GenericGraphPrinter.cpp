@@ -16,7 +16,10 @@ UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions() const
 	{
 		if (auto* PrintGraphOptions = PrintWidgetOptions->Duplicate<UPrintGraphOptions>())
 		{
-			PrintGraphOptions->bDrawOnlyGraph = UGenericGraphPrinterSettings::Get().bDrawOnlyGraph;
+			auto& Settings = UGenericGraphPrinterSettings::Get();
+			
+			PrintGraphOptions->Padding = Settings.Padding;
+			PrintGraphOptions->bDrawOnlyGraph = Settings.bDrawOnlyGraph;
 
 			return PrintGraphOptions;
 		}

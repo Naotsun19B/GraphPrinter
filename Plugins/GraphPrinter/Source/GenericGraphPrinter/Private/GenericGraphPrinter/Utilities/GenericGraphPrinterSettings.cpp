@@ -5,7 +5,8 @@
 #define LOCTEXT_NAMESPACE "GenericGraphPrinterSettings"
 
 UGenericGraphPrinterSettings::UGenericGraphPrinterSettings()
-	: bDrawOnlyGraph(false)
+	: Padding(100.f)
+	, bDrawOnlyGraph(false)
 {
 }
 

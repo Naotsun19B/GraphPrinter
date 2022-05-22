@@ -4,25 +4,6 @@
 #include "WidgetPrinter/WidgetPrinters/InnerPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 
-namespace GraphPrinter
-{
-	class FWidgetPrinter : public TInnerPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>
-	{
-	public:
-		using Super = TInnerPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>;
-		
-	public:
-		FWidgetPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
-			: Super(InPrintOptions, InOnPrinterProcessingFinished)
-		{
-		}
-		FWidgetPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
-			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
-		{
-		}
-	};
-}
-
 UWidgetPrinter::UWidgetPrinter()
 {
 	if (!IsTemplate())
@@ -109,7 +90,6 @@ UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions() const
 		PrintOptions->ImageWriteOptions.CompressionQuality = Settings.CompressionQuality;
 		PrintOptions->FilteringMode = Settings.FilteringMode;
 		PrintOptions->bUseGamma = Settings.bUseGamma;
-		PrintOptions->Padding = Settings.Padding;
 		PrintOptions->MaxImageSize = Settings.MaxImageSize;
 		PrintOptions->RenderingScale = Settings.RenderingScale;
 		PrintOptions->ImageWriteOptions.bOverwriteFile = Settings.bCanOverwriteFileWhenExport;

@@ -18,7 +18,14 @@ public:
 	// Constructor.
 	UPrintGraphOptions();
 
+	// UPrintWidgetOptions interface.
+	virtual UPrintWidgetOptions* Duplicate(const TSubclassOf<UPrintWidgetOptions>& DestinationClass) const override;
+	// End of UPrintWidgetOptions interface.
+
 public:
+	// Margins when drawing the graph editor.
+	float Padding;
+	
 	// Whether to hide the title bar of the graph editor and the text of the graph type in the lower right.
 	bool bDrawOnlyGraph;
 };

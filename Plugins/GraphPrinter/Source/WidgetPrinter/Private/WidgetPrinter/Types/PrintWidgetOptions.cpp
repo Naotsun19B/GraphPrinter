@@ -9,7 +9,6 @@ UPrintWidgetOptions::UPrintWidgetOptions()
 	, bIsIncludeNodeInfoInImageFile(true)
 #endif
 	, bUseGamma(true)
-	, Padding(0.f)
 	, MaxImageSize(FVector2D::ZeroVector)
 	, RenderingScale(1.f)
 	, FilteringMode(TextureFilter::TF_Default)
@@ -30,7 +29,6 @@ UPrintWidgetOptions* UPrintWidgetOptions::Duplicate(const TSubclassOf<UPrintWidg
 		Destination->ExportMethod = ExportMethod;
 		Destination->bIsIncludeNodeInfoInImageFile = bIsIncludeNodeInfoInImageFile;
 		Destination->bUseGamma = bUseGamma;
-		Destination->Padding = Padding;
 		Destination->MaxImageSize = MaxImageSize;
 		Destination->RenderingScale = RenderingScale;
 		Destination->FilteringMode = FilteringMode;

@@ -39,7 +39,17 @@ namespace GraphPrinter
 
 		// Returns whether the target widget can be restored.
 		virtual bool CanRestoreWidget() const = 0;
-	
+
+	protected:
+		// Draw the widget on the render target.
+		static UTextureRenderTarget2D* DrawWidgetToRenderTargetInternal(
+			const TSharedRef<SWidget>& Widget,
+			const FVector2D& DrawSize,
+			const TextureFilter FilteringMode,
+			const bool bUseGamma,
+			const float RenderingScale
+		);
+		
 	protected:
 		// Number of attempts to draw the widget on the render target.
 		// The drawing result may be corrupted once.
@@ -323,45 +333,13 @@ namespace GraphPrinter
 		// Draw the widget on the render target.
 		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget()
 		{
-			FWidgetRenderer* WidgetRenderer = new FWidgetRenderer(PrintOptions->bUseGamma, false);
-			if (WidgetRenderer == nullptr)
-			{
-				UE_LOG(LogGraphPrinter, Error, TEXT("Widget Renderer could not be generated."));
-				return nullptr;
-			}
-
-			UTextureRenderTarget2D* RenderTarget = FWidgetRenderer::CreateTargetFor(
+			return DrawWidgetToRenderTargetInternal(
+				Widget.ToSharedRef(),
 				WidgetPrinterParams.DrawSize,
 				PrintOptions->FilteringMode,
-				PrintOptions->bUseGamma
+				PrintOptions->bUseGamma,
+				PrintOptions->RenderingScale
 			);
-			if (!IsValid(RenderTarget))
-			{
-				UE_LOG(LogGraphPrinter, Error, TEXT("Failed to generate RenderTarget."));
-				return nullptr;
-			}
-			if (PrintOptions->bUseGamma)
-			{
-				RenderTarget->bForceLinearGamma = true;
-				RenderTarget->UpdateResourceImmediate(true);
-			}
-
-			// Since the drawing result may be corrupted the first time, draw multiple times.
-			for (int32 Count = 0; Count < DrawTimes; Count++)
-			{
-				WidgetRenderer->DrawWidget(
-					RenderTarget,
-					Widget.ToSharedRef(),
-					PrintOptions->RenderingScale,
-					WidgetPrinterParams.DrawSize,
-					0.f
-				);
-				FlushRenderingCommands();
-			}
-
-			BeginCleanup(WidgetRenderer);
-
-			return RenderTarget;
 		}
 
 		// Performs processing after draw the widget.
@@ -584,6 +562,22 @@ namespace GraphPrinter
 			FString Filename;
 		};
 		FWidgetPrinterParams WidgetPrinterParams;
+	};
+
+	class WIDGETPRINTER_API FWidgetPrinter : public TInnerPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>
+	{
+	public:
+		using Super = TInnerPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>;
+		
+	public:
+		FWidgetPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
+			: Super(InPrintOptions, InOnPrinterProcessingFinished)
+		{
+		}
+		FWidgetPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
+			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
+		{
+		}
 	};
 }
 

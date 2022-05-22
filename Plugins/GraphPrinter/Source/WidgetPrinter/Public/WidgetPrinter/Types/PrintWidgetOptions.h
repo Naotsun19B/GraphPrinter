@@ -65,9 +65,6 @@ public:
 	// Whether to output the drawing result affected by the gamma value.
 	bool bUseGamma;
 
-	// Margins when drawing the graph editor.
-	float Padding;
-
 	// Set the maximum size of the output image. There is no limit at (0.f, 0.f).
 	// If set it too high, you may run out of video memory and crash.
 	FVector2D MaxImageSize;
