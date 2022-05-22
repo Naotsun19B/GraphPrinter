@@ -1,7 +1,7 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "WidgetPrinter/WidgetPrinters/InnerPrinter.h"
+#include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 
 UWidgetPrinter::UWidgetPrinter()
@@ -121,11 +121,11 @@ UWidgetPrinter::FRenderingResult UWidgetPrinter::GetRenderingResult(
 	{
 		WidgetPrinter->CachedPrintOptions = Options;
 		
-		const TSharedRef<GraphPrinter::IInnerPrinter> InnerPrinter = WidgetPrinter->CreatePrintModeInnerPrinter(
+		const TSharedRef<GraphPrinter::IInnerWidgetPrinter> InnerPrinter = WidgetPrinter->CreatePrintModeInnerPrinter(
 			FSimpleDelegate::CreateUObject(WidgetPrinter, &UWidgetPrinter::CleanupPrinter)
 		);
 		InnerPrinter->SetOnRendered(
-			GraphPrinter::IInnerPrinter::FOnRendered::CreateLambda(
+			GraphPrinter::IInnerWidgetPrinter::FOnRendered::CreateLambda(
 				[&](FRenderingResult RenderingResult)
 				{
 					ReturnValue = RenderingResult;
@@ -138,7 +138,7 @@ UWidgetPrinter::FRenderingResult UWidgetPrinter::GetRenderingResult(
 	return ReturnValue;
 }
 
-TSharedRef<GraphPrinter::IInnerPrinter> UWidgetPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
+TSharedRef<GraphPrinter::IInnerWidgetPrinter> UWidgetPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FWidgetPrinter>(
 		GetPrintOptions(),
@@ -146,7 +146,7 @@ TSharedRef<GraphPrinter::IInnerPrinter> UWidgetPrinter::CreatePrintModeInnerPrin
 	);
 }
 
-TSharedRef<GraphPrinter::IInnerPrinter> UWidgetPrinter::CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
+TSharedRef<GraphPrinter::IInnerWidgetPrinter> UWidgetPrinter::CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FWidgetPrinter>(
 		GetRestoreOptions(),

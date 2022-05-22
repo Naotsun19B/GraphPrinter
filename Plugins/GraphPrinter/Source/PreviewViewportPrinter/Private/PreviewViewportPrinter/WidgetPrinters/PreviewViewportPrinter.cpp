@@ -8,7 +8,7 @@ int32 UPreviewViewportPrinter::GetPriority() const
 	return PreviewViewportPrinterPriority;
 }
 
-TSharedRef<GraphPrinter::IInnerPrinter> UPreviewViewportPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
+TSharedRef<GraphPrinter::IInnerWidgetPrinter> UPreviewViewportPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FPreviewViewportPrinter>(
 		GetPrintOptions(),
@@ -16,7 +16,7 @@ TSharedRef<GraphPrinter::IInnerPrinter> UPreviewViewportPrinter::CreatePrintMode
 	);
 }
 
-TSharedRef<GraphPrinter::IInnerPrinter> UPreviewViewportPrinter::CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
+TSharedRef<GraphPrinter::IInnerWidgetPrinter> UPreviewViewportPrinter::CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FPreviewViewportPrinter>(
 		GetRestoreOptions(),

@@ -33,7 +33,7 @@ namespace GraphPrinter
 		{
 		}
 
-		// TInnerPrinter interface.
+		// TInnerWidgetPrinter interface.
 		virtual bool CanPrintWidget() const override
 		{
 			if (Super::CanPrintWidget())
@@ -143,6 +143,6 @@ namespace GraphPrinter
 
 			return TEXT("InvalidMaterialEditor");
 		}
-		// End of TInnerPrinter interface.
+		// End of TInnerWidgetPrinter interface.
 	};
 }

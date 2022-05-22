@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WidgetPrinter/WidgetPrinters/InnerPrinter.h"
+#include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "Kismet2/DebuggerCommands.h"
 #include "Framework/Docking/SDockingTabStack.h"
@@ -16,10 +16,10 @@ namespace GraphPrinter
 	 * An inner class with the ability to print and restore graph editors.
 	 */
 	class PREVIEWVIEWPORTPRINTER_API FPreviewViewportPrinter
-		: public TInnerPrinter<SGlobalPlayWorldActions, UPrintWidgetOptions, URestoreWidgetOptions>
+		: public TInnerWidgetPrinter<SGlobalPlayWorldActions, UPrintWidgetOptions, URestoreWidgetOptions>
 	{
 	public:
-		using Super = TInnerPrinter<SGlobalPlayWorldActions, UPrintWidgetOptions, URestoreWidgetOptions>;
+		using Super = TInnerWidgetPrinter<SGlobalPlayWorldActions, UPrintWidgetOptions, URestoreWidgetOptions>;
 	
 	public:
 		// Constructor.
@@ -32,7 +32,7 @@ namespace GraphPrinter
 		{
 		}
 		
-		// TInnerPrinter interface.
+		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SGlobalPlayWorldActions> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override
 		{
 			TSharedPtr<SWidget> ActualSearchTarget = SearchTarget;
@@ -105,7 +105,7 @@ namespace GraphPrinter
 	
 			return TEXT("PreviewViewport");
 		}
-		// End of TInnerPrinter interface.
+		// End of TInnerWidgetPrinter interface.
 
 	protected:
 		// A group of parameters that must be retained for processing.

@@ -49,6 +49,17 @@
 			]
 		},
 		{
+			"Name": "ReferenceViewerPrinter",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
 			"Name": "PreviewViewportPrinter",
 			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "Default",

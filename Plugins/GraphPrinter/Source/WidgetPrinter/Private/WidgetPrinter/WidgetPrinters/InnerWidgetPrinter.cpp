@@ -1,15 +1,15 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
-#include "WidgetPrinter/WidgetPrinters/InnerPrinter.h"
+#include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 
 namespace GraphPrinter
 {
-	void IInnerPrinter::SetOnRendered(const FOnRendered& InOnRendered)
+	void IInnerWidgetPrinter::SetOnRendered(const FOnRendered& InOnRendered)
 	{
 		OnRendered = InOnRendered;
 	}
 
-	UTextureRenderTarget2D* IInnerPrinter::DrawWidgetToRenderTargetInternal(
+	UTextureRenderTarget2D* IInnerWidgetPrinter::DrawWidgetToRenderTargetInternal(
 		const TSharedRef<SWidget>& Widget,
 		const FVector2D& DrawSize,
 		const TextureFilter FilteringMode,
@@ -58,7 +58,7 @@ namespace GraphPrinter
 		return RenderTarget;
 	}
 
-	void IInnerPrinter::ExportRenderTargetToImageFileInternal(
+	void IInnerWidgetPrinter::ExportRenderTargetToImageFileInternal(
 		UTextureRenderTarget2D* RenderTarget,
 		const FString& Filename,
 		const FImageWriteOptions& ImageWriteOptions
@@ -94,5 +94,5 @@ namespace GraphPrinter
 		}
 	}
 
-	FOneWayBool IInnerPrinter::IsFirstOutput = true;
+	FOneWayBool IInnerWidgetPrinter::IsFirstOutput = true;
 }

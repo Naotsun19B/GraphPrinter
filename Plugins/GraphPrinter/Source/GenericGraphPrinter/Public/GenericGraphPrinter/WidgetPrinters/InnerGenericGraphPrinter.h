@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WidgetPrinter/WidgetPrinters/InnerPrinter.h"
+#include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
 #include "SGraphEditorImpl.h"
 #include "EdGraphUtilities.h"
@@ -30,12 +30,12 @@ namespace GraphPrinter
 	 */
 	template<class TPrintGraphOptions, class TRestoreOptions>
 	class TGraphPrinter
-		: public TInnerPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>
+		: public TInnerWidgetPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>
 	{
 	public:
 		static_assert(TIsDerivedFrom<TPrintGraphOptions, UPrintGraphOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintGraphOptions.");
 		
-		using Super = TInnerPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>;
+		using Super = TInnerWidgetPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>;
 		
 	public:
 		// Constructor.
@@ -50,7 +50,7 @@ namespace GraphPrinter
 		{
 		}
 
-		// TInnerPrinter interface.
+		// TInnerWidgetPrinter interface.
 		virtual bool CanPrintWidget() const override
 		{
 			if (Super::CanPrintWidget())
@@ -299,7 +299,7 @@ namespace GraphPrinter
 		{
 			return false;
 		}
-		// End of TInnerPrinter interface.
+		// End of TInnerWidgetPrinter interface.
 
 	protected:
 		// Calculate the range and view location to use when drawing the graph editor.

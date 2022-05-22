@@ -10,7 +10,7 @@
 
 namespace GraphPrinter
 {
-	class IInnerPrinter;
+	class IInnerWidgetPrinter;
 }
 
 /**
@@ -77,8 +77,8 @@ public:
 
 protected:
 	// Generates and returns an inner class.
-	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
-	virtual TSharedRef<GraphPrinter::IInnerPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
+	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
+	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
 	
 	// Get optional classes.
 	UPrintWidgetOptions* GetPrintOptions() const;
@@ -95,7 +95,7 @@ private:
 	URestoreWidgetOptions* CachedRestoreOptions;
 
 	// Keep the inner printer running so that it is not destroyed.
-	TSharedPtr<GraphPrinter::IInnerPrinter> InnerPrinter;
+	TSharedPtr<GraphPrinter::IInnerWidgetPrinter> InnerPrinter;
 };
 
 namespace GraphPrinter

@@ -22,7 +22,7 @@ namespace GraphPrinter
 	/**
 	 * An inner class with the ability to print and restore widgets.
 	 */
-	class WIDGETPRINTER_API IInnerPrinter
+	class WIDGETPRINTER_API IInnerWidgetPrinter
 	{
 	public:
 		// Defines the event when receiving the drawing result without outputting the render target.
@@ -30,7 +30,7 @@ namespace GraphPrinter
 		
 	public:
 		// Destructor.
-		virtual ~IInnerPrinter() = default;
+		virtual ~IInnerWidgetPrinter() = default;
 		
 		// Draw and export the widget with arguments.
 		virtual void PrintWidget() = 0;
@@ -83,7 +83,7 @@ namespace GraphPrinter
 	 * A class template that implements the actual processing of the inner class.
 	 */
 	template<class TWidget, class TPrintOptions, class TRestoreOptions>
-	class TInnerPrinter : public IInnerPrinter
+	class TInnerWidgetPrinter : public IInnerWidgetPrinter
 	{
 	public:
 		static_assert(TIsDerivedFrom<TWidget, SWidget>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of SWidget.");
@@ -92,7 +92,7 @@ namespace GraphPrinter
 	
 	public:
 		// Constructor.
-		explicit TInnerPrinter(
+		explicit TInnerWidgetPrinter(
 			UPrintWidgetOptions* InPrintOptions,
 			const FSimpleDelegate& InOnPrinterProcessingFinished
 		)
@@ -105,7 +105,7 @@ namespace GraphPrinter
 				PrintOptions = InPrintOptions->Duplicate<TPrintOptions>();
 			}
 		}
-		explicit TInnerPrinter(
+		explicit TInnerWidgetPrinter(
 			URestoreWidgetOptions* InRestoreOptions,
 			const FSimpleDelegate& InOnPrinterProcessingFinished
 		)
@@ -119,7 +119,7 @@ namespace GraphPrinter
 			}
 		}
 		
-		// IInnerPrinter interface.
+		// IInnerWidgetPrinter interface.
 		virtual void PrintWidget() override
 		{
 			if (!IsValid(PrintOptions))
@@ -302,7 +302,7 @@ namespace GraphPrinter
 		{
 			return false;
 		}
-		// End of IInnerPrinter interface.
+		// End of IInnerWidgetPrinter interface.
 
 	protected:
 		// Returns the widget to print or restore.
@@ -571,10 +571,10 @@ namespace GraphPrinter
 		FWidgetPrinterParams WidgetPrinterParams;
 	};
 
-	class WIDGETPRINTER_API FWidgetPrinter : public TInnerPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>
+	class WIDGETPRINTER_API FWidgetPrinter : public TInnerWidgetPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>
 	{
 	public:
-		using Super = TInnerPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>;
+		using Super = TInnerWidgetPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>;
 		
 	public:
 		FWidgetPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)

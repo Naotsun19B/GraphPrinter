@@ -3,21 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "PreviewViewportPrinter.generated.h"
+#include "GenericGraphPrinter/WidgetPrinters/GenericGraphPrinter.h"
+#include "ReferenceViewerPrinter.generated.h"
 
 /**
- * A class of graph printers dedicated to preview viewport in materials, animation blueprints, etc.
+ * A class of graph printers dedicated to material assets.
+ * Print the preview window along with the graph editor.
  */
 UCLASS()
-class PREVIEWVIEWPORTPRINTER_API UPreviewViewportPrinter : public UWidgetPrinter
+class REFERENCEVIEWERPRINTER_API UReferenceViewerPrinter : public UGenericGraphPrinter
 {
 	GENERATED_BODY()
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 PreviewViewportPrinterPriority = 200;
-
+	static constexpr int32 ReferenceViewerPrinterPriority = GenericGraphPrinterPriority + 100;
+	
 public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;

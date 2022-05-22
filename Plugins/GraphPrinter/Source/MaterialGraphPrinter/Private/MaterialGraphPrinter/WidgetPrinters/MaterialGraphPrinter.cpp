@@ -27,7 +27,7 @@ UPrintWidgetOptions* UMaterialGraphPrinter::CreateDefaultPrintOptions() const
 	return nullptr;
 }
 
-TSharedRef<GraphPrinter::IInnerPrinter> UMaterialGraphPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
+TSharedRef<GraphPrinter::IInnerWidgetPrinter> UMaterialGraphPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FMaterialGraphPrinter>(
 		GetPrintOptions(),
@@ -35,7 +35,7 @@ TSharedRef<GraphPrinter::IInnerPrinter> UMaterialGraphPrinter::CreatePrintModeIn
 	);
 }
 
-TSharedRef<GraphPrinter::IInnerPrinter> UMaterialGraphPrinter::CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
+TSharedRef<GraphPrinter::IInnerWidgetPrinter> UMaterialGraphPrinter::CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FMaterialGraphPrinter>(
 		GetRestoreOptions(),
