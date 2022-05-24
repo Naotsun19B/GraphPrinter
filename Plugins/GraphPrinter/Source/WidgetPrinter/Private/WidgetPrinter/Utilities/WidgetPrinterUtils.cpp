@@ -19,38 +19,6 @@ namespace GraphPrinter
 		static const FName GraphMinimapClassName = TEXT("SGraphMinimap");
 	}
 	
-	FString FWidgetPrinterUtils::GetImageFileExtension(const EDesiredImageFormat ImageFormat, const bool bWithDot /* = true */)
-	{
-		FString Dot;
-		if (bWithDot)
-		{
-			Dot = TEXT(".");
-		}
-		
-#if BEFORE_UE_4_21
-		if (UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDesiredImageFormat"), true))
-		{
-			const FString& Extension = EnumPtr->GetNameStringByIndex(static_cast<int32>(ImageFormat));
-			return (Dot + FString::Printf(TEXT("%s"), *Extension.ToLower()));
-		}
-#else
-		if (const UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
-		{
-			const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
-			FString UnusedString;
-			FString Extension;
-			if (EnumString.Split(TEXT("::"), &UnusedString, &Extension))
-			{
-				Extension = Extension.ToLower();
-				return (Dot + FString::Printf(TEXT("%s"), *Extension));
-			}
-		}
-#endif
-	
-		checkNoEntry();
-		return {};
-	}
-
 	void FWidgetPrinterUtils::EnumerateChildWidgets(
 		TSharedPtr<SWidget> SearchTarget,
 		TFunction<bool(const TSharedPtr<SWidget> ChildWidget)> Predicate

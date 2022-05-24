@@ -381,7 +381,7 @@ namespace GraphPrinter
 			FString Filename = FPaths::ConvertRelativePathToFull(
 				FPaths::Combine(PrintOptions->OutputDirectoryPath, GetWidgetTitle())
 			);
-			const FString& Extension = FWidgetPrinterUtils::GetImageFileExtension(PrintOptions->ImageWriteOptions.Format);
+			const FString& Extension = FGraphPrinterUtils::GetImageFileExtension(PrintOptions->ImageWriteOptions.Format);
 
 			FText ValidatePathErrorText;
 			if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))

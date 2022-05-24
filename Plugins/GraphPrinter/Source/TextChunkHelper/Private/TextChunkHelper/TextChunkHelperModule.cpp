@@ -24,6 +24,7 @@ namespace TextChunkHelper
 
 		// ITextChunkHelper interface.
 		virtual TSharedPtr<ITextChunk> CreateTextChunk(const FString& InFilename) const override;
+		virtual bool IsSupportedImageFormat(const EDesiredImageFormat ImageFormat) const override;
 		virtual void RegisterTextChunkGenerator(
 			const EDesiredImageFormat ImageFormat,
 			const FOnCreateTextChunk& GenerationProcess
@@ -35,7 +36,7 @@ namespace TextChunkHelper
 		// Text chunk generation process for each image format.
 		TMap<EDesiredImageFormat, FOnCreateTextChunk> GenerationProcesses;
 	};
-
+	
 	void FTextChunkHelperModule::StartupModule()
 	{
 #if WITH_UNREALPNG
@@ -118,6 +119,11 @@ namespace TextChunkHelper
 		}
 		
 		return TextChunk;
+	}
+
+	bool FTextChunkHelperModule::IsSupportedImageFormat(const EDesiredImageFormat ImageFormat) const
+	{
+		return GenerationProcesses.Contains(ImageFormat);
 	}
 
 	void FTextChunkHelperModule::RegisterTextChunkGenerator(

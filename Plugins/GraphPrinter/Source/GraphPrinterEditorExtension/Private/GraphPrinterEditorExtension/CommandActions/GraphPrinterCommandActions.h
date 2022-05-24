@@ -13,26 +13,27 @@ namespace GraphPrinter
 	{
 	public:
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		// Copy all nodes of the currently active graph editor as images to clipboard.
-		static void CopyGraphWithAllNodesToClipboard();
-		static bool CanCopyGraphWithAllNodesToClipboard();
+		// Copy the entire target widget as an image to the clipboard.
+		static void CopyAllAreaOfWidgetToClipboard();
+		static bool CanCopyAllAreaOfWidgetToClipboard();
 
-		// Copy the selected node of the currently active graph editor as an image to clipboard.
-		static void CopyGraphWithSelectedNodesToClipboard();
-		static bool CanCopyGraphWithSelectedNodesToClipboard();
+		// Copy the selected area of the target widget to the clipboard as an image.
+		static void CopySelectedAreaOfWidgetToClipboard();
+		static bool CanCopySelectedAreaOfWidgetToClipboard();
 #endif
 
-		// Exports all nodes of the currently active graph editor as images.
-		static void PrintGraphWithAllNodes();
-		static bool CanPrintGraphWithAllNodes();
+		// Outputs the entire target widget as an image file.
+		static void PrintAllAreaOfWidget();
+		static bool CanPrintAllAreaOfWidget();
 
-		// Exports the selected node of the currently active graph editor as an image.
-		static void PrintGraphWithSelectedNodes();
-		static bool CanPrintGraphWithSelectedNodes();
+		// Outputs the selected area of the target widget as an image file.
+		static void PrintSelectedAreaOfWidget();
+		static bool CanPrintSelectedAreaOfWidget();
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-		// Open the file browser and restore the node from the selected png file.
-		static void RestoreNodesFromPngFile();
+		// Restores the state of the widget from the image file.
+		// You can only restore from images output from this plugin.
+		static void RestoreWidgetFromImageFile();
 		static bool CanExecuteRestoreWidget();
 #endif
 

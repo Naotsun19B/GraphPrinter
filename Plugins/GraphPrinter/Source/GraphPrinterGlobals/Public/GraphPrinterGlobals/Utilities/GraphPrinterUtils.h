@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ImageWriteTypes.h"
 
 class SNotificationItem;
 
@@ -80,6 +81,9 @@ namespace GraphPrinter
 			float ExpireDuration = 4.f, 
 			const TArray<FNotificationInteraction>& Interactions = TArray<FNotificationInteraction>()
 		);
+
+		// Get the extension by the format of the image file.
+		static FString GetImageFileExtension(const EDesiredImageFormat ImageFormat, const bool bWithDot = true);
 		
 		// Open the folder containing the file in Explorer.
 		static void OpenFolderWithExplorer(const FString& Filename);

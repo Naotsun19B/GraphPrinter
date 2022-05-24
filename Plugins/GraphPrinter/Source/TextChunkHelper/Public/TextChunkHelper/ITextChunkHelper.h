@@ -36,6 +36,9 @@ namespace TextChunkHelper
 
 		// Returns a class of text chunks depending on the type of image file.
 		virtual TSharedPtr<ITextChunk> CreateTextChunk(const FString& InFilename) const = 0;
+
+		// Returns whether text chunks in the specified image format is supported.
+		virtual bool IsSupportedImageFormat(const EDesiredImageFormat ImageFormat) const = 0;
 		
 		// Adds text chunk generation processing for the specified image format.
 		virtual void RegisterTextChunkGenerator(

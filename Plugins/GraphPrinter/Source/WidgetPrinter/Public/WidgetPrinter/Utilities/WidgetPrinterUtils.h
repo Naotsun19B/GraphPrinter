@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ImageWriteTypes.h"
 
 class SWidget;
 class SOverlay;
@@ -20,9 +19,6 @@ namespace GraphPrinter
 	class WIDGETPRINTER_API FWidgetPrinterUtils
 	{
 	public:
-		// Get the extension by the format of the image file.
-		static FString GetImageFileExtension(const EDesiredImageFormat ImageFormat, const bool bWithDot = true);
-
 		// Enumerate all widgets that are children of SearchTarget.
 		// if Predicate returns false, stop recursive process.
 		static void EnumerateChildWidgets(

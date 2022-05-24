@@ -43,13 +43,13 @@ namespace GraphPrinter
 		
 		// Instances of bound commands.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		TSharedPtr<FUICommandInfo> CopyGraphWithAllNodesToClipboard;
-		TSharedPtr<FUICommandInfo> CopyGraphWithSelectedNodesToClipboard;
+		TSharedPtr<FUICommandInfo> CopyAllAreaOfWidgetToClipboard;
+		TSharedPtr<FUICommandInfo> CopySelectedAreaOfWidgetToClipboard;
 #endif
-		TSharedPtr<FUICommandInfo> PrintGraphWithAllNodes;
-		TSharedPtr<FUICommandInfo> PrintGraphWithSelectedNodes;
+		TSharedPtr<FUICommandInfo> PrintAllAreaOfWidget;
+		TSharedPtr<FUICommandInfo> PrintSelectedAreaOfWidget;
 #ifdef WITH_TEXT_CHUNK_HELPER
-		TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
+		TSharedPtr<FUICommandInfo> RestoreWidgetFromImageFile;
 #endif
 		TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
 

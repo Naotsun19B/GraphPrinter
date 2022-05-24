@@ -10,7 +10,7 @@
 namespace GraphPrinter
 {
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-	void FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard()
+	void FGraphPrinterCommandActions::CopyAllAreaOfWidgetToClipboard()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -24,7 +24,7 @@ namespace GraphPrinter
 		}
 	}
 
-	bool FGraphPrinterCommandActions::CanCopyGraphWithAllNodesToClipboard()
+	bool FGraphPrinterCommandActions::CanCopyAllAreaOfWidgetToClipboard()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -37,7 +37,7 @@ namespace GraphPrinter
 		return false;
 	}
 
-	void FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard()
+	void FGraphPrinterCommandActions::CopySelectedAreaOfWidgetToClipboard()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -51,7 +51,7 @@ namespace GraphPrinter
 		}
 	}
 
-	bool FGraphPrinterCommandActions::CanCopyGraphWithSelectedNodesToClipboard()
+	bool FGraphPrinterCommandActions::CanCopySelectedAreaOfWidgetToClipboard()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
         {
@@ -64,7 +64,7 @@ namespace GraphPrinter
 	}
 #endif
 
-	void FGraphPrinterCommandActions::PrintGraphWithAllNodes()
+	void FGraphPrinterCommandActions::PrintAllAreaOfWidget()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -78,7 +78,7 @@ namespace GraphPrinter
 		}
 	}
 
-	bool FGraphPrinterCommandActions::CanPrintGraphWithAllNodes()
+	bool FGraphPrinterCommandActions::CanPrintAllAreaOfWidget()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -90,7 +90,7 @@ namespace GraphPrinter
 		return false;
 	}
 
-	void FGraphPrinterCommandActions::PrintGraphWithSelectedNodes()
+	void FGraphPrinterCommandActions::PrintSelectedAreaOfWidget()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -104,7 +104,7 @@ namespace GraphPrinter
 		}
 	}
 
-	bool FGraphPrinterCommandActions::CanPrintGraphWithSelectedNodes()
+	bool FGraphPrinterCommandActions::CanPrintSelectedAreaOfWidget()
 	{
 		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
 		{
@@ -117,7 +117,7 @@ namespace GraphPrinter
 	}
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-	void FGraphPrinterCommandActions::RestoreNodesFromPngFile()
+	void FGraphPrinterCommandActions::RestoreWidgetFromImageFile()
 	{
 		if (auto* Options = CreateDefaultRestoreOptions<UWidgetPrinter>())
 		{

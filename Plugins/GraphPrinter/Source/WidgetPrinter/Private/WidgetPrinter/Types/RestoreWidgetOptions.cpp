@@ -1,8 +1,8 @@
 // Copyright 2021-2022 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/Types/RestoreWidgetOptions.h"
-#include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "Misc/Paths.h"
 #include "ImageWriteTypes.h"
 
@@ -54,7 +54,7 @@ bool URestoreWidgetOptions::HasValidSourceImageFilePath() const
 
 void URestoreWidgetOptions::SetFileTypesFromImageFormat(const EDesiredImageFormat ImageFormat)
 {
-	const FString FormatString = GraphPrinter::FWidgetPrinterUtils::GetImageFileExtension(ImageFormat, false);
+	const FString FormatString = GraphPrinter::FGraphPrinterUtils::GetImageFileExtension(ImageFormat, false);
 	FileTypes = FString::Printf(
 		TEXT("%s Image (.%s)|*.%s"),
 		*FormatString.ToUpper(),

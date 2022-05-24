@@ -24,7 +24,7 @@ public:
 	bool bIsIncludeNodeInfoInImageFile;
 
 	// The desired output image format to write to disk.
-	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (EditCondition = "!bIsIncludeNodeInfoInImageFile"))
+	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	EDesiredImageFormat Format;
 
 	// An image format specific compression setting. Either 0 (Default) or 1 (Uncompressed) for EXRs, or a value between 0 and 100.

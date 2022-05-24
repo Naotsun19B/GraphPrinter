@@ -26,6 +26,7 @@ public class GraphPrinterGlobals : ModuleRules
 				"SettingsEditor",
 				"MainFrame",
 				"DesktopPlatform",
+				"ImageWriteQueue",
 			}
 		);
 		

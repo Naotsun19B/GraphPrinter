@@ -28,13 +28,13 @@ namespace GraphPrinter
 	{
 		// Register command here.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		UI_COMMAND(CopyGraphWithAllNodesToClipboard, "Copy Graph With All Nodes To Clipboard", "Copy all nodes of the currently active graph editor as images to clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F7, EModifierKey::Control));
-		UI_COMMAND(CopyGraphWithSelectedNodesToClipboard, "Copy Graph With Selected Nodes To Clipboard", "Copy the selected node of the currently active graph editor as an image to clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F8, EModifierKey::Control));
+		UI_COMMAND(CopyAllAreaOfWidgetToClipboard, "Copy All Area Of Widget To Clipboard", "Copy the entire target widget as an image to the clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F7, EModifierKey::Control));
+		UI_COMMAND(CopySelectedAreaOfWidgetToClipboard, "Copy Selected Area Of Widget To Clipboard", "Copy the selected area of the target widget to the clipboard as an image.", EUserInterfaceActionType::Button, FInputChord(EKeys::F8, EModifierKey::Control));
 #endif
-		UI_COMMAND(PrintGraphWithAllNodes, "Print Graph With All Nodes", "Exports all nodes of the currently active graph editor as images.", EUserInterfaceActionType::Button, FInputChord(EKeys::F9, EModifierKey::Control));
-		UI_COMMAND(PrintGraphWithSelectedNodes, "Print Graph With Selected Nodes", "Exports the selected node of the currently active graph editor as an image.", EUserInterfaceActionType::Button, FInputChord(EKeys::F10, EModifierKey::Control));
+		UI_COMMAND(PrintAllAreaOfWidget, "Print All Area Of Widget", "Outputs the entire target widget as an image file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F9, EModifierKey::Control));
+		UI_COMMAND(PrintSelectedAreaOfWidget, "Print Selected Area Of Widget", "Outputs the selected area of the target widget as an image file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F10, EModifierKey::Control));
 #ifdef WITH_TEXT_CHUNK_HELPER
-		UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
+		UI_COMMAND(RestoreWidgetFromImageFile, "Restore Widget From Image File", "Restores the state of the widget from the image file.\nYou can only restore from images output from this plugin.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
 		UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::Button, FInputChord(EKeys::F12, EModifierKey::Control));
 	}
@@ -58,19 +58,19 @@ namespace GraphPrinter
 		
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("CopyToClipboardSectionName", "Copy To Clipboard"));
-		MenuBuilder.AddMenuEntry(This->CopyGraphWithAllNodesToClipboard);
-		MenuBuilder.AddMenuEntry(This->CopyGraphWithSelectedNodesToClipboard);
+		MenuBuilder.AddMenuEntry(This->CopyAllAreaOfWidgetToClipboard);
+		MenuBuilder.AddMenuEntry(This->CopySelectedAreaOfWidgetToClipboard);
 		MenuBuilder.EndSection();
 #endif
 		
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ExportToImageFileSectionName", "Export To Image File"));
-		MenuBuilder.AddMenuEntry(This->PrintGraphWithAllNodes);
-		MenuBuilder.AddMenuEntry(This->PrintGraphWithSelectedNodes);
+		MenuBuilder.AddMenuEntry(This->PrintAllAreaOfWidget);
+		MenuBuilder.AddMenuEntry(This->PrintSelectedAreaOfWidget);
 		MenuBuilder.EndSection();
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ImportFromImageFileSectionName", "Import From Image File"));
-		MenuBuilder.AddMenuEntry(This->RestoreNodesFromPngFile);
+		MenuBuilder.AddMenuEntry(This->RestoreWidgetFromImageFile);
 		MenuBuilder.EndSection();
 #endif
 		
@@ -105,34 +105,34 @@ namespace GraphPrinter
 		// Bind command here.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		CommandBindings->MapAction(
-			CopyGraphWithAllNodesToClipboard,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyGraphWithAllNodesToClipboard),
-			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanCopyGraphWithAllNodesToClipboard)
+			CopyAllAreaOfWidgetToClipboard,
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyAllAreaOfWidgetToClipboard),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanCopyAllAreaOfWidgetToClipboard)
 		);
 
 		CommandBindings->MapAction(
-			CopyGraphWithSelectedNodesToClipboard,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopyGraphWithSelectedNodesToClipboard),
-			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanCopyGraphWithSelectedNodesToClipboard)
+			CopySelectedAreaOfWidgetToClipboard,
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CopySelectedAreaOfWidgetToClipboard),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanCopySelectedAreaOfWidgetToClipboard)
 		);
 #endif
 	
 		CommandBindings->MapAction(
-			PrintGraphWithAllNodes,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintGraphWithAllNodes),
-			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanPrintGraphWithAllNodes)
+			PrintAllAreaOfWidget,
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintAllAreaOfWidget),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanPrintAllAreaOfWidget)
 		);
 
 		CommandBindings->MapAction(
-			PrintGraphWithSelectedNodes,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintGraphWithSelectedNodes),
-			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanPrintGraphWithSelectedNodes)
+			PrintSelectedAreaOfWidget,
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::PrintSelectedAreaOfWidget),
+			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanPrintSelectedAreaOfWidget)
 		);
 	
 #ifdef WITH_TEXT_CHUNK_HELPER
 		CommandBindings->MapAction(
-			RestoreNodesFromPngFile,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::RestoreNodesFromPngFile),
+			RestoreWidgetFromImageFile,
+			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::RestoreWidgetFromImageFile),
 			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanExecuteRestoreWidget)
 		);
 #endif
