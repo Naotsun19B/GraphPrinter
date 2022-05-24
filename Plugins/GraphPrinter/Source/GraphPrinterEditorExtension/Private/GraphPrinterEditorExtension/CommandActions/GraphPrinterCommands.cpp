@@ -4,6 +4,7 @@
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "Interfaces/IMainFrameModule.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinterCommands"
@@ -36,7 +37,6 @@ namespace GraphPrinter
 		UI_COMMAND(RestoreNodesFromPngFile, "Restore Nodes From Png File", "Open the file browser and restore the node from the selected png file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
 		UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::Button, FInputChord(EKeys::F12, EModifierKey::Control));
-		UI_COMMAND(OpenPluginSettings, "Open Plugin Settings", "Open the Graph Printer settings screen in the editor preferences.", EUserInterfaceActionType::Button, FInputChord());
 	}
 
 	bool FGraphPrinterCommands::IsBound()
@@ -76,7 +76,11 @@ namespace GraphPrinter
 		
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("OtherSectionName", "Other"));
 		MenuBuilder.AddMenuEntry(This->OpenExportDestinationFolder);
-		MenuBuilder.AddMenuEntry(This->OpenPluginSettings);
+		MenuBuilder.AddSubMenu(
+			LOCTEXT("OpenPluginSettingsSubMenuTitle", "Open Plugin Settings"),
+			LOCTEXT("OpenPluginSettingsSubMenuTooltip", "Open the Graph Printer settings screen in the editor preferences."),
+			FNewMenuDelegate::CreateStatic(&FGraphPrinterCommands::OnExtendOpenSettingsSubMenu)
+		);
 		MenuBuilder.EndSection();
 	}
 
@@ -138,11 +142,22 @@ namespace GraphPrinter
 			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::OpenExportDestinationFolder),
 			FCanExecuteAction::CreateStatic(&FGraphPrinterCommandActions::CanOpenExportDestinationFolder)
 		);
+	}
 
-		CommandBindings->MapAction(
-			OpenPluginSettings,
-			FExecuteAction::CreateStatic(&FGraphPrinterCommandActions::OpenPluginSettings)
-		);
+	void FGraphPrinterCommands::OnExtendOpenSettingsSubMenu(FMenuBuilder& MenuBuilder)
+	{
+		const TArray<UGraphPrinterSettings::FSettingsInfo>& AllSettings = UGraphPrinterSettings::GetAllSettings();
+		for (const auto& Setting : AllSettings)
+		{
+			MenuBuilder.AddMenuEntry(
+				Setting.DisplayName,
+				Setting.Description,
+				FSlateIcon(),
+				FUIAction(
+					FExecuteAction::CreateStatic(&UGraphPrinterSettings::OpenSettings, Setting.SectionName)
+				)
+			);
+		}
 	}
 }
 

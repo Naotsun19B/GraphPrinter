@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "WidgetPrinterSettings.generated.h"
 
 enum TextureFilter;
@@ -13,7 +13,7 @@ enum class EDesiredImageFormat : uint8;
  * A class that sets the default values for UPrintWidgetOptions from the editor preferences.
  */
 UCLASS()
-class WIDGETPRINTER_API UWidgetPrinterSettings : public UGraphPrinterSubSettings
+class WIDGETPRINTER_API UWidgetPrinterSettings : public UGraphPrinterSettings
 {
 	GENERATED_BODY()
 	
@@ -74,9 +74,9 @@ public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	// End of UObject interface.
 
-	// UGraphPrinterSubSettings interface.
-	virtual FText GetDetailsTitle() const override;
-	// End of UGraphPrinterSubSettings interface.
+	// UGraphPrinterSettings interface.
+	virtual FSettingsInfo GetSettingsInfo() const override;
+	// End of UGraphPrinterSettings interface.
 
 protected:
 	// Functions called when the value changes.

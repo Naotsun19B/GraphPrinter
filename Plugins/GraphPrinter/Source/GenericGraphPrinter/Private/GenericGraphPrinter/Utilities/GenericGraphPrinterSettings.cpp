@@ -2,8 +2,6 @@
 
 #include "GenericGraphPrinter/Utilities/GenericGraphPrinterSettings.h"
 
-#define LOCTEXT_NAMESPACE "GenericGraphPrinterSettings"
-
 UGenericGraphPrinterSettings::UGenericGraphPrinterSettings()
 	: Padding(100.f)
 	, bDrawOnlyGraph(false)
@@ -17,9 +15,7 @@ const UGenericGraphPrinterSettings& UGenericGraphPrinterSettings::Get()
 	return *Settings;
 }
 
-FText UGenericGraphPrinterSettings::GetDetailsTitle() const
+UGraphPrinterSettings::FSettingsInfo UGenericGraphPrinterSettings::GetSettingsInfo() const
 {
-	return LOCTEXT("DetailsTitle", "Generic Graph Printer");
+	return FSettingsInfo(TEXT("GenericGraphPrinter"));
 }
-
-#undef LOCTEXT_NAMESPACE

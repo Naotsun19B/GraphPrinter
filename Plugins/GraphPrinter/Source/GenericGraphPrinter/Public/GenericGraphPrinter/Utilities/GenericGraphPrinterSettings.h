@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "GenericGraphPrinterSettings.generated.h"
 
 /**
  * A class that sets the default values for UPrintGraphOptions from the editor preferences.
  */
 UCLASS()
-class UGenericGraphPrinterSettings : public UGraphPrinterSubSettings
+class UGenericGraphPrinterSettings : public UGraphPrinterSettings
 {
 	GENERATED_BODY()
 
@@ -30,7 +30,7 @@ public:
 	// Returns reference of this settings.
 	static const UGenericGraphPrinterSettings& Get();
 
-	// UGraphPrinterSubSettings interface.
-	virtual FText GetDetailsTitle() const override;
-	// End of UGraphPrinterSubSettings interface.
+	// UGraphPrinterSettings interface.
+	virtual FSettingsInfo GetSettingsInfo() const override;
+	// End of UGraphPrinterSettings interface.
 };

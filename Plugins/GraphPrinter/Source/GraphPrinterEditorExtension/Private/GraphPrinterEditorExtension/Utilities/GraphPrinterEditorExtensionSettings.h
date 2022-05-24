@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterEditorExtensionSettings.generated.h"
 
 /**
  * Settings related to the editor extension of this plugin.
  */
 UCLASS()
-class UGraphPrinterEditorExtensionSettings : public UGraphPrinterSubSettings
+class UGraphPrinterEditorExtensionSettings : public UGraphPrinterSettings
 {
 	GENERATED_BODY()
 
@@ -26,7 +26,7 @@ public:
 	// Returns reference of this settings.
 	static const UGraphPrinterEditorExtensionSettings& Get();
 	
-	// UGraphPrinterSubSettings interface.
-	virtual FText GetDetailsTitle() const override;
-	// End of UGraphPrinterSubSettings interface.
+	// UGraphPrinterSettings interface.
+	virtual FSettingsInfo GetSettingsInfo() const override;
+	// End of UGraphPrinterSettings interface.
 };

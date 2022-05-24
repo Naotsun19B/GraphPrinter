@@ -2,8 +2,6 @@
 
 #include "MaterialGraphPrinter/Utilities/MaterialGraphPrinterSettings.h"
 
-#define LOCTEXT_NAMESPACE "MaterialGraphPrinterSettings"
-
 UMaterialGraphPrinterSettings::UMaterialGraphPrinterSettings()
 	: MaterialGraphExportMethod(EMaterialGraphExportMethod::CombinePreviewAndGraph)
 {
@@ -16,9 +14,7 @@ const UMaterialGraphPrinterSettings& UMaterialGraphPrinterSettings::Get()
 	return *Settings;
 }
 
-FText UMaterialGraphPrinterSettings::GetDetailsTitle() const
+UGraphPrinterSettings::FSettingsInfo UMaterialGraphPrinterSettings::GetSettingsInfo() const
 {
-	return LOCTEXT("DetailsTitle", "Material Graph");
+	return FSettingsInfo(TEXT("MaterialGraphPrinter"));
 }
-
-#undef LOCTEXT_NAMESPACE

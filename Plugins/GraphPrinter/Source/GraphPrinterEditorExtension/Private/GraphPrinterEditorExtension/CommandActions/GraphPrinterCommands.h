@@ -33,6 +33,10 @@ namespace GraphPrinter
 		// Internal processing of command binding.
 		virtual void BindCommands();
 
+	private:
+		// Called when a submenu that opens plugin settings is built.
+		static void OnExtendOpenSettingsSubMenu(FMenuBuilder& MenuBuilder);
+		
 	public:
 		// A list of shortcut keys used by this plugin.
 		TSharedRef<FUICommandList> CommandBindings;
@@ -48,7 +52,6 @@ namespace GraphPrinter
 		TSharedPtr<FUICommandInfo> RestoreNodesFromPngFile;
 #endif
 		TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
-		TSharedPtr<FUICommandInfo> OpenPluginSettings;
 
 	private:
 		// Is the command registered here bound.

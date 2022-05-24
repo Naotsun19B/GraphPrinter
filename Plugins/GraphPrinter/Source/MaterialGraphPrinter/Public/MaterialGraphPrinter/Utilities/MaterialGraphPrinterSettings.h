@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GraphPrinterGlobals/Utilities/GraphPrinterSubSettings.h"
+#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "MaterialGraphPrinter/Types/MaterialGraphExportMethod.h"
 #include "MaterialGraphPrinterSettings.generated.h"
 
 /**
- * A class that sets the default values for UPrintMateriaGraphOptions from the editor preferences.
+ * A class that sets the default values for UPrintMaterialGraphOptions from the editor preferences.
  */
 UCLASS()
-class MATERIALGRAPHPRINTER_API UMaterialGraphPrinterSettings : public UGraphPrinterSubSettings
+class MATERIALGRAPHPRINTER_API UMaterialGraphPrinterSettings : public UGraphPrinterSettings
 {
 	GENERATED_BODY()
 
@@ -27,7 +27,7 @@ public:
 	// Returns reference of this settings.
 	static const UMaterialGraphPrinterSettings& Get();
 	
-	// UGraphPrinterSubSettings interface.
-	virtual FText GetDetailsTitle() const override;
-	// End of UGraphPrinterSubSettings interface.
+	// UGraphPrinterSettings interface.
+	virtual FSettingsInfo GetSettingsInfo() const override;
+	// End of UGraphPrinterSettings interface.
 };

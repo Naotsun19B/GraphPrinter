@@ -150,9 +150,4 @@ namespace GraphPrinter
 	{
 		return FPaths::DirectoryExists(UWidgetPrinterSettings::Get().OutputDirectory.Path);
 	}
-
-	void FGraphPrinterCommandActions::OpenPluginSettings()
-	{
-		UGraphPrinterSettings::OpenSettings();
-	}
 }

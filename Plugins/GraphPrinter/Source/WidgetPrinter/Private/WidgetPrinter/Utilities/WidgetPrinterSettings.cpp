@@ -7,8 +7,6 @@
 #include "Misc/Paths.h"
 #include "HAL/FileManager.h"
 
-#define LOCTEXT_NAMESPACE "WidgetPrinterSettings"
-
 UWidgetPrinterSettings::UWidgetPrinterSettings()
 	: Format(EDesiredImageFormat::PNG)
 	, CompressionQuality(0)
@@ -86,9 +84,9 @@ void UWidgetPrinterSettings::PostEditChangeProperty(FPropertyChangedEvent& Prope
 	}
 }
 
-FText UWidgetPrinterSettings::GetDetailsTitle() const
+UGraphPrinterSettings::FSettingsInfo UWidgetPrinterSettings::GetSettingsInfo() const
 {
-	return LOCTEXT("DetailsTitle", "Widget Printer");
+	return FSettingsInfo(TEXT("WidgetPrinter"));
 }
 
 void UWidgetPrinterSettings::ModifyFormat()
@@ -122,5 +120,3 @@ void UWidgetPrinterSettings::ModifyMaxImageSize()
 		MaxImageSize.Y = 0.f;
 	}
 }
-
-#undef LOCTEXT_NAMESPACE
