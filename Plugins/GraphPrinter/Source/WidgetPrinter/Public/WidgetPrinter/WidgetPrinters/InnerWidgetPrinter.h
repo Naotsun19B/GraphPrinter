@@ -155,6 +155,9 @@ namespace GraphPrinter
 				return;
 			}
 
+			// Adjust the draw size according to the rendering scale.
+			WidgetPrinterParams.DrawSize *= PrintOptions->RenderingScale;
+
 			PreDrawWidget();
 
 			const bool bIsPrintableSize = IsPrintableSize();
