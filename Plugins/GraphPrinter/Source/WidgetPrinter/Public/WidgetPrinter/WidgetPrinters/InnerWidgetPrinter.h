@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "WidgetPrinter/Types/OneWayBool.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
@@ -128,18 +128,12 @@ namespace GraphPrinter
 			}
 			
 			Widget = FindTargetWidget(PrintOptions->SearchTarget);
-
-			// If don't have an active graph editor, end here.
 			if (!Widget.IsValid())
 			{
-				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("NotFoundGraphEditorError", "The graph editor isn't currently open."),
-					FGraphPrinterUtils::CS_Fail
-				);
 				return;
 			}
 
-			// If the restore function cannot be used, the node information will not be embedded.
+			// If the restore function cannot be used, the widget information will not be embedded.
 			RestoreOptions = NewObject<URestoreWidgetOptions>();
 			if (IsValid(RestoreOptions))
 			{
@@ -165,7 +159,7 @@ namespace GraphPrinter
 
 			const bool bIsPrintableSize = IsPrintableSize();
 
-			// Draw the graph editor on the render target.
+			// Draw the widget on the render target.
 			if (bIsPrintableSize)
 			{
 				WidgetPrinterParams.RenderTarget = TStrongObjectPtr<UTextureRenderTarget2D>(DrawWidgetToRenderTarget());
@@ -175,11 +169,27 @@ namespace GraphPrinter
 
 			if (!bIsPrintableSize)
 			{
-				const FText& Message = FText::FromString(FString::Printf(
-					TEXT("%s / %s\nThe drawing range is too wide.\nIf necessary, change the maximum size from the editor settings."),
-					*WidgetPrinterParams.DrawSize.ToString(), *PrintOptions->MaxImageSize.ToString()
-				));
-				FGraphPrinterUtils::ShowNotification(Message, FGraphPrinterUtils::CS_Fail, 6.f);
+				const FText& Message = FText::Format(
+					LOCTEXT("TooLargeSize", "{DrawSize} / {MaxImageSize}\nThe drawing range is too wide.\nIf necessary, change the maximum size from the editor preferences."),
+					FText::FromString(WidgetPrinterParams.DrawSize.ToString()),
+					FText::FromString(PrintOptions->MaxImageSize.ToString())
+				);
+				FGraphPrinterUtils::ShowNotification(
+					Message,
+					FGraphPrinterUtils::CS_Fail,
+					6.f,
+					TArray<FNotificationInteraction>{
+						FNotificationInteraction(
+							LOCTEXT("OpenSettingsNavigation", "Jump to the editor preferences."),
+							FSimpleDelegate::CreateLambda(
+								[]()
+								{
+									OpenSettings<UWidgetPrinterSettings>();
+								}
+							)
+						)
+					}
+				);
 				return;
 			}
 
@@ -232,18 +242,12 @@ namespace GraphPrinter
 			}
 			
 			Widget = FindTargetWidget(RestoreOptions->SearchTarget);
-
-			// If don't have an active graph editor, end here.
 			if (!Widget.IsValid())
 			{
-				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("NotFoundGraphEditorError", "The graph editor isn't currently open."),
-					FGraphPrinterUtils::CS_Fail
-				);
 				return;
 			}
 
-			// Launch the file browser and select the png file.
+			// Launch the file browser and select the iamge file.
 			if (RestoreOptions->HasValidSourceImageFilePath())
 			{
 				WidgetPrinterParams.Filename = RestoreOptions->GetSourceImageFilePath();
@@ -270,13 +274,12 @@ namespace GraphPrinter
 
 				WidgetPrinterParams.Filename = FPaths::ConvertRelativePathToFull(Filenames[0]);
 			}
-
-			// Restore node from png file.
+			
 			if (RestoreWidgetFromTextChunk())
 			{
 				const FString Filename = WidgetPrinterParams.Filename;
 				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("SucceededRestore", "Restore nodes from"),
+					LOCTEXT("SucceededRestore", "Restore widget from"),
 					FGraphPrinterUtils::CS_Success, 5.f,
 					TArray<FNotificationInteraction>{
 						FNotificationInteraction(
@@ -292,7 +295,7 @@ namespace GraphPrinter
 			else
 			{
 				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("FailedRestoreError", "Failed restore nodes."),
+					LOCTEXT("FailedRestoreError", "Failed restore widget."),
 					FGraphPrinterUtils::CS_Fail
 				);
 			}
@@ -423,7 +426,7 @@ namespace GraphPrinter
 			return {};
 		}
 
-		// Export the render target that draws the graph editor to image file.
+		// Export the render target that draws the widget to image file.
 		virtual void ExportRenderTargetToImageFile()
 		{
 			if (PrintOptions->ExportMethod == UPrintWidgetOptions::EExportMethod::RenderTarget)
@@ -451,7 +454,7 @@ namespace GraphPrinter
 			if (!bIsSucceeded)
 			{
 				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("FailedOutputError", "Failed capture GraphEditor."),
+					LOCTEXT("FailedOutputError", "Failed capture widget."),
 					FGraphPrinterUtils::CS_Fail
 				);
 				return;
@@ -461,7 +464,7 @@ namespace GraphPrinter
 			{
 				const FString Filename = WidgetPrinterParams.Filename;
 				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("SucceededOutput", "GraphEditor capture saved as"),
+					LOCTEXT("SucceededOutput", "Capture saved as"),
 					FGraphPrinterUtils::CS_Success, 5.f,
 					TArray<FNotificationInteraction>{
 						FNotificationInteraction(
@@ -475,7 +478,7 @@ namespace GraphPrinter
 				);
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-				// Embed node information in the output png image.
+				// Embed information of widget in the output image file.
 				// When copying to the clipboard, the process is skipped.
 				if (PrintOptions->bIsIncludeNodeInfoInImageFile &&
 					PrintOptions->ImageWriteOptions.Format == EDesiredImageFormat::PNG)
@@ -483,7 +486,7 @@ namespace GraphPrinter
 					if (!WriteWidgetInfoToTextChunk())
 					{
 						FGraphPrinterUtils::ShowNotification(
-							LOCTEXT("FailedEmbedNodeInfoError", "Failed to write node information to png file."),
+							LOCTEXT("FailedEmbedWidgetInfoError", "Failed to write widget information to image file."),
 							FGraphPrinterUtils::CS_Fail
 						);
 					}
@@ -515,7 +518,7 @@ namespace GraphPrinter
 			OnPrinterProcessingFinished.ExecuteIfBound();
 		}
 
-		// Copy the image file that draws the graph editor to clipboard.
+		// Copy the image file that draws the widget to clipboard.
 		virtual bool CopyImageFileToClipboard()
 		{
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
@@ -537,7 +540,7 @@ namespace GraphPrinter
 			return false;
 		}
 
-		// Returns whether to use the optional Print Scope setting.
+		// Returns whether to use the optional PrintScope setting.
 		virtual bool ShouldAlwaysPrintAll() const
 		{
 			return true;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
 #include "SGraphEditorImpl.h"
 #include "EdGraphUtilities.h"

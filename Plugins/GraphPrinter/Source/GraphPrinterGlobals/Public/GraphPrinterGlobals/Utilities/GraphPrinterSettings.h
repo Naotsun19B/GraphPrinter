@@ -63,3 +63,16 @@ private:
 	// All registered editor settings classes about GraphPrinter.
 	static TArray<FSettingsInfo> AllSettings;
 };
+
+namespace GraphPrinter
+{
+	// Open the settings menu for this plugin.
+	template<class TSettings>
+	static void OpenSettings()
+	{
+		static_assert(TIsDerivedFrom<TSettings, UGraphPrinterSettings>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UGraphPrinterSettings.");
+
+		auto* Settings = GetDefault<TSettings>();
+		UGraphPrinterSettings::OpenSettings(Settings->GetSettingsInfo().SectionName);
+	}
+}

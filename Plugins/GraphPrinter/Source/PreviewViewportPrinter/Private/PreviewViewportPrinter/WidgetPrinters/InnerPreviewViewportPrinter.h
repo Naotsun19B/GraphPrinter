@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "Kismet2/DebuggerCommands.h"
 #include "Framework/Docking/SDockingTabStack.h"
