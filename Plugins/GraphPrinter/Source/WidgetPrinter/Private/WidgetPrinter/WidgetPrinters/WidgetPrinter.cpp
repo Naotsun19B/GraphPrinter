@@ -76,13 +76,18 @@ int32 UWidgetPrinter::GetPriority(const TSubclassOf<UWidgetPrinter>& Class)
 	return TNumericLimits<int32>::Min();
 }
 
-UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions() const
+UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
+	const UPrintWidgetOptions::EPrintScope PrintScope,
+	const UPrintWidgetOptions::EExportMethod ExportMethod
+) const
 {
 	auto* PrintOptions = NewObject<UPrintWidgetOptions>();
 	if (IsValid(PrintOptions))
 	{
 		auto& Settings = UWidgetPrinterSettings::Get();
 
+		PrintOptions->PrintScope = PrintScope;
+		PrintOptions->ExportMethod = ExportMethod;
 #ifdef WITH_TEXT_CHUNK_HELPER
 		PrintOptions->bIsIncludeNodeInfoInImageFile = Settings.bIsIncludeNodeInfoInImageFile;
 #endif

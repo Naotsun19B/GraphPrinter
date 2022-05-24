@@ -2,7 +2,6 @@
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
-#include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "WidgetPrinter/IWidgetPrinterRegistry.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "Misc/Paths.h"
@@ -12,25 +11,20 @@ namespace GraphPrinter
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 	void FGraphPrinterCommandActions::CopyAllAreaOfWidgetToClipboard()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::Clipboard))
 		{
-			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
-			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
-
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
-				WidgetPrinter->PrintWidget(WidgetPrinter->CreateDefaultPrintOptions());
+				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::Clipboard);
+				WidgetPrinter->PrintWidget(Options);
 			}
 		}
 	}
 
 	bool FGraphPrinterCommandActions::CanCopyAllAreaOfWidgetToClipboard()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::Clipboard))
 		{
-			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
-			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
-			
 			return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
 		}
 		
@@ -39,24 +33,20 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::CopySelectedAreaOfWidgetToClipboard()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::Clipboard))
 		{
-			Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
-			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
-			
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
-				WidgetPrinter->PrintWidget(WidgetPrinter->CreateDefaultPrintOptions());
+				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::Clipboard);
+				WidgetPrinter->PrintWidget(Options);
 			}
 		}
 	}
 
 	bool FGraphPrinterCommandActions::CanCopySelectedAreaOfWidgetToClipboard()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::Clipboard))
         {
-            Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
-            Options->ExportMethod = UPrintWidgetOptions::EExportMethod::Clipboard;
             return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
         }
         
@@ -66,24 +56,20 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::PrintAllAreaOfWidget()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::ImageFile))
 		{
-			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
-			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
-			
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
-				WidgetPrinter->PrintWidget(WidgetPrinter->CreateDefaultPrintOptions());
+				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::ImageFile);
+				WidgetPrinter->PrintWidget(Options);
 			}
 		}
 	}
 
 	bool FGraphPrinterCommandActions::CanPrintAllAreaOfWidget()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::ImageFile))
 		{
-			Options->PrintScope = UPrintWidgetOptions::EPrintScope::All;
-			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
 			return IsValid(IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options));
 		}
         
@@ -92,21 +78,19 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::PrintSelectedAreaOfWidget()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::ImageFile))
 		{
-			Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
-			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;
-			
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
-				WidgetPrinter->PrintWidget(WidgetPrinter->CreateDefaultPrintOptions());
+				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::ImageFile);
+				WidgetPrinter->PrintWidget(Options);
 			}
 		}
 	}
 
 	bool FGraphPrinterCommandActions::CanPrintSelectedAreaOfWidget()
 	{
-		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>())
+		if (auto* Options = CreateDefaultPrintOptions<UWidgetPrinter>(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::ImageFile))
 		{
 			Options->PrintScope = UPrintWidgetOptions::EPrintScope::Selected;
 			Options->ExportMethod = UPrintWidgetOptions::EExportMethod::ImageFile;

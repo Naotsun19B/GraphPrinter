@@ -10,9 +10,12 @@ int32 UMaterialGraphPrinter::GetPriority() const
 	return MaterialGraphPrinterPriority;
 }
 
-UPrintWidgetOptions* UMaterialGraphPrinter::CreateDefaultPrintOptions() const
+UPrintWidgetOptions* UMaterialGraphPrinter::CreateDefaultPrintOptions(
+	const UPrintWidgetOptions::EPrintScope PrintScope,
+	const UPrintWidgetOptions::EExportMethod ExportMethod
+) const
 {
-	if (UPrintWidgetOptions* PrintWidgetOptions = Super::CreateDefaultPrintOptions())
+	if (UPrintWidgetOptions* PrintWidgetOptions = Super::CreateDefaultPrintOptions(PrintScope, ExportMethod))
 	{
 		if (auto* PrintMaterialGraphOptions = PrintWidgetOptions->Duplicate<UPrintMaterialGraphOptions>())
 		{

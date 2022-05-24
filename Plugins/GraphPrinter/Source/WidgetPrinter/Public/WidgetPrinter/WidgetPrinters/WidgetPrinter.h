@@ -66,7 +66,10 @@ public:
 	static int32 GetPriority(const TSubclassOf<UWidgetPrinter>& Class);
 	
 	// Generates and returns an option class with the default settings applied.
-	virtual UPrintWidgetOptions* CreateDefaultPrintOptions() const;
+	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(
+		const UPrintWidgetOptions::EPrintScope PrintScope,
+		const UPrintWidgetOptions::EExportMethod ExportMethod
+	) const;
 	virtual URestoreWidgetOptions* CreateDefaultRestoreOptions() const;
 
 	// Returns the rendering result used when the export method is rendered as the render target.
@@ -102,7 +105,10 @@ namespace GraphPrinter
 {
 	// Generates and returns an option class with the default settings applied.
 	template<class TPrinterClass>
-	static UPrintWidgetOptions* CreateDefaultPrintOptions()
+	static UPrintWidgetOptions* CreateDefaultPrintOptions(
+		const UPrintWidgetOptions::EPrintScope PrintScope,
+		const UPrintWidgetOptions::EExportMethod ExportMethod
+	)
 	{
 		static_assert(TIsDerivedFrom<TPrinterClass, UWidgetPrinter>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UWidgetPrinter.");
 
@@ -110,7 +116,7 @@ namespace GraphPrinter
 		{
 			if (const auto* WidgetPrinter = Cast<UWidgetPrinter>(Class->ClassDefaultObject))
 			{
-				return WidgetPrinter->CreateDefaultPrintOptions();
+				return WidgetPrinter->CreateDefaultPrintOptions(PrintScope, ExportMethod);
 			}
 		}
 

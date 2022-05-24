@@ -10,9 +10,12 @@ int32 UGenericGraphPrinter::GetPriority() const
 	return GenericGraphPrinterPriority;
 }
 
-UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions() const
+UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions(
+	const UPrintWidgetOptions::EPrintScope PrintScope,
+	const UPrintWidgetOptions::EExportMethod ExportMethod
+) const
 {
-	if (UPrintWidgetOptions* PrintWidgetOptions = Super::CreateDefaultPrintOptions())
+	if (UPrintWidgetOptions* PrintWidgetOptions = Super::CreateDefaultPrintOptions(PrintScope, ExportMethod))
 	{
 		if (auto* PrintGraphOptions = PrintWidgetOptions->Duplicate<UPrintGraphOptions>())
 		{
