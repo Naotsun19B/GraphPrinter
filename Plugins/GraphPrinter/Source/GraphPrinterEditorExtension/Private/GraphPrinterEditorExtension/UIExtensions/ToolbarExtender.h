@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 
+class FToolBarBuilder;
+class FExtender;
+class SWidget;
+
 namespace GraphPrinter
 {
 	/**

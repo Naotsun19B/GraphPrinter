@@ -6,6 +6,7 @@
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "Interfaces/IMainFrameModule.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
 
 #define LOCTEXT_NAMESPACE "GraphPrinterCommands"
 

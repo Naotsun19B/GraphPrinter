@@ -7,8 +7,8 @@
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "Kismet2/DebuggerCommands.h"
-#include "Framework/Docking/SDockingTabStack.h"
 #include "SGraphEditorImpl.h"
+#include "Widgets/Docking/SDockTab.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 
 namespace GraphPrinter

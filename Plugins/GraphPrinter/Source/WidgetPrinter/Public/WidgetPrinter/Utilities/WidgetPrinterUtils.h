@@ -8,7 +8,6 @@ class SWidget;
 class SOverlay;
 class STextBlock;
 class SGraphEditorImpl;
-class SDockingTabStack;
 class SStandaloneAssetEditorToolkitHost;
 
 namespace GraphPrinter
@@ -34,7 +33,7 @@ namespace GraphPrinter
 		);
 
 		// Find the docking tab stack that contains the specified dock tab.
-		static TSharedPtr<SDockingTabStack> FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget);
+		static TSharedPtr<SWidget> FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget);
 		
 		// Returns the toolkit host of the Asset Editor that contains the specified tab.
 		static TSharedPtr<SStandaloneAssetEditorToolkitHost> FindNearestParentStandaloneAssetEditorToolkitHost(TSharedPtr<SWidget> SearchTarget);

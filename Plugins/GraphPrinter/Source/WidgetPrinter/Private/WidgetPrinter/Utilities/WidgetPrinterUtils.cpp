@@ -70,7 +70,7 @@ namespace GraphPrinter
 		}
 	}
 
-	TSharedPtr<SDockingTabStack> FWidgetPrinterUtils::FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SWidget> FWidgetPrinterUtils::FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget)
 	{
 		TSharedPtr<SDockingTabStack> FoundDockingTabStack = nullptr;
 		
@@ -142,7 +142,7 @@ namespace GraphPrinter
 		const TSharedPtr<SDockTab> ActiveTab = GlobalTabManager->GetActiveTab();
 		if (ActiveTab.IsValid())
 		{
-			const TSharedPtr<SDockingTabStack> DockingTabStack = FindNearestParentDockingTabStack(ActiveTab);
+			const TSharedPtr<SWidget> DockingTabStack = FindNearestParentDockingTabStack(ActiveTab);
 			if (DockingTabStack.IsValid())
 			{
 				TSharedPtr<SGraphEditorImpl> GraphEditor = FindNearestChildGraphEditor(DockingTabStack);

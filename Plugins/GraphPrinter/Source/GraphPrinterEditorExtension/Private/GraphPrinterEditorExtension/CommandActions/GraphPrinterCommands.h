@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
+#include "Framework/Commands/UICommandList.h"
+#include "Framework/Commands/UICommandInfo.h"
+
+class FMenuBuilder;
 
 namespace GraphPrinter
 {

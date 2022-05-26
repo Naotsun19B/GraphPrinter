@@ -5,6 +5,8 @@
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Toolkits/AssetEditorToolkit.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "Framework/MultiBox/MultiBoxExtender.h"
 
 #define LOCTEXT_NAMESPACE "ToolMenuExtender"
 

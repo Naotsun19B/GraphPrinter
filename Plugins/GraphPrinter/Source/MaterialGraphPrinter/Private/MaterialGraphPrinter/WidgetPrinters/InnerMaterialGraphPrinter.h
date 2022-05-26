@@ -8,6 +8,8 @@
 #include "PreviewViewportPrinter/WidgetPrinters/PreviewViewportPrinter.h"
 #include "MaterialGraph/MaterialGraph.h"
 #include "SGraphEditorImpl.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/Images/SImage.h"
 #include "Framework/Docking/SDockingTabStack.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 

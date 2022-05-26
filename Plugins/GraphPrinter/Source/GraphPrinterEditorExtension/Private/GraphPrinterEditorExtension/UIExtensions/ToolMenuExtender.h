@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 
+class FMenuBuilder;
+class FExtender;
+
 namespace GraphPrinter
 {
 	/**
