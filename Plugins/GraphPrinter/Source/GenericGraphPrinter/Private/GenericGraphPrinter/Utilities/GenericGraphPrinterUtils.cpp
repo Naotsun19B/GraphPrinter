@@ -3,8 +3,11 @@
 #include "GenericGraphPrinter/Utilities/GenericGraphPrinterUtils.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
+#include "Framework/Docking/TabManager.h"
+#include "Framework/Application/SlateApplication.h"
 #include "SGraphEditorImpl.h"
 #include "Widgets/Text/STextBlock.h"
+#include "Widgets/Docking/SDockTab.h"
 
 namespace GraphPrinter
 {
