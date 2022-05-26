@@ -26,7 +26,6 @@ public class ClipboardImageExtension : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
 				"ImageWrapper",
 				"ImageWriteQueue",
 				"ApplicationCore",

@@ -20,8 +20,6 @@ public class GenericGraphPrinter : ModuleRules
 			new string[]
 			{
 				"Core",
-				"InputCore",
-				"ImageWriteQueue",
 			}
 		);
 			
@@ -39,7 +37,7 @@ public class GenericGraphPrinter : ModuleRules
 
 				"GraphPrinterGlobals",
 				"WidgetPrinter",
-                "TextChunkHelper",
+				"TextChunkHelper",
                 "ClipboardImageExtension",
             }
 		);

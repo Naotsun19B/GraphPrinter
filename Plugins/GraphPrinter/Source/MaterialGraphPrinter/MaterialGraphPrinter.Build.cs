@@ -20,8 +20,6 @@ public class MaterialGraphPrinter : ModuleRules
 			new string[]
 			{
 				"Core",
-				"InputCore",
-				"ImageWriteQueue",
 			}
 		);
 			
@@ -40,10 +38,10 @@ public class MaterialGraphPrinter : ModuleRules
 				"GraphPrinterGlobals",
 				"WidgetPrinter",
 				"GenericGraphPrinter",
-				"PreviewViewportPrinter", 
-                "TextChunkHelper",
-                "ClipboardImageExtension",
-            }
+				"PreviewViewportPrinter",
+				"TextChunkHelper",
+				"ClipboardImageExtension",
+			}
 		);
 	}
 }

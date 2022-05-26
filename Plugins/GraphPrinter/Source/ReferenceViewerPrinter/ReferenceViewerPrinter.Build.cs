@@ -20,8 +20,6 @@ public class ReferenceViewerPrinter : ModuleRules
 			new string[]
 			{
 				"Core",
-				"InputCore",
-				"ImageWriteQueue",
 			}
 		);
 			
@@ -42,8 +40,8 @@ public class ReferenceViewerPrinter : ModuleRules
 				"WidgetPrinter",
 				"GenericGraphPrinter",
 				"TextChunkHelper",
-                "ClipboardImageExtension",
-            }
+				"ClipboardImageExtension",
+			}
 		);
 	}
 }

@@ -20,8 +20,6 @@ public class PreviewViewportPrinter : ModuleRules
 			new string[]
 			{
 				"Core",
-				"InputCore",
-				"ImageWriteQueue",
 			}
 		);
 			
@@ -39,12 +37,12 @@ public class PreviewViewportPrinter : ModuleRules
 
 				"GraphPrinterGlobals",
 				"WidgetPrinter",
-                "TextChunkHelper",
-                "ClipboardImageExtension",
-                
-                // #TODO: Need a graph editor to get the asset name in the preview viewport.
-                "GenericGraphPrinter"
-            }
+				"TextChunkHelper",
+				"ClipboardImageExtension",
+				
+				// #TODO: Need a graph editor to get the asset name in the preview viewport.
+				"GenericGraphPrinter"
+			}
 		);
 	}
 }

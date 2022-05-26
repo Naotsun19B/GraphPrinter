@@ -20,7 +20,6 @@ public class WidgetPrinter : ModuleRules
 			new string[]
 			{
 				"Core",
-				"InputCore",
 				"ImageWriteQueue",
 			}
 		);
