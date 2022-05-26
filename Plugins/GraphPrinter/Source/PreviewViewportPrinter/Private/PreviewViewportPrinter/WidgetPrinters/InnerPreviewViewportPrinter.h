@@ -6,6 +6,7 @@
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
+#include "GenericGraphPrinter/Utilities/GenericGraphPrinterUtils.h"
 #include "Kismet2/DebuggerCommands.h"
 #include "SGraphEditorImpl.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -91,7 +92,7 @@ namespace GraphPrinter
 			const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);
 			if (StandaloneAssetEditorToolkitHost.IsValid())
 			{
-				const TSharedPtr<SGraphEditorImpl> GraphEditor = FWidgetPrinterUtils::FindNearestChildGraphEditor(StandaloneAssetEditorToolkitHost);
+				const TSharedPtr<SGraphEditorImpl> GraphEditor = FGenericGraphPrinterUtils::FindNearestChildGraphEditor(StandaloneAssetEditorToolkitHost);
 				if (GraphEditor.IsValid())
 				{
 					if (const UEdGraph* Graph = GraphEditor->GetCurrentGraph())

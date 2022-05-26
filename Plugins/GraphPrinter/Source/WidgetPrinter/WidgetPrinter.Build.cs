@@ -46,9 +46,6 @@ public class WidgetPrinter : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[]
 			{
-				// To use SGraphEditorImpl.
-				Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
-				
 				// To use SDockingTabStack.
 				Path.Combine(EngineDirectory, "Source", "Runtime", "Slate", "Private"),
 	            

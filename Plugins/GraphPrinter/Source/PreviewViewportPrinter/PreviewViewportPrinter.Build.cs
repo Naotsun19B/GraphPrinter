@@ -41,21 +41,10 @@ public class PreviewViewportPrinter : ModuleRules
 				"WidgetPrinter",
                 "TextChunkHelper",
                 "ClipboardImageExtension",
+                
+                // #TODO: Need a graph editor to get the asset name in the preview viewport.
+                "GenericGraphPrinter"
             }
 		);
-		
-        PublicIncludePaths.AddRange(
-            new string[]
-            {
-	            // To use SGraphEditorImpl.
-	            Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
-				
-	            // To use SDockingTabStack.
-	            Path.Combine(EngineDirectory, "Source", "Runtime", "Slate", "Private"),
-	            
-	            // To use SStandaloneAssetEditorToolkitHost.
-	            Path.Combine(EngineDirectory, "Source", "Editor", "UnrealEd", "Private"),
-            }
-        );
 	}
 }

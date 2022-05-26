@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
+#include "GenericGraphPrinter/Utilities/GenericGraphPrinterUtils.h"
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
 #include "SGraphEditorImpl.h"
 #include "EdGraphUtilities.h"
@@ -88,10 +89,10 @@ namespace GraphPrinter
 		{
 			if (SearchTarget.IsValid())
 			{
-				return FWidgetPrinterUtils::FindNearestChildGraphEditor(SearchTarget);
+				return FGenericGraphPrinterUtils::FindNearestChildGraphEditor(SearchTarget);
 			}
 	
-			return FWidgetPrinterUtils::GetActiveGraphEditor();
+			return FGenericGraphPrinterUtils::GetActiveGraphEditor();
 		}
 		virtual void PreCalculateDrawSize() override
 		{
@@ -122,7 +123,7 @@ namespace GraphPrinter
 		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget() override
 		{
 			// If there is a minimap, hide it only while drawing.
-			const TSharedPtr<SWidget> Minimap = FWidgetPrinterUtils::FindNearestChildMinimap(Widget);
+			const TSharedPtr<SWidget> Minimap = FGenericGraphPrinterUtils::FindNearestChildMinimap(Widget);
 			TOptional<EVisibility> PreviousMinimapVisibility;
 			if (Minimap.IsValid())
 			{
@@ -144,7 +145,7 @@ namespace GraphPrinter
 			if (PrintOptions->bDrawOnlyGraph)
 			{
 				const TSharedPtr<SOverlay> Overlay = FWidgetPrinterUtils::FindNearestChildOverlay(Widget);
-				TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks = FWidgetPrinterUtils::GetVisibleChildTextBlocks(Overlay);
+				TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks = FGenericGraphPrinterUtils::GetVisibleChildTextBlocks(Overlay);
 				for (const TSharedPtr<STextBlock>& VisibleChildTextBlock : VisibleChildTextBlocks)
 				{
 					if (VisibleChildTextBlock.IsValid())

@@ -43,5 +43,13 @@ public class GenericGraphPrinter : ModuleRules
                 "ClipboardImageExtension",
             }
 		);
+		
+		PublicIncludePaths.AddRange(
+			new string[]
+			{
+				// To use SGraphEditorImpl.
+				Path.Combine(EngineDirectory, "Source", "Editor", "GraphEditor", "Private"),
+			}
+		);
 	}
 }
