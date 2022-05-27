@@ -41,7 +41,7 @@ UGraphPrinterSettings::FSettingsInfo::FSettingsInfo(
 FText UGraphPrinterSettings::FSettingsInfo::GetFormattedDisplayName() const
 {
 	return FText::Format(
-		NSLOCTEXT("GraphPrinterSettings", "DisplayNameFormat", "{PluginName} - {DisplayName}"),
+		NSLOCTEXT("GraphPrinterSettings", "DisplayNameFormat", "{0} - {1}"),
 		FText::FromString(FName::NameToDisplayString(GraphPrinter::PluginName.ToString(), false)),
 		DisplayName
 	);
