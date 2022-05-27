@@ -12,6 +12,7 @@
 #include "UObject/StrongObjectPtr.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "HAL/FileManager.h"
+#include "EdGraph/EdGraph.h"
 
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 #include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"

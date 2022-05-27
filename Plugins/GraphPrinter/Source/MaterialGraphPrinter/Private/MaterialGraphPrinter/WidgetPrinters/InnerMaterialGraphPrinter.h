@@ -13,6 +13,10 @@
 #include "Framework/Docking/SDockingTabStack.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 
+#if BEFORE_UE_4_27
+#include "MaterialGraph/MaterialGraphNode_Root.h"
+#endif
+
 namespace GraphPrinter
 {
 	/**
@@ -112,7 +116,11 @@ namespace GraphPrinter
 					]
 				];
 
+#if BEFORE_UE_4_27
+			CombinedWidget->InvalidatePrepass();
+#else
 			CombinedWidget->MarkPrepassAsDirty();
+#endif
 
 			const FVector2D CombinedSize(
 				RenderingResult.RenderTarget->SizeX + RenderedGraph->SizeX,
@@ -131,10 +139,18 @@ namespace GraphPrinter
 		{
 			if (const auto* MaterialGraph = Cast<UMaterialGraph>(Widget->GetCurrentGraph()))
 			{
+#if BEFORE_UE_4_27
+				if (const UMaterial* Material = MaterialGraph->Material)
+#else
 				if (const UMaterial* Material = MaterialGraph->Material.Get())
+#endif
 				{
 					FString GraphName = TEXT("MaterialGraph");
+#if BEFORE_UE_4_27
+					if (IsValid(MaterialGraph->RootNode))
+#else
 					if (MaterialGraph->RootNode.IsNull())
+#endif
 					{
 						GraphName = MaterialGraph->GetName();
 					}

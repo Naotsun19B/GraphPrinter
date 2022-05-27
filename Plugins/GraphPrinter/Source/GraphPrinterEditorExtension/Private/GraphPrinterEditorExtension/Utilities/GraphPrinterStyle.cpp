@@ -37,7 +37,7 @@ namespace GraphPrinter
 
 		Instance->Set(
 			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PluginIcon),
-#if !BEFORE_UE_5_00
+#if BEFORE_UE_4_27
 			new IMAGE_BRUSH("Icon128", IconSize::Icon64x64)
 #else
 			new IMAGE_BRUSH("GrayIcon128", IconSize::Icon64x64)

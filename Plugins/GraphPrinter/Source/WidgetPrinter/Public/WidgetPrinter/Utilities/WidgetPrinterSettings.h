@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
+#include "Engine/EngineTypes.h"
 #include "WidgetPrinterSettings.generated.h"
 
 enum TextureFilter;
@@ -19,7 +20,7 @@ class WIDGETPRINTER_API UWidgetPrinterSettings : public UGraphPrinterSettings
 	
 public:
 	// Whether to embed node configuration information in the image file.
-	// When this option is enabled, the only output image format is png.
+	// When this option is enabled, the image formats that can be selected are limited.
 	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (EditCondition = "bWithTextChunkHelper", HideEditConditionToggle))
 	bool bIsIncludeNodeInfoInImageFile;
 
