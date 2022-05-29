@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "UObject/StrongObjectPtr.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
 #include "WidgetPrinter/Types/RestoreWidgetOptions.h"
 #include "WidgetPrinter.generated.h"
-
-class UTextureRenderTarget2D;
 
 namespace GraphPrinter
 {
