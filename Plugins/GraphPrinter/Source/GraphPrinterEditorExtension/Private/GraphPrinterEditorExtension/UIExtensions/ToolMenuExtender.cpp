@@ -5,6 +5,7 @@
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Toolkits/AssetEditorToolkit.h"
+#include "LevelEditor.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Framework/MultiBox/MultiBoxExtender.h"
 
@@ -12,6 +13,14 @@
 
 namespace GraphPrinter
 {
+	namespace LevelEditor
+	{
+		static TSharedPtr<FExtensibilityManager> GetMenuExtensibilityManager()
+		{
+			return FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor")).GetMenuExtensibilityManager();
+		}
+	}
+	
 	void FToolMenuExtender::Register()
 	{
 		Extender = MakeShared<FExtender>();
@@ -32,20 +41,32 @@ namespace GraphPrinter
 			CommandBindings,
 			FMenuExtensionDelegate::CreateStatic(&FToolMenuExtender::OnExtendToolMenu)
 		);
-		
-		const TSharedPtr<FExtensibilityManager>& ExtensibilityManager = FAssetEditorToolkit::GetSharedMenuExtensibilityManager();
-		if (ExtensibilityManager.IsValid())
+
+		const TArray<TSharedPtr<FExtensibilityManager>, TInlineAllocator<2>> ExtensibilityManagers = {
+			FAssetEditorToolkit::GetSharedMenuExtensibilityManager(),
+			LevelEditor::GetMenuExtensibilityManager()
+		};
+		for (const auto& ExtensibilityManager : ExtensibilityManagers)
 		{
-			ExtensibilityManager->AddExtender(Extender);
+			if (ExtensibilityManager.IsValid())
+			{
+				ExtensibilityManager->AddExtender(Extender);
+			}
 		}
 	}
 
 	void FToolMenuExtender::Unregister()
 	{
-		const TSharedPtr<FExtensibilityManager>& ExtensibilityManager = FAssetEditorToolkit::GetSharedMenuExtensibilityManager();
-		if (ExtensibilityManager.IsValid())
+		const TArray<TSharedPtr<FExtensibilityManager>, TInlineAllocator<2>> ExtensibilityManagers = {
+			FAssetEditorToolkit::GetSharedMenuExtensibilityManager(),
+			LevelEditor::GetMenuExtensibilityManager()
+		};
+		for (const auto& ExtensibilityManager : ExtensibilityManagers)
 		{
-			ExtensibilityManager->RemoveExtender(Extender);
+			if (ExtensibilityManager.IsValid())
+			{
+				ExtensibilityManager->RemoveExtender(Extender);
+			}
 		}
 	}
 

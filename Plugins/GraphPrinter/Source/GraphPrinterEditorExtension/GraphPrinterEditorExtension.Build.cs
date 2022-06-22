@@ -26,6 +26,7 @@ public class GraphPrinterEditorExtension : ModuleRules
 				"EditorStyle",
 				"Projects",
 				"MainFrame",
+				"LevelEditor",
 
 				"GraphPrinterGlobals",
 				"WidgetPrinter",
