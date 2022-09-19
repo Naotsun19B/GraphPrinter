@@ -32,6 +32,9 @@ namespace GraphPrinter
 
 		// Fill the menu builder with the commands of this plugin.
 		static void FillMenuBuilder(FMenuBuilder& MenuBuilder);
+
+		// Returns commands with names matching the specified name.
+		TSharedPtr<FUICommandInfo> FindCommandByName(const FName& CommandName) const;
 		
 	protected:
 		// Internal processing of command binding.

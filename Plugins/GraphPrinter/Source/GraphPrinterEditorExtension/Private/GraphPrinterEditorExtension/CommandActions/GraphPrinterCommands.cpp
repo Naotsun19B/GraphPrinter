@@ -85,6 +85,37 @@ namespace GraphPrinter
 		MenuBuilder.EndSection();
 	}
 
+	TSharedPtr<FUICommandInfo> FGraphPrinterCommands::FindCommandByName(const FName& CommandName) const
+	{
+		static const TArray<TSharedPtr<FUICommandInfo>, TInlineAllocator<6>> Commands = {
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+			CopyAllAreaOfWidgetToClipboard,
+			CopySelectedAreaOfWidgetToClipboard,
+#endif
+			PrintAllAreaOfWidget,
+			PrintSelectedAreaOfWidget,
+#ifdef WITH_TEXT_CHUNK_HELPER
+			RestoreWidgetFromImageFile,
+#endif
+			OpenExportDestinationFolder,
+		};
+
+		for (const auto& Command : Commands)
+		{
+			if (!Command.IsValid())
+			{
+				continue;
+			}
+
+			if (Command->GetCommandName().IsEqual(CommandName))
+			{
+				return Command;
+			}
+		}
+
+		return nullptr;
+	}
+
 	void FGraphPrinterCommands::BindCommands()
 	{
 		if (!IsRegistered())

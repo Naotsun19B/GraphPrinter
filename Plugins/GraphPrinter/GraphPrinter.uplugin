@@ -93,6 +93,17 @@
 			]
 		},
 		{
+			"Name": "GraphPrinterRemoteControl",
+			"Type": "EditorNoCommandlet",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Mac",
+				"Linux"
+			]
+        },
+		{
 			"Name": "TextChunkHelper",
 			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "Default",
