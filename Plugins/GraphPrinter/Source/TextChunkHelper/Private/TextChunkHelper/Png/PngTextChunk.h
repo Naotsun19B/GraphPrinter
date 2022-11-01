@@ -29,9 +29,6 @@ namespace TextChunkHelper
 		// Constructor.
 		FPngTextChunk();
 
-		// Destructor.
-		virtual ~FPngTextChunk();
-
 	protected:
 		// ITextChunk interface.
 		virtual bool Write(const TMap<FString, FString>& MapToWrite) override;

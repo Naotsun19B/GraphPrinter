@@ -87,7 +87,17 @@ namespace GraphPrinter
 
 	TSharedPtr<FUICommandInfo> FGraphPrinterCommands::FindCommandByName(const FName& CommandName) const
 	{
-		static const TArray<TSharedPtr<FUICommandInfo>, TInlineAllocator<6>> Commands = {
+		static constexpr int32 NumOfCommands = (
+			3
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+			+ 2
+#endif
+#ifdef WITH_TEXT_CHUNK_HELPER
+			+ 1
+#endif
+		);
+		
+		static const TArray<TSharedPtr<FUICommandInfo>, TInlineAllocator<NumOfCommands>> Commands = {
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 			CopyAllAreaOfWidgetToClipboard,
 			CopySelectedAreaOfWidgetToClipboard,

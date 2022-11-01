@@ -1,6 +1,7 @@
 // Copyright 2020-2022 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtender.h"
+#include "GraphPrinterEditorExtension/UIExtensions/StreamDeckMenu.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
@@ -17,7 +18,8 @@ namespace GraphPrinter
 	{
 		static TSharedPtr<FExtensibilityManager> GetMenuExtensibilityManager()
 		{
-			return FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor")).GetMenuExtensibilityManager();
+			auto& LevelEditor = FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor"));
+			return LevelEditor.GetMenuExtensibilityManager();
 		}
 	}
 	
@@ -90,6 +92,9 @@ namespace GraphPrinter
 	void FToolMenuExtender::OnExtendSubMenu(FMenuBuilder& MenuBuilder)
 	{
 		FGraphPrinterCommands::FillMenuBuilder(MenuBuilder);
+#ifdef WITH_STREAM_DECK
+		FStreamDeckMenu::FillMenuBuilder(MenuBuilder);
+#endif
 	}
 
 	TSharedPtr<FExtender> FToolMenuExtender::Extender = nullptr;

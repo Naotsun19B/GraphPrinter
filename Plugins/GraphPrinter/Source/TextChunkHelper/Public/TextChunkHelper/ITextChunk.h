@@ -12,6 +12,9 @@ namespace TextChunkHelper
 	class TEXTCHUNKHELPER_API ITextChunk
 	{
 	public:
+		// Destructor.
+		virtual ~ITextChunk() = default;
+		
 		// Write to text chunk of image file.
 		virtual bool Write(const TMap<FString, FString>& MapToWrite) = 0;
 

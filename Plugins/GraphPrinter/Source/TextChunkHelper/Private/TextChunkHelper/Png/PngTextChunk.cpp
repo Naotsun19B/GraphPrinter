@@ -239,10 +239,6 @@ namespace TextChunkHelper
 	{
 	}
 
-	FPngTextChunk::~FPngTextChunk()
-	{
-	}
-
 	bool FPngTextChunk::Write(const TMap<FString, FString>& MapToWrite)
 	{
 		check(IsPng());
