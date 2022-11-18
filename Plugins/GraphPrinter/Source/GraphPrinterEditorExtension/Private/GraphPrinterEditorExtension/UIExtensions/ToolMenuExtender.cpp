@@ -6,6 +6,7 @@
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Toolkits/AssetEditorToolkit.h"
+#include "Modules/ModuleManager.h"
 #include "LevelEditor.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Framework/MultiBox/MultiBoxExtender.h"

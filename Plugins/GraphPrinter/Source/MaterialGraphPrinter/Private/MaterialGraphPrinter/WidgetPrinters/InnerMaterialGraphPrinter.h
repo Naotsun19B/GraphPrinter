@@ -149,7 +149,7 @@ namespace GraphPrinter
 #if BEFORE_UE_4_27
 					if (IsValid(MaterialGraph->RootNode))
 #else
-					if (MaterialGraph->RootNode.IsNull())
+					if (MaterialGraph->RootNode)
 #endif
 					{
 						GraphName = MaterialGraph->GetName();

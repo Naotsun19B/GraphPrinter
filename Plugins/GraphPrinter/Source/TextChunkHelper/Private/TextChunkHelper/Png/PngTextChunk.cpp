@@ -13,7 +13,11 @@ THIRD_PARTY_INCLUDES_START
 #if PLATFORM_LINUX || PLATFORM_LINUXAARCH64
 #include "ThirdParty/zlib/v1.2.8/include/Linux/x86_64-unknown-linux-gnu/zlib.h" 
 #else
+#if BEFORE_UE_5_00
 #include "ThirdParty/zlib/zlib-1.2.5/Inc/zlib.h"
+#else
+#include "ThirdParty/zlib/1.2.12/include/zlib.h"
+#endif
 #endif
 
 #if !WITH_LIBPNG_1_6

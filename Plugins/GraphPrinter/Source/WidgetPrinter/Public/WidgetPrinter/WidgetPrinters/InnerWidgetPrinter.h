@@ -345,7 +345,11 @@ namespace GraphPrinter
 		virtual bool IsPrintableSize() const
 		{
 			// Check draw size.
+#if BEFORE_UE_5_00
 			if (PrintOptions->MaxImageSize > FVector2D::ZeroVector)
+#else
+			if (PrintOptions->MaxImageSize.ComponentwiseAllGreaterThan(FVector2D::ZeroVector))
+#endif
 			{
 				if (WidgetPrinterParams.DrawSize.X > PrintOptions->MaxImageSize.X ||
 					WidgetPrinterParams.DrawSize.Y > PrintOptions->MaxImageSize.Y)
