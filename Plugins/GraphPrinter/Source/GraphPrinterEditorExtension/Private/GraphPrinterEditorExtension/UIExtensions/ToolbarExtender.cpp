@@ -15,7 +15,7 @@ namespace GraphPrinter
 {
 	void FToolbarExtender::Register()
 	{
-		if (!ShouldExtendToolbar())
+		if (Extender.IsValid() || !ShouldExtendToolbar())
 		{
 			return;
 		}

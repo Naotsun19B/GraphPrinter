@@ -13,6 +13,12 @@ UENUM()
 enum class EGraphPrinterStyleIconType : uint8
 {
 	PluginIcon,
+	CopyAllAreaOfWidgetToClipboard,
+	CopySelectedAreaOfWidgetToClipboard,
+	PrintAllAreaOfWidget,
+	PrintSelectedAreaOfWidget,
+	RestoreWidgetFromImageFile,
+	OpenExportDestinationFolder,
 };
 
 namespace GraphPrinter

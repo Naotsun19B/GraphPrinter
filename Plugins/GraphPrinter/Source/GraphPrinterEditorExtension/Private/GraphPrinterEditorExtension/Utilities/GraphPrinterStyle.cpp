@@ -18,13 +18,19 @@ namespace GraphPrinter
 	{
 	}
 
-#define IMAGE_BRUSH(RelativePath, ...) FSlateImageBrush(Instance->RootToContentDir(TEXT(RelativePath), TEXT(".png")), __VA_ARGS__)
+#define IMAGE_BRUSH_INTERNAL(RelativePath, ...) FSlateImageBrush(Instance->RootToContentDir(TEXT(RelativePath), TEXT(".png")), __VA_ARGS__)
 
+#if BEFORE_UE_4_27
+#define IMAGE_BRUSH(RelativePath, ...) IMAGE_BRUSH_INTERNAL(RelativePath, __VA_ARGS__)
+#else
+#define IMAGE_BRUSH(RelativePath, ...) IMAGE_BRUSH_INTERNAL("Gray" RelativePath, __VA_ARGS__)
+#endif
+	
 	void FGraphPrinterStyle::Register()
 	{
 		FString StyleContentRoot;
 		{
-			const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(GraphPrinter::PluginName.ToString());
+			const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(PluginName.ToString());
 			check(Plugin.IsValid());
 			StyleContentRoot = FPaths::ConvertRelativePathToFull(
 				Plugin->GetBaseDir() / TEXT("Resources")
@@ -34,20 +40,41 @@ namespace GraphPrinter
 		Instance = MakeShared<FGraphPrinterStyle>();
 		Instance->SetContentRoot(StyleContentRoot);
 		Instance->SetCoreContentRoot(StyleContentRoot);
-
+		
 		Instance->Set(
 			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PluginIcon),
-#if BEFORE_UE_4_27
 			new IMAGE_BRUSH("Icon128", IconSize::Icon64x64)
-#else
-			new IMAGE_BRUSH("GrayIcon128", IconSize::Icon64x64)
-#endif
+		);
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::CopyAllAreaOfWidgetToClipboard),
+			new IMAGE_BRUSH("ClipboardAll128", IconSize::Icon64x64)
+		);
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::CopySelectedAreaOfWidgetToClipboard),
+			new IMAGE_BRUSH("ClipboardSelected128", IconSize::Icon64x64)
+		);
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PrintAllAreaOfWidget),
+			new IMAGE_BRUSH("PrintAll128", IconSize::Icon64x64)
+		);
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PrintSelectedAreaOfWidget),
+			new IMAGE_BRUSH("PrintSelected128", IconSize::Icon64x64)
+		);
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::RestoreWidgetFromImageFile),
+			new IMAGE_BRUSH("Restore128", IconSize::Icon64x64)
+		);
+		Instance->Set(
+			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::OpenExportDestinationFolder),
+			new IMAGE_BRUSH("Open128", IconSize::Icon64x64)
 		);
 
 		FSlateStyleRegistry::RegisterSlateStyle(*Instance);
 	}
 
 #undef IMAGE_BRUSH
+#undef IMAGE_BRUSH_INTERNAL
 
 	void FGraphPrinterStyle::Unregister()
 	{
@@ -77,7 +104,7 @@ namespace GraphPrinter
 		check(IsValid(EnumPtr));
 		
 		const FString EnumName = EnumPtr->GetNameStringByValue(static_cast<int64>(IconType));
-		return *FString::Printf(TEXT("Icons.%s"), *EnumName);
+		return *FString::Printf(TEXT("%s.%s"), *PluginName.ToString(), *EnumName);
 	}
 
 	TSharedPtr<FGraphPrinterStyle> FGraphPrinterStyle::Instance = nullptr;

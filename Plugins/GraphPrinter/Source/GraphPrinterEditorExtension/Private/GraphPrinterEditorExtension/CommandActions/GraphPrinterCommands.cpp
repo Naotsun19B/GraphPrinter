@@ -56,7 +56,7 @@ namespace GraphPrinter
 	{
 		const TSharedPtr<FGraphPrinterCommands> This = Instance.Pin();
 		check(This.IsValid());
-		
+
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("CopyToClipboardSectionName", "Copy To Clipboard"));
 		MenuBuilder.AddMenuEntry(This->CopyAllAreaOfWidgetToClipboard);
@@ -80,7 +80,9 @@ namespace GraphPrinter
 		MenuBuilder.AddSubMenu(
 			LOCTEXT("OpenPluginSettingsSubMenuTitle", "Open Plugin Settings"),
 			LOCTEXT("OpenPluginSettingsSubMenuTooltip", "Open the Graph Printer settings screen in the editor preferences."),
-			FNewMenuDelegate::CreateStatic(&FGraphPrinterCommands::OnExtendOpenSettingsSubMenu)
+			FNewMenuDelegate::CreateStatic(&FGraphPrinterCommands::OnExtendOpenSettingsSubMenu),
+			false,
+			FSlateIcon(FAppStyle::Get().GetStyleSetName(), TEXT("Icons.Settings"))
 		);
 		MenuBuilder.EndSection();
 	}

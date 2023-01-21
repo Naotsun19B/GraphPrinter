@@ -26,6 +26,11 @@ namespace GraphPrinter
 	
 	void FToolMenuExtender::Register()
 	{
+		if (Extender.IsValid())
+		{
+			return;
+		}
+		
 		Extender = MakeShared<FExtender>();
 		check(Extender.IsValid());
 	
