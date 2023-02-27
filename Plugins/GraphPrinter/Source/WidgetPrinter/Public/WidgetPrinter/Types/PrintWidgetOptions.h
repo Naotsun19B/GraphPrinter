@@ -58,9 +58,9 @@ public:
 	EExportMethod ExportMethod;
 
 #ifdef WITH_TEXT_CHUNK_HELPER
-	// Whether to embed node configuration information in the image file.
+	// Whether to embed widget configuration information in the image file.
 	// When this option is enabled, the image formats that can be selected are limited.
-	bool bIsIncludeNodeInfoInImageFile;
+	bool bIsIncludeWidgetInfoInImageFile;
 #endif
 		
 	// Whether to output the drawing result affected by the gamma value.

@@ -143,7 +143,7 @@ namespace GraphPrinter
 				RestoreOptions->SearchTarget = PrintOptions->SearchTarget;
 				if (!CanRestoreWidget())
 				{
-					PrintOptions->bIsIncludeNodeInfoInImageFile = false;
+					PrintOptions->bIsIncludeWidgetInfoInImageFile = false;
 				}
 			}
 
@@ -490,7 +490,7 @@ namespace GraphPrinter
 #ifdef WITH_TEXT_CHUNK_HELPER
 				// Embed information of widget in the output image file.
 				// When copying to the clipboard, the process is skipped.
-				if (PrintOptions->bIsIncludeNodeInfoInImageFile &&
+				if (PrintOptions->bIsIncludeWidgetInfoInImageFile &&
 					PrintOptions->ImageWriteOptions.Format == EDesiredImageFormat::PNG)
 				{
 					if (!WriteWidgetInfoToTextChunk())

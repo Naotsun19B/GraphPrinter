@@ -19,10 +19,10 @@ class WIDGETPRINTER_API UWidgetPrinterSettings : public UGraphPrinterSettings
 	GENERATED_BODY()
 	
 public:
-	// Whether to embed node configuration information in the image file.
+	// Whether to embed the widget information in the image file.
 	// When this option is enabled, the image formats that can be selected are limited.
-	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (EditCondition = "bWithTextChunkHelper", HideEditConditionToggle))
-	bool bIsIncludeNodeInfoInImageFile;
+	UPROPERTY(EditAnywhere, Config, Category = "Image")
+	bool bIsIncludeWidgetInfoInImageFile;
 
 	// The desired output image format to write to disk.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
@@ -58,11 +58,6 @@ public:
 	// Directory path where the image file is output.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
 	FDirectoryPath OutputDirectory;	
-
-protected:
-	// An internal variable used to determine if bIsIncludeNodeInfoInImageFile can be edited.
-	UPROPERTY()
-	bool bWithTextChunkHelper;
 	
 public:
 	// Constructor.
@@ -74,6 +69,7 @@ public:
 	// UObject interface.
 	virtual void PostInitProperties() override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual bool CanEditChange(const FProperty* InProperty) const override;
 	// End of UObject interface.
 
 	// UGraphPrinterSettings interface.

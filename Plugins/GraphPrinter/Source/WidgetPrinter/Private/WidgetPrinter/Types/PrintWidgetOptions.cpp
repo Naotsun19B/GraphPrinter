@@ -6,7 +6,7 @@ UPrintWidgetOptions::UPrintWidgetOptions()
 	: PrintScope(EPrintScope::All)
 	, ExportMethod(EExportMethod::ImageFile)
 #ifdef WITH_TEXT_CHUNK_HELPER
-	, bIsIncludeNodeInfoInImageFile(true)
+	, bIsIncludeWidgetInfoInImageFile(true)
 #endif
 	, bUseGamma(true)
 	, MaxImageSize(FVector2D::ZeroVector)
@@ -27,7 +27,7 @@ UPrintWidgetOptions* UPrintWidgetOptions::Duplicate(const TSubclassOf<UPrintWidg
 	{
 		Destination->PrintScope = PrintScope;
 		Destination->ExportMethod = ExportMethod;
-		Destination->bIsIncludeNodeInfoInImageFile = bIsIncludeNodeInfoInImageFile;
+		Destination->bIsIncludeWidgetInfoInImageFile = bIsIncludeWidgetInfoInImageFile;
 		Destination->bUseGamma = bUseGamma;
 		Destination->MaxImageSize = MaxImageSize;
 		Destination->RenderingScale = RenderingScale;

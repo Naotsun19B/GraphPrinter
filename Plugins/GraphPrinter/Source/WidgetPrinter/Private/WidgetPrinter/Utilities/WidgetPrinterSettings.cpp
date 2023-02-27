@@ -24,11 +24,9 @@ UWidgetPrinterSettings::UWidgetPrinterSettings()
 	, bCanOverwriteFileWhenExport(false)
 {
 #ifdef WITH_TEXT_CHUNK_HELPER
-	bIsIncludeNodeInfoInImageFile = true;
-	bWithTextChunkHelper = true;
+	bIsIncludeWidgetInfoInImageFile = true;
 #else
-	bIsIncludeNodeInfoInImageFile = false;
-	bWithTextChunkHelper = false;
+	bIsIncludeWidgetInfoInImageFile = false;
 #endif
 	
 	OutputDirectory.Path = FPaths::ConvertRelativePathToFull(
@@ -51,7 +49,7 @@ void UWidgetPrinterSettings::PostInitProperties()
 	Super::PostInitProperties();
 
 #ifndef WITH_TEXT_CHUNK_HELPER
-	bIsIncludeNodeInfoInImageFile = false;
+	bIsIncludeWidgetInfoInImageFile = false;
 #endif
 
 	// If you don't have a directory, you can't open it with Explorer, so create it first.
@@ -75,7 +73,7 @@ void UWidgetPrinterSettings::PostEditChangeProperty(FPropertyChangedEvent& Prope
 		return;
 	}
 
-	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UWidgetPrinterSettings, bIsIncludeNodeInfoInImageFile) ||
+	if (PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UWidgetPrinterSettings, bIsIncludeWidgetInfoInImageFile) ||
 		PropertyChangedEvent.MemberProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UWidgetPrinterSettings, Format))
 	{
 		ModifyFormat();
@@ -93,6 +91,21 @@ void UWidgetPrinterSettings::PostEditChangeProperty(FPropertyChangedEvent& Prope
 	}
 }
 
+bool UWidgetPrinterSettings::CanEditChange(const FProperty* InProperty) const
+{
+	if (InProperty != nullptr)
+	{
+		if (InProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UWidgetPrinterSettings, bIsIncludeWidgetInfoInImageFile))
+		{
+#ifndef WITH_TEXT_CHUNK_HELPER
+			return false;
+#endif
+		}
+	}
+	
+	return Super::CanEditChange(InProperty);
+}
+
 UGraphPrinterSettings::FSettingsInfo UWidgetPrinterSettings::GetSettingsInfo() const
 {
 	return FSettingsInfo(TEXT("WidgetPrinter"));
@@ -101,7 +114,7 @@ UGraphPrinterSettings::FSettingsInfo UWidgetPrinterSettings::GetSettingsInfo() c
 void UWidgetPrinterSettings::ModifyFormat()
 {
 #ifdef WITH_TEXT_CHUNK_HELPER
-	if (bIsIncludeNodeInfoInImageFile)
+	if (bIsIncludeWidgetInfoInImageFile)
 	{
 		if (!TextChunkHelper::ITextChunkHelper::Get().IsSupportedImageFormat(Format))
 		{
@@ -129,7 +142,7 @@ void UWidgetPrinterSettings::ModifyFormat()
 			}
 			if (!bFoundSupportedImageFormat)
 			{
-				bIsIncludeNodeInfoInImageFile = false;
+				bIsIncludeWidgetInfoInImageFile = false;
 			}
 		}
 	}

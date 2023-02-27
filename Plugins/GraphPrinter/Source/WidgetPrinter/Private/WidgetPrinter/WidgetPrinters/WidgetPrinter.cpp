@@ -89,7 +89,7 @@ UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
 		PrintOptions->PrintScope = PrintScope;
 		PrintOptions->ExportMethod = ExportMethod;
 #ifdef WITH_TEXT_CHUNK_HELPER
-		PrintOptions->bIsIncludeNodeInfoInImageFile = Settings.bIsIncludeNodeInfoInImageFile;
+		PrintOptions->bIsIncludeWidgetInfoInImageFile = Settings.bIsIncludeWidgetInfoInImageFile;
 #endif
 		PrintOptions->ImageWriteOptions.Format = Settings.Format;
 		PrintOptions->ImageWriteOptions.CompressionQuality = Settings.CompressionQuality;
