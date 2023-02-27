@@ -1,4 +1,4 @@
-// Copyright 2020-2022 Naotsun. All Rights Reserved.
+// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
