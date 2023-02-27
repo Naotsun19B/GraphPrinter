@@ -41,7 +41,7 @@ public class GraphPrinterGlobals : ModuleRules
 		// #TODO: Allows the use of the Stream Deck plugin on Mac.
 		if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows))
 		{
-			// #TODO: Unable to use functions under construction to support UE 5.1.
+			// #TODO: Avoid adding functionality to the editor until the Stream Deck plugin is complete.
 			// PublicDefinitions.Add("WITH_STREAM_DECK");
 		}
 	}

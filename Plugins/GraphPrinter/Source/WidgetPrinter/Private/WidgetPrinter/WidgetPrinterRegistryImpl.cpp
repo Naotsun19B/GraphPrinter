@@ -6,7 +6,7 @@
 #include "UObject/Class.h"
 #include "UObject/UObjectIterator.h"
 
-#if BEFORE_UE_4_27
+#if !UE_5_00_OR_LATER
 #include "Misc/HotReloadInterface.h"
 #endif
 
@@ -31,10 +31,10 @@ namespace GraphPrinter
 		void HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow);
 		
 		// Called when the hot reload is complete.
-#if BEFORE_UE_4_27
-		void HandleOnHotReload(bool bWasTriggeredAutomatically);
-#else
+#if UE_5_00_OR_LATER
 		void HandleOnReloadComplete(EReloadCompleteReason ReloadCompleteReason);
+#else
+		void HandleOnHotReload(bool bWasTriggeredAutomatically);
 #endif
 		
 		// Collect instances of inherited classes of all existing UWidgetPrinter class.
@@ -50,21 +50,21 @@ namespace GraphPrinter
 		// Collect widget printers and try to recollect them at hot reload.
 		IMainFrameModule::Get().OnMainFrameCreationFinished().AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnMainFrameCreationFinished);
 		
-#if BEFORE_UE_4_27
+#if UE_5_00_OR_LATER
+		FCoreUObjectDelegates::ReloadCompleteDelegate.AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnReloadComplete);
+#else
 		IHotReloadInterface& HotReloadInterface = FModuleManager::LoadModuleChecked<IHotReloadInterface>(TEXT("HotReload"));
 		HotReloadInterface.OnHotReload().AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnHotReload);
-#else
-		FCoreUObjectDelegates::ReloadCompleteDelegate.AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnReloadComplete);
 #endif
 	}
 
 	FWidgetPrinterRegistryImpl::~FWidgetPrinterRegistryImpl()
 	{
-#if BEFORE_UE_4_27
+#if UE_5_00_OR_LATER
+		FCoreUObjectDelegates::ReloadCompleteDelegate.RemoveAll(this);
+#else
 		IHotReloadInterface& HotReloadInterface = FModuleManager::LoadModuleChecked<IHotReloadInterface>(TEXT("HotReload"));
 		HotReloadInterface.OnHotReload().RemoveAll(this);
-#else
-		FCoreUObjectDelegates::ReloadCompleteDelegate.RemoveAll(this);
 #endif
 		
 		WidgetPrinterClasses.Reset();
@@ -119,10 +119,10 @@ namespace GraphPrinter
 		IMainFrameModule::Get().OnMainFrameCreationFinished().RemoveAll(this);
 	}
 	
-#if BEFORE_UE_4_27
-	void FWidgetPrinterRegistryImpl::HandleOnHotReload(bool bWasTriggeredAutomatically)
-#else
+#if UE_5_00_OR_LATER
 	void FWidgetPrinterRegistryImpl::HandleOnReloadComplete(EReloadCompleteReason ReloadCompleteReason)
+#else
+	void FWidgetPrinterRegistryImpl::HandleOnHotReload(bool bWasTriggeredAutomatically)
 #endif
 	{
 		CollectWidgetPrinters();

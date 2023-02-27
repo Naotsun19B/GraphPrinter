@@ -37,10 +37,10 @@ namespace GraphPrinter
 		const TSharedPtr<FUICommandList>& CommandBindings = FGraphPrinterCommands::Get().CommandBindings;
 
 		const FName ExtensionHook =
-#if BEFORE_UE_4_27
-			TEXT("GraphEditor");
-#else
+#if UE_5_00_OR_LATER
 			TEXT("Tools");
+#else
+			TEXT("GraphEditor");
 #endif
 		
 		Extender->AddMenuExtension(
@@ -80,7 +80,7 @@ namespace GraphPrinter
 
 	void FToolMenuExtender::OnExtendToolMenu(FMenuBuilder& MenuBuilder)
 	{
-#if BEFORE_UE_4_27
+#if !UE_5_00_OR_LATER
 		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ToolsSectionTitle", "Tools"));
 #endif
 		MenuBuilder.AddSubMenu(
@@ -90,7 +90,7 @@ namespace GraphPrinter
 			false,
 			FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
 		);
-#if BEFORE_UE_4_27
+#if !UE_5_00_OR_LATER
 		MenuBuilder.EndSection();
 #endif
 	}

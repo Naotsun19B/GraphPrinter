@@ -327,10 +327,10 @@ namespace GraphPrinter
 		virtual bool CalculateDrawSize(FVector2D& DrawSize)
 		{
 			const FGeometry& Geometry =
-#if BEFORE_UE_4_23
-				Widget->GetCachedGeometry();
-#else
+#if UE_4_24_OR_LATER
 				Widget->GetTickSpaceGeometry();
+#else
+				Widget->GetCachedGeometry();
 #endif
 
 			DrawSize = Geometry.GetAbsoluteSize();
@@ -345,10 +345,10 @@ namespace GraphPrinter
 		virtual bool IsPrintableSize() const
 		{
 			// Check draw size.
-#if BEFORE_UE_5_00
-			if (PrintOptions->MaxImageSize > FVector2D::ZeroVector)
-#else
+#if UE_5_01_OR_LATER
 			if (PrintOptions->MaxImageSize.ComponentwiseAllGreaterThan(FVector2D::ZeroVector))
+#else
+			if (PrintOptions->MaxImageSize > FVector2D::ZeroVector)
 #endif
 			{
 				if (WidgetPrinterParams.DrawSize.X > PrintOptions->MaxImageSize.X ||

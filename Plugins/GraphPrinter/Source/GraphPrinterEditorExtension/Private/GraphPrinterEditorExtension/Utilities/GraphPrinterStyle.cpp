@@ -20,10 +20,10 @@ namespace GraphPrinter
 
 #define IMAGE_BRUSH_INTERNAL(RelativePath, ...) FSlateImageBrush(Instance->RootToContentDir(TEXT(RelativePath), TEXT(".png")), __VA_ARGS__)
 
-#if BEFORE_UE_4_27
-#define IMAGE_BRUSH(RelativePath, ...) IMAGE_BRUSH_INTERNAL(RelativePath, __VA_ARGS__)
-#else
+#if UE_5_00_OR_LATER
 #define IMAGE_BRUSH(RelativePath, ...) IMAGE_BRUSH_INTERNAL("Gray" RelativePath, __VA_ARGS__)
+#else
+#define IMAGE_BRUSH(RelativePath, ...) IMAGE_BRUSH_INTERNAL(RelativePath, __VA_ARGS__)
 #endif
 	
 	void FGraphPrinterStyle::Register()

@@ -36,7 +36,13 @@ namespace ClipboardImageExtension
 				return nullptr;
 			}
 
-#if BEFORE_UE_4_24
+#if UE_4_25_OR_LATER
+			TArray<uint8> BitmapBuffer;
+			if (!ImageWrapper->GetRaw(ImageWrapper->GetFormat(), ImageWrapper->GetBitDepth(), BitmapBuffer))
+			{
+				return nullptr;
+			}
+#else
 			const TArray<uint8>* BitmapBuffer;
 			if (!ImageWrapper->GetRaw(ImageWrapper->GetFormat(), ImageWrapper->GetBitDepth(), BitmapBuffer))
 			{
@@ -46,20 +52,14 @@ namespace ClipboardImageExtension
 			{
 				return nullptr;
 			}
-#else
-			TArray<uint8> BitmapBuffer;
-			if (!ImageWrapper->GetRaw(ImageWrapper->GetFormat(), ImageWrapper->GetBitDepth(), BitmapBuffer))
-			{
-				return nullptr;
-			}
 #endif
 
 			return CreateBitmap(
 				ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), 1, 32,
-#if BEFORE_UE_4_24
-				BitmapBuffer->GetData()
-#else
+#if UE_4_25_OR_LATER
 				BitmapBuffer.GetData()
+#else
+				BitmapBuffer->GetData()
 #endif
 			);
 		}

@@ -16,7 +16,7 @@ namespace GraphPrinter
 		: TCommands<FGraphPrinterCommands>
 		(
 			TEXT("GraphPrinter"),
-			NSLOCTEXT("Contexts", "GraphPrinter", "Graph Printer"),
+			LOCTEXT("ContextDesc", "Graph Printer"),
 			NAME_None,
 			FGraphPrinterStyle::Get().GetStyleSetName()
 		)

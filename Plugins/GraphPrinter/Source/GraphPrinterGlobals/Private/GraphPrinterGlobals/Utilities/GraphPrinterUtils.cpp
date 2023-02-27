@@ -115,13 +115,7 @@ namespace GraphPrinter
 			Dot = TEXT(".");
 		}
 		
-#if BEFORE_UE_4_21
-		if (UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDesiredImageFormat"), true))
-		{
-			const FString& Extension = EnumPtr->GetNameStringByIndex(static_cast<int32>(ImageFormat));
-			return (Dot + FString::Printf(TEXT("%s"), *Extension.ToLower()));
-		}
-#else
+#if UE_4_22_OR_LATER
 		if (const UEnum* EnumPtr = StaticEnum<EDesiredImageFormat>())
 		{
 			const FString& EnumString = EnumPtr->GetValueAsString(ImageFormat);
@@ -132,6 +126,12 @@ namespace GraphPrinter
 				Extension = Extension.ToLower();
 				return (Dot + FString::Printf(TEXT("%s"), *Extension));
 			}
+		}
+#else
+		if (UEnum* EnumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EDesiredImageFormat"), true))
+		{
+			const FString& Extension = EnumPtr->GetNameStringByIndex(static_cast<int32>(ImageFormat));
+			return (Dot + FString::Printf(TEXT("%s"), *Extension.ToLower()));
 		}
 #endif
 	
