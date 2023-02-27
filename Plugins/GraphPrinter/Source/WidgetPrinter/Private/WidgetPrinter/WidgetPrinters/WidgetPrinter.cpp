@@ -1,4 +1,4 @@
-// Copyright 2021-2022 Naotsun. All Rights Reserved.
+// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"

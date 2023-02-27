@@ -4,28 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
-#include "PrintGraphOptions.generated.h"
+#include "PrintDetailsPanelOptions.generated.h"
 
 /**
- * An optional class to specify when printing the graph editor.
+ * An optional class to specify when printing the details panel.
  */
 UCLASS()
-class GENERICGRAPHPRINTER_API UPrintGraphOptions : public UPrintWidgetOptions
+class DETAILSPANELPRINTER_API UPrintDetailsPanelOptions : public UPrintWidgetOptions
 {
 	GENERATED_BODY()
 
 public:
 	// Constructor.
-	UPrintGraphOptions();
+	UPrintDetailsPanelOptions();
 
 	// UPrintWidgetOptions interface.
 	virtual UPrintWidgetOptions* Duplicate(const TSubclassOf<UPrintWidgetOptions>& DestinationClass) const override;
 	// End of UPrintWidgetOptions interface.
 
 public:
-	// Margins when drawing the graph editor.
-	float Padding;
-	
-	// Whether to hide the title bar of the graph editor and the text of the graph type in the lower right.
-	bool bDrawOnlyGraph;
+	// Expand all hierarchies when printing the details panel.
+	bool bExpandHierarchyWhenPrinting;
 };

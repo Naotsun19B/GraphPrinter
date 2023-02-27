@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "GenericGraphPrinter.generated.h"
+#include "DetailsPanelPrinter.generated.h"
 
 /**
- * A general-purpose printer class for the graph editor.
+ * A printer class for the details panel.
  */
 UCLASS()
-class GENERICGRAPHPRINTER_API UGenericGraphPrinter : public UWidgetPrinter
+class DETAILSPANELPRINTER_API UDetailsPanelPrinter : public UWidgetPrinter
 {
 	GENERATED_BODY()
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 GenericGraphPrinterPriority = 0;
+	static constexpr int32 DetailsPanelPrinterPriority = 25;
 	
 public:
 	// UWidgetPrinter interface.
