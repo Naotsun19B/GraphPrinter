@@ -38,8 +38,8 @@ namespace GraphPrinter
 			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
 		{
 		}
-
-		// TInnerWidgetPrinter interface.
+		
+		// IInnerWidgetPrinter interface.
 		virtual bool CanPrintWidget() const override
 		{
 			if (Super::CanPrintWidget())
@@ -50,6 +50,9 @@ namespace GraphPrinter
 
 			return false;
 		}
+		// End of IInnerWidgetPrinter interface.
+
+		// TInnerWidgetPrinter interface.
 		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget() override
 		{
 			UTextureRenderTarget2D* RenderedGraph = Super::DrawWidgetToRenderTarget();

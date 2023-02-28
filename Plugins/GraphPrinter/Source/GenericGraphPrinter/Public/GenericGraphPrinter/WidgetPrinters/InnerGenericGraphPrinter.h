@@ -30,14 +30,18 @@ namespace GraphPrinter
 	/**
 	 * An inner class with the ability to print and restore graph editors.
 	 */
-	template<class TPrintGraphOptions, class TRestoreOptions>
+	template<class TPrintOptions, class TRestoreOptions>
 	class TGraphPrinter
-		: public TInnerWidgetPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>
+		: public TInnerWidgetPrinter<SGraphEditorImpl, TPrintOptions, TRestoreOptions>
 	{
 	public:
-		static_assert(TIsDerivedFrom<TPrintGraphOptions, UPrintGraphOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintGraphOptions.");
-		
-		using Super = TInnerWidgetPrinter<SGraphEditorImpl, TPrintGraphOptions, TRestoreOptions>;
+		static_assert(TIsDerivedFrom<TPrintOptions, UPrintGraphOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintGraphOptions.");
+
+		using Super = TInnerWidgetPrinter<SGraphEditorImpl, TPrintOptions, TRestoreOptions>;
+		using TInnerWidgetPrinter<SGraphEditorImpl, TPrintOptions, TRestoreOptions>::PrintOptions;
+		using TInnerWidgetPrinter<SGraphEditorImpl, TPrintOptions, TRestoreOptions>::RestoreOptions;
+		using TInnerWidgetPrinter<SGraphEditorImpl, TPrintOptions, TRestoreOptions>::Widget;
+		using TInnerWidgetPrinter<SGraphEditorImpl, TPrintOptions, TRestoreOptions>::WidgetPrinterParams;
 		
 	public:
 		// Constructor.
@@ -52,14 +56,14 @@ namespace GraphPrinter
 		{
 		}
 
-		// TInnerWidgetPrinter interface.
+		// IInnerWidgetPrinter interface.
 		virtual bool CanPrintWidget() const override
 		{
 			if (Super::CanPrintWidget())
 			{
-				if (this->PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::Selected)
+				if (PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::Selected)
 				{
-					const TSharedPtr<SGraphEditorImpl> GraphEditor = FindTargetWidget(this->PrintOptions->SearchTarget);
+					const TSharedPtr<SGraphEditorImpl> GraphEditor = FindTargetWidget(PrintOptions->SearchTarget);
 					if (GraphEditor.IsValid())
 					{
 						const TSet<UObject*>& SelectedNodes = GraphEditor->GetSelectedNodes();
@@ -77,14 +81,17 @@ namespace GraphPrinter
 		}
 		virtual bool CanRestoreWidget() const override
 		{
-			if (!IsValid(this->RestoreOptions))
+			if (!IsValid(RestoreOptions))
 			{
 				return false;
 			}
 			
-			const TSharedPtr<SGraphEditorImpl> GraphEditor = FindTargetWidget(this->RestoreOptions->SearchTarget);
+			const TSharedPtr<SGraphEditorImpl> GraphEditor = FindTargetWidget(RestoreOptions->SearchTarget);
 			return GraphEditor.IsValid();
 		}
+		// End of IInnerWidgetPrinter interface.
+		
+		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SGraphEditorImpl> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override
 		{
 			if (SearchTarget.IsValid())
@@ -97,12 +104,12 @@ namespace GraphPrinter
 		virtual void PreCalculateDrawSize() override
 		{
 			// Holds the node selected by the user for printing and then restoring.
-			GenericGraphPrinterParams.PreviousSelectedNodes = this->Widget->GetSelectedNodes();
+			GenericGraphPrinterParams.PreviousSelectedNodes = Widget->GetSelectedNodes();
 
 			// Get the range of the selected node and the position of the camera to use when drawing.
-			if (this->PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::All)
+			if (PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::All)
 			{
-				this->Widget->SelectAllNodes();
+				Widget->SelectAllNodes();
 			}
 		}
 		virtual bool CalculateDrawSize(FVector2D& DrawSize) override
@@ -112,18 +119,18 @@ namespace GraphPrinter
 		virtual void PreDrawWidget() override
 		{
 			// Set the camera position to the upper left of the drawing range and set the zoom magnification to 1:1.
-			this->Widget->GetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
-			this->Widget->SetViewLocation(GenericGraphPrinterParams.ViewLocation, 1.f);
+			Widget->GetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
+			Widget->SetViewLocation(GenericGraphPrinterParams.ViewLocation, 1.f);
 
-			GenericGraphPrinterParams.NodesToPrint = this->Widget->GetSelectedNodes();
+			GenericGraphPrinterParams.NodesToPrint = Widget->GetSelectedNodes();
 	
 			// Erase the drawing result so that the frame for which the node is selected does not appear.
-			this->Widget->ClearSelectionSet();
+			Widget->ClearSelectionSet();
 		}
 		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget() override
 		{
 			// If there is a minimap, hide it only while drawing.
-			const TSharedPtr<SWidget> Minimap = FGenericGraphPrinterUtils::FindNearestChildMinimap(this->Widget);
+			const TSharedPtr<SWidget> Minimap = FGenericGraphPrinterUtils::FindNearestChildMinimap(Widget);
 			TOptional<EVisibility> PreviousMinimapVisibility;
 			if (Minimap.IsValid())
 			{
@@ -132,9 +139,9 @@ namespace GraphPrinter
 			}
 	
 			// If there is a title bar, hide it only while drawing.
-			const TSharedPtr<SWidget> TitleBar = this->Widget->GetTitleBar();
+			const TSharedPtr<SWidget> TitleBar = Widget->GetTitleBar();
 			TOptional<EVisibility> PreviousTitleBarVisibility;
-			if (this->PrintOptions->bDrawOnlyGraph && TitleBar.IsValid())
+			if (PrintOptions->bDrawOnlyGraph && TitleBar.IsValid())
 			{
 				PreviousTitleBarVisibility = TitleBar->GetVisibility();
 				TitleBar->SetVisibility(EVisibility::Collapsed);
@@ -142,9 +149,9 @@ namespace GraphPrinter
 
 			// Hide zoom magnification and graph type text while drawing.
 			TMap<TSharedPtr<STextBlock>, EVisibility> PreviousChildTextBlockVisibilities;
-			if (this->PrintOptions->bDrawOnlyGraph)
+			if (PrintOptions->bDrawOnlyGraph)
 			{
-				const TSharedPtr<SOverlay> Overlay = FWidgetPrinterUtils::FindNearestChildOverlay(this->Widget);
+				const TSharedPtr<SOverlay> Overlay = FWidgetPrinterUtils::FindNearestChildOverlay(Widget);
 				TArray<TSharedPtr<STextBlock>> VisibleChildTextBlocks = FGenericGraphPrinterUtils::GetVisibleChildTextBlocks(Overlay);
 				for (const TSharedPtr<STextBlock>& VisibleChildTextBlock : VisibleChildTextBlocks)
 				{
@@ -165,12 +172,12 @@ namespace GraphPrinter
 				Minimap->SetVisibility(PreviousMinimapVisibility.GetValue());
 			}
 	
-			if (this->PrintOptions->bDrawOnlyGraph && TitleBar.IsValid() && PreviousTitleBarVisibility.IsSet())
+			if (PrintOptions->bDrawOnlyGraph && TitleBar.IsValid() && PreviousTitleBarVisibility.IsSet())
 			{
 				TitleBar->SetVisibility(PreviousTitleBarVisibility.GetValue());
 			}
 
-			if (this->PrintOptions->bDrawOnlyGraph)
+			if (PrintOptions->bDrawOnlyGraph)
 			{
 				for (const auto& PreviousChildTextBlockVisibility : PreviousChildTextBlockVisibilities)
 				{
@@ -188,21 +195,21 @@ namespace GraphPrinter
 		virtual void PostDrawWidget() override
 		{
 			// Restore camera position and zoom magnification.
-			this->Widget->SetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
+			Widget->SetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
 
 			// Restore the node selection status.
-			this->Widget->ClearSelectionSet();
+			Widget->ClearSelectionSet();
 			for (const auto& SelectedNode : GenericGraphPrinterParams.PreviousSelectedNodes)
 			{
 				if (auto* GraphNode = Cast<UEdGraphNode>(SelectedNode))
 				{
-					this->Widget->SetNodeSelection(GraphNode, true);
+					Widget->SetNodeSelection(GraphNode, true);
 				}
 			}
 		}
 		virtual FString GetWidgetTitle() override
 		{
-			if (const UEdGraph* Graph = this->Widget->GetCurrentGraph())
+			if (const UEdGraph* Graph = Widget->GetCurrentGraph())
 			{
 				if (const UObject* Outer = Graph->GetOuter())
 				{
@@ -217,7 +224,7 @@ namespace GraphPrinter
 #ifdef WITH_TEXT_CHUNK_HELPER
 			FString ExportedText;
 			FEdGraphUtilities::ExportNodesToText(GenericGraphPrinterParams.NodesToPrint, ExportedText);
-			if (!FEdGraphUtilities::CanImportNodesFromText(this->Widget->GetCurrentGraph(), ExportedText))
+			if (!FEdGraphUtilities::CanImportNodesFromText(Widget->GetCurrentGraph(), ExportedText))
 			{
 				return false;
 			}
@@ -226,7 +233,7 @@ namespace GraphPrinter
 			TMap<FString, FString> MapToWrite;
 			MapToWrite.Add(TextChunkDefine::PngTextChunkKey, ExportedText);
 
-			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(this->WidgetPrinterParams.Filename);
+			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
 			if (!TextChunk.IsValid())
 			{
 				return false;
@@ -241,7 +248,7 @@ namespace GraphPrinter
 #ifdef WITH_TEXT_CHUNK_HELPER
 			// Read data from png file using helper class.
 			TMap<FString, FString> MapToRead;
-			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(this->WidgetPrinterParams.Filename);
+			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
 			if (!TextChunk.IsValid())
 			{
 				return false;
@@ -284,13 +291,13 @@ namespace GraphPrinter
 				TextToImport = TextToImport.Mid(StartPosition, TextLength - StartPosition);
 			}
 
-			if (!FEdGraphUtilities::CanImportNodesFromText(this->Widget->GetCurrentGraph(), TextToImport))
+			if (!FEdGraphUtilities::CanImportNodesFromText(Widget->GetCurrentGraph(), TextToImport))
 			{
 				return false;
 			}
 
 			TSet<UEdGraphNode*> UnuseImportedNodeSet;
-			FEdGraphUtilities::ImportNodesFromText(this->Widget->GetCurrentGraph(), TextToImport, UnuseImportedNodeSet);
+			FEdGraphUtilities::ImportNodesFromText(Widget->GetCurrentGraph(), TextToImport, UnuseImportedNodeSet);
 
 			return true;
 #else
@@ -307,14 +314,14 @@ namespace GraphPrinter
 		// Calculate the range and view location to use when drawing the graph editor.
 		virtual bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation)
 		{
-			const TSet<UObject*>& SelectedNodes = this->Widget->GetSelectedNodes();
+			const TSet<UObject*>& SelectedNodes = Widget->GetSelectedNodes();
 			if (SelectedNodes.Num() == 0)
 			{
 				return false;
 			}
 
 			FSlateRect Bounds;
-			if (!this->Widget->GetBoundsForSelectedNodes(Bounds, this->PrintOptions->Padding))
+			if (!Widget->GetBoundsForSelectedNodes(Bounds, PrintOptions->Padding))
 			{
 				return false;
 			}

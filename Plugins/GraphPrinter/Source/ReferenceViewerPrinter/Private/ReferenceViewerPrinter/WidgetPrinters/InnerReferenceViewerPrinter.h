@@ -29,7 +29,7 @@ namespace GraphPrinter
 		{
 		}
 
-		// TInnerWidgetPrinter interface.
+		// IInnerWidgetPrinter interface.
 		virtual bool CanPrintWidget() const override
 		{
 			if (Super::CanPrintWidget())
@@ -40,6 +40,9 @@ namespace GraphPrinter
 
 			return false;
 		}
+		// End of IInnerWidgetPrinter interface.
+
+		// TInnerWidgetPrinter interface.
 		virtual FString GetWidgetTitle() override
 		{
 			if (const auto* ReferenceViewerGraph = Cast<UEdGraph_ReferenceViewer>(Widget->GetCurrentGraph()))

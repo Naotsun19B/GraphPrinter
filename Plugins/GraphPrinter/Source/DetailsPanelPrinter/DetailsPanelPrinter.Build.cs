@@ -41,5 +41,16 @@ public class DetailsPanelPrinter : ModuleRules
                 "ClipboardImageExtension",
             }
         );
+        
+        PublicIncludePaths.AddRange(
+            new string[]
+            {
+                // To use SDetailsView.
+                Path.Combine(EngineDirectory, "Source", "Editor", "PropertyEditor", "Private"),
+                
+                // To use SActorDetails.
+                Path.Combine(EngineDirectory, "Source", "Editor", "LevelEditor", "Private"),
+            }
+        );
     }
 }

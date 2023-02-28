@@ -38,5 +38,12 @@ namespace GraphPrinter
 		
 		// Find the widget that is the overlay and nearest parent of SearchTarget.
 		static TSharedPtr<SOverlay> FindNearestChildOverlay(TSharedPtr<SWidget> SearchTarget);
+
+		// Returns whether the specified window is for menus.
+		static bool IsMenuStackWindow(TSharedPtr<SWindow> TestWindow);
+
+		// Returns the nearest docking tab stack from the widget under the mouse cursor.
+		// Returns nullptr if the widget under the mouse cursor belongs to a menu stack window.
+		static TSharedPtr<SWidget> GetMostSuitableSearchTarget();
 	};
 }

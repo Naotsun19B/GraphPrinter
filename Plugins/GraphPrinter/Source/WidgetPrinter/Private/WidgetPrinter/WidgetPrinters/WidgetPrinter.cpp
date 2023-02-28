@@ -3,6 +3,7 @@
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 
 UWidgetPrinter::UWidgetPrinter()
 {
@@ -99,6 +100,7 @@ UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
 		PrintOptions->RenderingScale = Settings.RenderingScale;
 		PrintOptions->ImageWriteOptions.bOverwriteFile = Settings.bCanOverwriteFileWhenExport;
 		PrintOptions->OutputDirectoryPath = Settings.OutputDirectory.Path;
+		PrintOptions->SearchTarget = GraphPrinter::FWidgetPrinterUtils::GetMostSuitableSearchTarget();
 	}
 	
 	return PrintOptions;
@@ -107,6 +109,10 @@ UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
 URestoreWidgetOptions* UWidgetPrinter::CreateDefaultRestoreOptions() const
 {
 	auto* RestoreOptions = NewObject<URestoreWidgetOptions>();
+	if (IsValid(RestoreOptions))
+	{
+		RestoreOptions->SearchTarget = GraphPrinter::FWidgetPrinterUtils::GetMostSuitableSearchTarget();
+	}
 	return RestoreOptions;
 }
 

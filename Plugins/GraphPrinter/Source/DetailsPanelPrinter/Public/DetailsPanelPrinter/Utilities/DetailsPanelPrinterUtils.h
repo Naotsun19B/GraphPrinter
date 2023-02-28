@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 
-class IDetailsView;
 class SWidget;
+class SDetailsView;
+class SActorDetails;
 
 namespace GraphPrinter
 {
@@ -15,10 +16,16 @@ namespace GraphPrinter
 	class DETAILSPANELPRINTER_API FDetailsPanelPrinterUtils
 	{
 	public:
-		// Find the widget that is the graph editor and nearest child of SearchTarget.
-		static TSharedPtr<IDetailsView> FindNearestChildDetailsView(TSharedPtr<SWidget> SearchTarget);
+		// Finds the widget that is the details view and nearest child of SearchTarget.
+		static TSharedPtr<SDetailsView> FindNearestChildDetailsView(TSharedPtr<SWidget> SearchTarget);
 
 		// Returns the details view contained in the currently active tab.
-		static TSharedPtr<IDetailsView> GetActiveDetailsView();
+		static TSharedPtr<SDetailsView> GetActiveDetailsView();
+
+		// Finds the widget that is the actor details view and nearest child of SearchTarget.
+		static TSharedPtr<SActorDetails> FindNearestChildActorDetailsView(TSharedPtr<SWidget> SearchTarget);
+
+		// Returns the actor details view contained in the currently active tab.
+		static TSharedPtr<SActorDetails> GetActiveActorDetailsView();
 	};
 }

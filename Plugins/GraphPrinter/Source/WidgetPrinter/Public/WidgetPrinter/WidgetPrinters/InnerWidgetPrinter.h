@@ -152,7 +152,7 @@ namespace GraphPrinter
 			if (!CalculateDrawSize(WidgetPrinterParams.DrawSize))
 			{
 				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("NotSelectedError", "No node is selected."),
+					LOCTEXT("NotSelectedError", "No widget is selected."),
 					FGraphPrinterUtils::CS_Fail
 				);
 				return;

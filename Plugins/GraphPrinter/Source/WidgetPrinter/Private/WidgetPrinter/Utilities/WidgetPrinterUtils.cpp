@@ -2,12 +2,19 @@
 
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Framework/Docking/SDockingTabStack.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
 #include "Widgets/SOverlay.h"
 
 namespace GraphPrinter
 {
+	namespace WidgetPrinterUtilsConstant
+	{
+		// The name of the SMenuContentWrapper.
+		static const FName MenuContentWrapperClassName = TEXT("SMenuContentWrapper");
+	}
+	
 	void FWidgetPrinterUtils::EnumerateChildWidgets(
 		TSharedPtr<SWidget> SearchTarget,
 		TFunction<bool(const TSharedPtr<SWidget> ChildWidget)> Predicate
@@ -123,5 +130,45 @@ namespace GraphPrinter
 		);
 
 		return FoundOverlay;
+	}
+
+	bool FWidgetPrinterUtils::IsMenuStackWindow(TSharedPtr<SWindow> TestWindow)
+	{
+		bool bIsMenuStackWindow = false;
+		
+		EnumerateChildWidgets(
+			TestWindow,
+			[&](const TSharedPtr<SWidget>& Widget) -> bool
+			{
+				const TSharedPtr<SWidget> CastedWidget = Private::CastSlateWidget<SWidget, SWidget>(Widget, WidgetPrinterUtilsConstant::MenuContentWrapperClassName);
+				if (CastedWidget.IsValid())
+				{
+					bIsMenuStackWindow = true;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return bIsMenuStackWindow;
+	}
+
+	TSharedPtr<SWidget> FWidgetPrinterUtils::GetMostSuitableSearchTarget()
+	{
+		FSlateApplication& SlateApplication = FSlateApplication::Get();
+		const FWidgetPath WidgetsUnderCursor = SlateApplication.LocateWindowUnderMouse(
+			SlateApplication.GetCursorPos(), SlateApplication.GetInteractiveTopLevelWindows()
+		);
+		if (WidgetsUnderCursor.IsValid())
+		{
+			const FArrangedChildren& Widgets = WidgetsUnderCursor.Widgets;
+			if ((Widgets.Num() > 0) && !IsMenuStackWindow(WidgetsUnderCursor.GetWindow()))
+			{
+				return FindNearestParentDockingTabStack(Widgets.Last().Widget);
+			}
+		}
+
+		return nullptr;
 	}
 }

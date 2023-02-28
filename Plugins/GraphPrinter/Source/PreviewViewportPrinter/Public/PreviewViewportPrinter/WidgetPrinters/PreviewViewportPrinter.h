@@ -16,7 +16,7 @@ class PREVIEWVIEWPORTPRINTER_API UPreviewViewportPrinter : public UWidgetPrinter
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 PreviewViewportPrinterPriority = 200;
+	static constexpr int32 PreviewViewportPrinterPriority = 150;
 
 public:
 	// UWidgetPrinter interface.
