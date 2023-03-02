@@ -126,29 +126,24 @@ namespace GraphPrinter
 	
 			// Erase the drawing result so that the frame for which the node is selected does not appear.
 			Widget->ClearSelectionSet();
-		}
-		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget() override
-		{
+
 			// If there is a minimap, hide it only while drawing.
-			const TSharedPtr<SWidget> Minimap = FGenericGraphPrinterUtils::FindNearestChildMinimap(Widget);
-			TOptional<EVisibility> PreviousMinimapVisibility;
-			if (Minimap.IsValid())
+			GenericGraphPrinterParams.Minimap = FGenericGraphPrinterUtils::FindNearestChildMinimap(Widget);
+			if (GenericGraphPrinterParams.Minimap.IsValid())
 			{
-				PreviousMinimapVisibility = Minimap->GetVisibility();
-				Minimap->SetVisibility(EVisibility::Collapsed);
+				GenericGraphPrinterParams.PreviousMinimapVisibility = GenericGraphPrinterParams.Minimap->GetVisibility();
+				GenericGraphPrinterParams.Minimap->SetVisibility(EVisibility::Collapsed);
 			}
 	
 			// If there is a title bar, hide it only while drawing.
-			const TSharedPtr<SWidget> TitleBar = Widget->GetTitleBar();
-			TOptional<EVisibility> PreviousTitleBarVisibility;
-			if (PrintOptions->bDrawOnlyGraph && TitleBar.IsValid())
+			GenericGraphPrinterParams.TitleBar = Widget->GetTitleBar();
+			if (PrintOptions->bDrawOnlyGraph && GenericGraphPrinterParams.TitleBar.IsValid())
 			{
-				PreviousTitleBarVisibility = TitleBar->GetVisibility();
-				TitleBar->SetVisibility(EVisibility::Collapsed);
+				GenericGraphPrinterParams.PreviousTitleBarVisibility = GenericGraphPrinterParams.TitleBar->GetVisibility();
+				GenericGraphPrinterParams.TitleBar->SetVisibility(EVisibility::Collapsed);
 			}
 
 			// Hide zoom magnification and graph type text while drawing.
-			TMap<TSharedPtr<STextBlock>, EVisibility> PreviousChildTextBlockVisibilities;
 			if (PrintOptions->bDrawOnlyGraph)
 			{
 				const TSharedPtr<SOverlay> Overlay = FWidgetPrinterUtils::FindNearestChildOverlay(Widget);
@@ -157,29 +152,29 @@ namespace GraphPrinter
 				{
 					if (VisibleChildTextBlock.IsValid())
 					{
-						PreviousChildTextBlockVisibilities.Add(VisibleChildTextBlock, VisibleChildTextBlock->GetVisibility());
+						GenericGraphPrinterParams.PreviousChildTextBlockVisibilities.Add(VisibleChildTextBlock, VisibleChildTextBlock->GetVisibility());
 						VisibleChildTextBlock->SetVisibility(EVisibility::Collapsed);
 					}
 				}
 			}
-
-			UTextureRenderTarget2D* RenderTarget = Super::DrawWidgetToRenderTarget();
-
+		}
+		virtual void PostDrawWidget() override
+		{
 			// Restores the visibility of the title bar,
 			// zoom magnification text, and graph type text.
-			if (Minimap.IsValid() && PreviousMinimapVisibility.IsSet())
+			if (GenericGraphPrinterParams.Minimap.IsValid() && GenericGraphPrinterParams.PreviousMinimapVisibility.IsSet())
 			{
-				Minimap->SetVisibility(PreviousMinimapVisibility.GetValue());
+				GenericGraphPrinterParams.Minimap->SetVisibility(GenericGraphPrinterParams.PreviousMinimapVisibility.GetValue());
 			}
 	
-			if (PrintOptions->bDrawOnlyGraph && TitleBar.IsValid() && PreviousTitleBarVisibility.IsSet())
+			if (PrintOptions->bDrawOnlyGraph && GenericGraphPrinterParams.TitleBar.IsValid() && GenericGraphPrinterParams.PreviousTitleBarVisibility.IsSet())
 			{
-				TitleBar->SetVisibility(PreviousTitleBarVisibility.GetValue());
+				GenericGraphPrinterParams.TitleBar->SetVisibility(GenericGraphPrinterParams.PreviousTitleBarVisibility.GetValue());
 			}
 
 			if (PrintOptions->bDrawOnlyGraph)
 			{
-				for (const auto& PreviousChildTextBlockVisibility : PreviousChildTextBlockVisibilities)
+				for (const auto& PreviousChildTextBlockVisibility : GenericGraphPrinterParams.PreviousChildTextBlockVisibilities)
 				{
 					TSharedPtr<STextBlock> TextBlock = PreviousChildTextBlockVisibility.Key;
 					EVisibility PreviousVisibility = PreviousChildTextBlockVisibility.Value;
@@ -189,11 +184,7 @@ namespace GraphPrinter
 					}
 				}
 			}
-	
-			return RenderTarget;
-		}
-		virtual void PostDrawWidget() override
-		{
+			
 			// Restore camera position and zoom magnification.
 			Widget->SetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
 
@@ -345,6 +336,21 @@ namespace GraphPrinter
 			
 			// The size of the image to output.
 			FVector2D ViewLocation;
+
+			// A minimap widget for graph editors added by the GraphMinimap plugin.
+			TSharedPtr<SWidget> Minimap;
+
+			// Original visibility of the minimap in the graph editor.
+			TOptional<EVisibility> PreviousMinimapVisibility;
+
+			// A title bar widget that appears at the top of the graph editor.
+			TSharedPtr<SWidget> TitleBar;
+
+			// Original visibility of title bar in graph editor
+			TOptional<EVisibility> PreviousTitleBarVisibility;
+
+			// Original visibility of text in graph editor overlays.
+			TMap<TSharedPtr<STextBlock>, EVisibility> PreviousChildTextBlockVisibilities;
 		};
 		FGenericGraphPrinterParams GenericGraphPrinterParams;
 	};
@@ -355,6 +361,7 @@ namespace GraphPrinter
 		using Super = TGraphPrinter<UPrintGraphOptions, URestoreWidgetOptions>;
 		
 	public:
+		// Constructors.
 		FGenericGraphPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 			: Super(InPrintOptions, InOnPrinterProcessingFinished)
 		{

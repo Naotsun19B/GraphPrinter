@@ -33,7 +33,7 @@ public class DetailsPanelPrinter : ModuleRules
                 "Engine",
                 "UnrealEd",
                 "MainFrame",
-                "RenderCore",
+                "SubobjectEditor",
 
                 "GraphPrinterGlobals",
                 "WidgetPrinter",

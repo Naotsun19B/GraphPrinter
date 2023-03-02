@@ -3,7 +3,7 @@
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
 
 UPrintDetailsPanelOptions::UPrintDetailsPanelOptions()
-	: bExpandHierarchyWhenPrinting(true)
+	: bIsIncludeExpansionStateInImageFile(true)
 {
 }
 
@@ -12,7 +12,8 @@ UPrintWidgetOptions* UPrintDetailsPanelOptions::Duplicate(const TSubclassOf<UPri
 	auto* Destination = Super::Duplicate(DestinationClass);
 	if (auto* CastedDestination = Cast<UPrintDetailsPanelOptions>(Destination))
 	{
-		CastedDestination->bExpandHierarchyWhenPrinting = bExpandHierarchyWhenPrinting;
+		CastedDestination->Padding = Padding;
+		CastedDestination->bIsIncludeExpansionStateInImageFile = bIsIncludeExpansionStateInImageFile;
 	}
 	
 	return Destination;

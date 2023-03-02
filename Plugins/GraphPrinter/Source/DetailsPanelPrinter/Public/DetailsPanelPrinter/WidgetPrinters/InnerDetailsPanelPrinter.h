@@ -6,19 +6,31 @@
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
-#include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
 #include "SDetailsView.h"
 #include "SActorDetails.h"
 #include "EdGraphUtilities.h"
-#include "IDetailRootObjectCustomization.h"
 
 namespace GraphPrinter
 {
 	/**
+	 * I want to hide the implementation to the cpp file side in order to forcibly access the protected property.
+	 */
+	class FDetailsViewBaseAccessor
+	{
+	protected:
+		// I want to hide the implementation to the cpp file side in order to forcibly access the protected property.
+		// Therefore, it is implemented in a specialized child class.
+		static TSharedPtr<SDetailTree> ExtractDetailTree(TSharedRef<SDetailsViewBase> DetailsViewBase);
+		static FDetailNodeList& ExtractRootTreeNodes(TSharedRef<SDetailsViewBase> DetailsViewBase);
+	};
+	
+	/**
 	 * An inner class with the ability to print and restore details panel.
 	 */
 	template<class TWidget, class TPrintOptions, class TRestoreOptions>
-	class TDetailsPanelPrinter : public TInnerWidgetPrinter<TWidget, TPrintOptions, TRestoreOptions>
+	class TDetailsPanelPrinter
+		: public TInnerWidgetPrinter<TWidget, TPrintOptions, TRestoreOptions>
+		, public FDetailsViewBaseAccessor
 	{
 	public:
 		static_assert(TIsDerivedFrom<TPrintOptions, UPrintDetailsPanelOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of UPrintDetailsPanelOptions.");
@@ -86,23 +98,82 @@ namespace GraphPrinter
 		// TInnerWidgetPrinter interface.
 		virtual void PreCalculateDrawSize() override
 		{
+			DetailsPanelPrinterParams.ActualDetailsViewWidth = Widget->GetDesiredSize().X;
 			
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+
+			// Cache the expanded state of each item and expand all if necessary.
+			if (PrintOptions->bIsIncludeExpansionStateInImageFile)
+			{
+				TFunction<void(FDetailNodeList&, const FString&)> CacheExpansionStateRecursive =
+					[&](FDetailNodeList& Nodes, const FString& ParentNodeName)
+					{
+						for (const auto& Node : Nodes)
+						{
+							const FString NodeName = Node->GetNodeName().ToString();
+							FString CombinedNodeName = NodeName;
+							if (!ParentNodeName.IsEmpty())
+							{
+								CombinedNodeName = FString::Join(TArray<FString>{ CombinedNodeName, NodeName }, TEXT("-"));
+							}
+							
+							DetailsPanelPrinterParams.ExpansionStateMap.Add(CombinedNodeName, DetailsTree->IsItemExpanded(Node));
+
+							FDetailNodeList Children;
+							Node->GetChildren(Children);
+							CacheExpansionStateRecursive(Children, NodeName);
+						}
+					};
+
+				FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+				CacheExpansionStateRecursive(RootTreeNodes, TEXT(""));
+			}
+			
+			// The current scroll bar position is cached and scrolled to the bottom
+			// because the correct drawing result cannot be obtained unless the scroll is scrolled to the bottom.
+			DetailsPanelPrinterParams.ScrollOffset = DetailsTree->GetScrollOffset();
+			DetailsTree->SetScrollOffset(DetailsTree->GetScrollDistance().Y + 100.f);
+
+#if UE_5_00_OR_LATER
+			DetailsTree->MarkPrepassAsDirty();
+#else
+			DetailsTree->InvalidatePrepass();
+#endif
+			DetailsTree->SlatePrepass();
 		}
 		virtual bool CalculateDrawSize(FVector2D& DrawSize) override
 		{
 			DrawSize = Widget->GetDesiredSize();
+			
+			// When drawing a large details view, the width becomes smaller according to the height, so the width before scrolling is used.
+			DrawSize.X = DetailsPanelPrinterParams.ActualDetailsViewWidth;
+
+			// In the processing up to this point, there is a difference in the vertical width of the drawing size, so adjust it.
+			DrawSize.Y += PrintOptions->Padding;
+			DrawSize.Y += GetAdditionalDrawHeight();
+			
 			return true;
 		}
 		virtual void PostDrawWidget() override
 		{
-			
+			// Restores the position of the scrollbar to its state before it was drawn.
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+			DetailsTree->SetScrollOffset(DetailsPanelPrinterParams.ScrollOffset);
 		}
 		virtual FString GetWidgetTitle() override
 		{
 			// Do special handling if it contains multiple objects, such as editor preferences.
 			if (DetailsPanelPrinterParams.DetailsView->ContainsMultipleTopLevelObjects())
 			{
-				// #TODO: I need to get the object that is actually displayed when multiple objects are included and display it.
+				const FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+				if (RootTreeNodes.IsValidIndex(0))
+				{
+					const TSharedRef<FDetailTreeNode> RootTreeNode = RootTreeNodes[0];
+					if (RootTreeNode->GetNodeType() == EDetailNodeType::Object)
+					{
+						return RootTreeNode->GetNodeName().ToString();
+					}
+				}
 			}
 			
 			TArray<TWeakObjectPtr<UObject>> SelectedObjects = DetailsPanelPrinterParams.DetailsView->GetSelectedObjects();
@@ -165,16 +236,57 @@ namespace GraphPrinter
 		{
 			return GP_CAST_SLATE_WIDGET(SDetailsView, SearchTarget);
 		}
+
+		// Returns the additional height added to the height of the drawing size.
+		virtual float GetAdditionalDrawHeight() const
+		{
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+			const FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+			if (RootTreeNodes.IsValidIndex(0))
+			{
+				const TSharedPtr<ITableRow> TableRow = DetailsTree->WidgetFromItem(RootTreeNodes[0]);
+				if (TableRow.IsValid())
+				{
+					const TSharedRef<SWidget> ItemWidget = TableRow->AsWidget();
+					return ItemWidget->GetDesiredSize().Y;
+				}
+			}
+
+			return 50.f;
+		}
+
+	private:
+		// Functions that access protected properties of the DetailsView.
+		TSharedRef<SDetailTree> GetDetailTree() const
+		{
+			const TSharedPtr<SDetailTree> DetailTree = ExtractDetailTree(DetailsPanelPrinterParams.DetailsView.ToSharedRef());
+			check(DetailTree.IsValid());
+			return DetailTree.ToSharedRef();
+		}
+		FDetailNodeList& GetRootTreeNodes() const
+		{
+			return ExtractRootTreeNodes(DetailsPanelPrinterParams.DetailsView.ToSharedRef());
+		}
 		
 	protected:
 		// A group of parameters that must be retained for processing.
 		struct FDetailsPanelPrinterParams
 		{
+			// Details view to print.
 			TSharedPtr<SDetailsView> DetailsView;
+
+			// Width before pre calculate draw size.
+			float ActualDetailsViewWidth = 0.f;
+			
+			// Details view scrollbar position.
+			float ScrollOffset = 0.f;
+			
+			// Expanded state for each item.
+			TMap<FString, bool> ExpansionStateMap;
 		};
 		FDetailsPanelPrinterParams DetailsPanelPrinterParams;
 	};
-
+	
 	/**
 	 * An inner class with the ability to print and restore details panel.
 	 */
@@ -185,25 +297,11 @@ namespace GraphPrinter
 
 	public:
 		// Constructor.
-		FDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
-			: Super(InPrintOptions, InOnPrinterProcessingFinished)
-		{
-		}
-		FDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
-			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
-		{
-		}
+		FDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
+		FDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
 		
 		// TInnerWidgetPrinter interface.
-		virtual TSharedPtr<SDetailsView> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override
-		{
-			if (SearchTarget.IsValid())
-			{
-				return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(SearchTarget);
-			}
-			
-			return FDetailsPanelPrinterUtils::GetActiveDetailsView();
-		}
+		virtual TSharedPtr<SDetailsView> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
 		// End of TInnerWidgetPrinter interface.
 	};
 	
@@ -217,37 +315,16 @@ namespace GraphPrinter
 		
 	public:
 		// Constructor.
-		FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
-			: Super(InPrintOptions, InOnPrinterProcessingFinished)
-		{
-		}
-		FActorDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
-			: Super(InRestoreOptions, InOnPrinterProcessingFinished)
-		{
-		}
+		FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
+		FActorDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
 
 		// TInnerWidgetPrinter interface.
-		virtual TSharedPtr<SActorDetails> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override
-		{
-			if (SearchTarget.IsValid())
-			{
-				return FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(SearchTarget);
-			}
-			
-			return FDetailsPanelPrinterUtils::GetActiveActorDetailsView();
-		}
+		virtual TSharedPtr<SActorDetails> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
 		// End of TInnerWidgetPrinter interface.
 
 		// TDetailsPanelPrinter interface.
-		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override
-		{
-			if (SearchTarget.IsValid())
-			{
-				return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(SearchTarget);
-			}
-			
-			return FDetailsPanelPrinterUtils::GetActiveDetailsView();
-		}
+		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
+		virtual float GetAdditionalDrawHeight() const override;
 		// End of TDetailsPanelPrinter interface.
 	};
 }

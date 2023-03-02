@@ -10,6 +10,7 @@
 #include "SDetailsView.h"
 #include "SDetailsViewBase.h"
 #include "SActorDetails.h"
+#include "SSubobjectInstanceEditor.h"
 
 namespace GraphPrinter
 {
@@ -107,5 +108,27 @@ namespace GraphPrinter
 		}
 
 		return nullptr;
+	}
+
+	TSharedPtr<SWidget> FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(TSharedPtr<SWidget> SearchTarget)
+	{
+		TSharedPtr<SWidget> FoundSubobjectInstanceEditor = nullptr;
+		
+		FWidgetPrinterUtils::EnumerateChildWidgets(
+			SearchTarget,
+			[&FoundSubobjectInstanceEditor](const TSharedPtr<SWidget> ChildWidget) -> bool
+			{
+				const TSharedPtr<SSubobjectInstanceEditor> SubobjectInstanceEditor = GP_CAST_SLATE_WIDGET(SSubobjectInstanceEditor, ChildWidget);
+				if (SubobjectInstanceEditor.IsValid())
+				{
+					FoundSubobjectInstanceEditor = SubobjectInstanceEditor;
+					return false;
+				}
+
+				return true;
+			}
+		);
+
+		return FoundSubobjectInstanceEditor;
 	}
 }

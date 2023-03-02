@@ -3,7 +3,8 @@
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterSettings.h"
 
 UDetailsPanelPrinterSettings::UDetailsPanelPrinterSettings()
-	: bExpandHierarchyWhenPrinting(true)
+	: Padding(50.f)
+	, bIsIncludeExpansionStateInImageFile(true)
 {
 }
 

@@ -20,8 +20,9 @@ UPrintWidgetOptions* UDetailsPanelPrinter::CreateDefaultPrintOptions(
 		if (auto* PrintGraphOptions = PrintWidgetOptions->Duplicate<UPrintDetailsPanelOptions>())
 		{
 			auto& Settings = UDetailsPanelPrinterSettings::Get();
-			
-			PrintGraphOptions->bExpandHierarchyWhenPrinting = Settings.bExpandHierarchyWhenPrinting;
+
+			PrintGraphOptions->Padding = Settings.Padding;
+			PrintGraphOptions->bIsIncludeExpansionStateInImageFile = Settings.bIsIncludeExpansionStateInImageFile;
 
 			return PrintGraphOptions;
 		}

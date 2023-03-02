@@ -15,9 +15,13 @@ class DETAILSPANELPRINTER_API UDetailsPanelPrinterSettings : public UGraphPrinte
 	GENERATED_BODY()
 
 public:
-	// Expand all hierarchies when printing the details panel.
-	UPROPERTY(EditAnywhere, Config, Category = "Details Panel")
-	bool bExpandHierarchyWhenPrinting;
+	// Height margin when drawing the details view.
+	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0.f, ClampMin = 0.f))
+	float Padding;
+	
+	// Whether to embed the expanded state of each item in the image file and restore the expanded state of each item when restoring.
+	UPROPERTY(EditAnywhere, Config, Category = "Expansion State")
+	bool bIsIncludeExpansionStateInImageFile;
 
 public:
 	// Constructor.

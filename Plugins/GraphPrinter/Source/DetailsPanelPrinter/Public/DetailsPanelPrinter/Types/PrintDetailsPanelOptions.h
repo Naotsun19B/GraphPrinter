@@ -23,6 +23,9 @@ public:
 	// End of UPrintWidgetOptions interface.
 
 public:
-	// Expand all hierarchies when printing the details panel.
-	bool bExpandHierarchyWhenPrinting;
+	// Height margin when drawing the details view.
+	float Padding;
+	
+	// Whether to embed the expanded state of each item in the image file and restore the expanded state of each item when restoring.
+	bool bIsIncludeExpansionStateInImageFile;
 };

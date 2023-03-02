@@ -590,6 +590,7 @@ namespace GraphPrinter
 		using Super = TInnerWidgetPrinter<SWidget, UPrintWidgetOptions, URestoreWidgetOptions>;
 		
 	public:
+		// Constructors.
 		FWidgetPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 			: Super(InPrintOptions, InOnPrinterProcessingFinished)
 		{

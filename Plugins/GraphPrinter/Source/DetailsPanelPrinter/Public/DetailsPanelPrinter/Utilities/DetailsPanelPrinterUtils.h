@@ -27,5 +27,8 @@ namespace GraphPrinter
 
 		// Returns the actor details view contained in the currently active tab.
 		static TSharedPtr<SActorDetails> GetActiveActorDetailsView();
+
+		// Finds the widget that is the subobject instance editor and nearest child of SearchTarget.
+		static TSharedPtr<SWidget> FindNearestChildSubobjectInstanceEditor(TSharedPtr<SWidget> SearchTarget);
 	};
 }
