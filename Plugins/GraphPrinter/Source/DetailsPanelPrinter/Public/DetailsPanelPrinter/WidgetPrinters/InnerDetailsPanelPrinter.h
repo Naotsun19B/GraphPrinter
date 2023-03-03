@@ -39,6 +39,7 @@ namespace GraphPrinter
 		using TInnerWidgetPrinter<TWidget, TPrintOptions, TRestoreOptions>::PrintOptions;
 		using TInnerWidgetPrinter<TWidget, TPrintOptions, TRestoreOptions>::RestoreOptions;
 		using TInnerWidgetPrinter<TWidget, TPrintOptions, TRestoreOptions>::Widget;
+		using TInnerWidgetPrinter<TWidget, TPrintOptions, TRestoreOptions>::WidgetPrinterParams;
 		
 	public:
 		// Constructor.
@@ -98,11 +99,11 @@ namespace GraphPrinter
 		// TInnerWidgetPrinter interface.
 		virtual void PreCalculateDrawSize() override
 		{
-			DetailsPanelPrinterParams.ActualDetailsViewWidth = Widget->GetDesiredSize().X;
+			DetailsPanelPrinterParams.PreCalculateDetailsViewWidth = Widget->GetDesiredSize().X;
 			
 			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
 
-			// Cache the expanded state of each item and expand all if necessary.
+			// Cache the expanded state of each item if necessary.
 			if (PrintOptions->bIsIncludeExpansionStateInImageFile)
 			{
 				TFunction<void(FDetailNodeList&, const FString&)> CacheExpansionStateRecursive =
@@ -135,22 +136,21 @@ namespace GraphPrinter
 			DetailsTree->SetScrollOffset(DetailsTree->GetScrollDistance().Y + 100.f);
 
 #if UE_5_00_OR_LATER
-			DetailsTree->MarkPrepassAsDirty();
+			DetailsPanelPrinterParams.DetailsView->MarkPrepassAsDirty();
 #else
-			DetailsTree->InvalidatePrepass();
+			DetailsPanelPrinterParams.DetailsView->InvalidatePrepass();
 #endif
-			DetailsTree->SlatePrepass();
+			DetailsPanelPrinterParams.DetailsView->SlatePrepass();
 		}
 		virtual bool CalculateDrawSize(FVector2D& DrawSize) override
 		{
 			DrawSize = Widget->GetDesiredSize();
 			
 			// When drawing a large details view, the width becomes smaller according to the height, so the width before scrolling is used.
-			DrawSize.X = DetailsPanelPrinterParams.ActualDetailsViewWidth;
-
-			// In the processing up to this point, there is a difference in the vertical width of the drawing size, so adjust it.
-			DrawSize.Y += PrintOptions->Padding;
-			DrawSize.Y += GetAdditionalDrawHeight();
+			DrawSize.X = DetailsPanelPrinterParams.PreCalculateDetailsViewWidth;
+			
+			// Increase the height by the amount of padding in the editor preferences.
+			WidgetPrinterParams.DrawSize.Y += PrintOptions->Padding;
 			
 			return true;
 		}
@@ -232,30 +232,8 @@ namespace GraphPrinter
 
 	protected:
 		// Finds and returns SDetailsView from the searched widget.
-		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const
-		{
-			return GP_CAST_SLATE_WIDGET(SDetailsView, SearchTarget);
-		}
-
-		// Returns the additional height added to the height of the drawing size.
-		virtual float GetAdditionalDrawHeight() const
-		{
-			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
-			const FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
-			if (RootTreeNodes.IsValidIndex(0))
-			{
-				const TSharedPtr<ITableRow> TableRow = DetailsTree->WidgetFromItem(RootTreeNodes[0]);
-				if (TableRow.IsValid())
-				{
-					const TSharedRef<SWidget> ItemWidget = TableRow->AsWidget();
-					return ItemWidget->GetDesiredSize().Y;
-				}
-			}
-
-			return 50.f;
-		}
-
-	private:
+		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const = 0;
+		
 		// Functions that access protected properties of the DetailsView.
 		TSharedRef<SDetailTree> GetDetailTree() const
 		{
@@ -276,7 +254,7 @@ namespace GraphPrinter
 			TSharedPtr<SDetailsView> DetailsView;
 
 			// Width before pre calculate draw size.
-			float ActualDetailsViewWidth = 0.f;
+			float PreCalculateDetailsViewWidth = 0.f;
 			
 			// Details view scrollbar position.
 			float ScrollOffset = 0.f;
@@ -302,7 +280,12 @@ namespace GraphPrinter
 		
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
+		virtual bool CalculateDrawSize(FVector2D& DrawSize) override;
 		// End of TInnerWidgetPrinter interface.
+
+		// TDetailsPanelPrinter interface.
+		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
+		// End of TDetailsPanelPrinter interface.
 	};
 	
 	/**
@@ -320,11 +303,11 @@ namespace GraphPrinter
 
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SActorDetails> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
+		virtual bool CalculateDrawSize(FVector2D& DrawSize) override;
 		// End of TInnerWidgetPrinter interface.
 
 		// TDetailsPanelPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
-		virtual float GetAdditionalDrawHeight() const override;
 		// End of TDetailsPanelPrinter interface.
 	};
 }

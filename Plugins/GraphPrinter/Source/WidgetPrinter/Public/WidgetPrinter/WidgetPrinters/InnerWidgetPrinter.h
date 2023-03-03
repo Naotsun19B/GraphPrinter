@@ -351,8 +351,12 @@ namespace GraphPrinter
 			if (PrintOptions->MaxImageSize > FVector2D::ZeroVector)
 #endif
 			{
-				if (WidgetPrinterParams.DrawSize.X > PrintOptions->MaxImageSize.X ||
-					WidgetPrinterParams.DrawSize.Y > PrintOptions->MaxImageSize.Y)
+				if (WidgetPrinterParams.DrawSize.X > PrintOptions->MaxImageSize.X || WidgetPrinterParams.DrawSize.Y > PrintOptions->MaxImageSize.Y)
+				{
+					return false;
+				}
+
+				if (WidgetPrinterParams.DrawSize.X <= 0.f || WidgetPrinterParams.DrawSize.Y <= 0.f)
 				{
 					return false;
 				}

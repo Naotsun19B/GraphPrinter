@@ -3,7 +3,8 @@
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
 
 UPrintDetailsPanelOptions::UPrintDetailsPanelOptions()
-	: bIsIncludeExpansionStateInImageFile(true)
+	: Padding(50.f)
+	, bIsIncludeExpansionStateInImageFile(true)
 {
 }
 

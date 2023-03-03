@@ -92,6 +92,39 @@ namespace GraphPrinter
 		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
 	}
 
+	bool FDetailsPanelPrinter::CalculateDrawSize(FVector2D& DrawSize)
+	{
+		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
+
+		// There is a difference in the height of the drawing size, so adjust by adding the height of one item.
+		TOptional<float> ItemHeight;
+		{
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+			const FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+			if (RootTreeNodes.IsValidIndex(0))
+			{
+				const TSharedPtr<ITableRow> TableRow = DetailsTree->WidgetFromItem(RootTreeNodes[0]);
+				if (TableRow.IsValid())
+				{
+					const TSharedRef<SWidget> ItemWidget = TableRow->AsWidget();
+					ItemHeight = ItemWidget->GetDesiredSize().Y;
+				}
+			}
+		}
+		if (ItemHeight.IsSet())
+		{
+			DrawSize.Y += ItemHeight.GetValue();
+			return bSuperResult;
+		}
+
+		return false;
+	}
+
+	TSharedPtr<SDetailsView> FDetailsPanelPrinter::FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const
+	{
+		return GP_CAST_SLATE_WIDGET(SDetailsView, SearchTarget);
+	}
+
 	FActorDetailsPanelPrinter::FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 		: Super(InPrintOptions, InOnPrinterProcessingFinished)
 	{
@@ -122,26 +155,24 @@ namespace GraphPrinter
 		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
 	}
 
-	float FActorDetailsPanelPrinter::GetAdditionalDrawHeight() const
+	bool FActorDetailsPanelPrinter::CalculateDrawSize(FVector2D& DrawSize)
 	{
-		float SubobjectInstanceEditorHeightDifference = 0.f;
-		
-		const TSharedPtr<SWidget> SubobjectInstanceEditor = FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(Widget);
-		if (SubobjectInstanceEditor.IsValid())
-		{
-			const FGeometry& Geometry =
-#if UE_4_24_OR_LATER
-				SubobjectInstanceEditor->GetTickSpaceGeometry();
-#else
-				SubobjectInstanceEditor->GetCachedGeometry();
-#endif
-			const FVector2D LocalSize = Geometry.GetLocalSize();
-			const FVector2D DesiredSize = SubobjectInstanceEditor->GetDesiredSize();
+		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
 
-			SubobjectInstanceEditorHeightDifference = FMath::Abs(LocalSize.Y - DesiredSize.Y);
-			SubobjectInstanceEditorHeightDifference *= 5.f;
+		// Since the actor detail panel has a different structure than other detail panels,
+		// add the difference between the displayed size of subobject instance editor and details view and the actual size.
+		const TSharedPtr<SWidget> SubobjectInstanceEditor = FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(Widget);
+		if (!SubobjectInstanceEditor.IsValid())
+		{
+			return false;
 		}
+		DrawSize.Y += FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(SubobjectInstanceEditor).Y;
 		
-		return (Super::GetAdditionalDrawHeight() + SubobjectInstanceEditorHeightDifference);
+		// #TODO: It is necessary to investigate the reason why the accurate size cannot be measured.
+		// If don't apply a fixed scale here, the image will be too large.
+		static constexpr float DetailsViewDifferenceScale = 0.3f;
+		DrawSize.Y += FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(DetailsPanelPrinterParams.DetailsView).Y * DetailsViewDifferenceScale;
+		
+		return bSuperResult;
 	}
 }

@@ -29,6 +29,9 @@ namespace GraphPrinter
 		static TSharedPtr<SActorDetails> GetActiveActorDetailsView();
 
 		// Finds the widget that is the subobject instance editor and nearest child of SearchTarget.
-		static TSharedPtr<SWidget> FindNearestChildSubobjectInstanceEditor(TSharedPtr<SWidget> SearchTarget);
+		static TSharedPtr<SWidget> FindNearestChildSubobjectInstanceEditor(TSharedPtr<SActorDetails> SearchTarget);
+
+		// Returns the difference between the widget's actual visible size and its overall size.
+		static FVector2D GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(TSharedPtr<SWidget> Widget);
 	};
 }

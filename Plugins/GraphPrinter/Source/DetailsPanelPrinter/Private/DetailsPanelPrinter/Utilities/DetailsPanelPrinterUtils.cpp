@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "Framework/Docking/TabManager.h"
@@ -110,7 +111,7 @@ namespace GraphPrinter
 		return nullptr;
 	}
 
-	TSharedPtr<SWidget> FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SWidget> FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(TSharedPtr<SActorDetails> SearchTarget)
 	{
 		TSharedPtr<SWidget> FoundSubobjectInstanceEditor = nullptr;
 		
@@ -130,5 +131,27 @@ namespace GraphPrinter
 		);
 
 		return FoundSubobjectInstanceEditor;
+	}
+
+	FVector2D FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(TSharedPtr<SWidget> Widget)
+	{
+		check(Widget.IsValid());
+		
+		const FVector2D DesiredSize = Widget->GetDesiredSize();
+		
+		const FGeometry& Geometry =
+#if UE_4_24_OR_LATER
+			Widget->GetTickSpaceGeometry();
+#else
+			Widget->GetCachedGeometry();
+#endif
+		const FVector2D LocalSize = Geometry.GetLocalSize();
+
+		if (DesiredSize.ComponentwiseAllGreaterThan(LocalSize))
+		{
+			return (DesiredSize - LocalSize);
+		}
+
+		return FVector2D::ZeroVector;
 	}
 }
