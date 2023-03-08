@@ -88,11 +88,12 @@ namespace TextChunkHelper
 		};
 
 		auto& ImageWrapper = FModuleManager::LoadModuleChecked<IImageWrapperModule>(TEXT("ImageWrapper"));
-		const TOptional<EDesiredImageFormat> ImageFormat = ToDesiredImageFormat(ImageWrapper.DetectImageFormat(
-			CompressedData.GetData(),
-			CompressedData.Num()
-		));
-
+		const TOptional<EDesiredImageFormat> ImageFormat = ToDesiredImageFormat(
+			ImageWrapper.DetectImageFormat(
+				CompressedData.GetData(),
+				CompressedData.Num()
+			)
+		);
 		if (!ImageFormat.IsSet())
 		{
 			return nullptr;

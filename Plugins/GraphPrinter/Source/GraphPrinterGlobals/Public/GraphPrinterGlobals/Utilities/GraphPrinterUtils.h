@@ -74,7 +74,7 @@ namespace GraphPrinter
 		static const ECompletionState CS_Fail;
 		
 	public:
-		// Show notifications at the bottom right of the editor (When Expire Duration is 0 or less, you need to call the fade process manually.).
+		// Shows notifications at the bottom right of the editor (When Expire Duration is 0 or less, you need to call the fade process manually.).
 		static FNotificationHandle ShowNotification(
 			const FText& NotificationText, 
 			ECompletionState CompletionState, 
@@ -82,13 +82,13 @@ namespace GraphPrinter
 			const TArray<FNotificationInteraction>& Interactions = TArray<FNotificationInteraction>()
 		);
 
-		// Get the extension by the format of the image file.
+		// Gets the extension by the format of the image file.
 		static FString GetImageFileExtension(const EDesiredImageFormat ImageFormat, const bool bWithDot = true);
 		
-		// Open the folder containing the file in Explorer.
+		// Opens the folder containing the file in Explorer.
 		static void OpenFolderWithExplorer(const FString& Filename);
 
-		// Show the file browser and let the user select a file.
+		// Shows the file browser and let the user select a file.
 		static bool OpenFileDialog(
 			TArray<FString>& Filenames,
 			const FString& DialogTitle = TEXT("Open File Dialog"),
@@ -97,5 +97,9 @@ namespace GraphPrinter
 			const FString& FileTypes = TEXT("All (*)|*.*"),
 			bool bIsMultiple = false
 		);
+
+		// Cuts out unnecessary character strings mixed in at the beginning of sentences.
+		// Returns whether the clipping was actually done.
+		static bool ClearUnnecessaryCharactersFromHead(FString& String, const FString& BeginningOfString);
 	};
 }

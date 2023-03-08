@@ -2,74 +2,72 @@
 
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
+#include "WidgetPrinter/Utilities/CastSlateWidget.h"
+#include "DetailMultiTopLevelObjectRootNode.h"
+#include "GameFramework/WorldSettings.h"
+
+#define HACK_INACCESSIBLE_PROPERTY(PropertyType, ClassType, PropertyName) \
+	namespace PropertyName \
+	{ \
+		namespace Inner \
+		{ \
+			static PropertyType ClassType##::* Pointer; \
+			\
+			template<typename Tag, typename Tag::Type Ptr> \
+			struct THacker \
+			{ \
+				struct FFiller \
+				{ \
+					FFiller() \
+					{ \
+						Pointer = Ptr; \
+					} \
+				}; \
+				static FFiller Filler; \
+			}; \
+			\
+			template<typename Tag, typename Tag::Type Ptr> \
+			typename THacker<Tag, Ptr>::FFiller THacker<Tag, Ptr>::Filler; \
+			\
+			struct FTag \
+			{ \
+				typedef PropertyType ClassType##::*Type; \
+			}; \
+			template struct THacker<FTag, &##ClassType##::##PropertyName##>; \
+		} \
+		\
+		static PropertyType& Extract(ClassType& Class) \
+		{ \
+		return Class.*Inner::Pointer;\
+		} \
+	}
 
 namespace GraphPrinter
 {
-	namespace DetailsViewBaseAccessor
+	namespace Hack
 	{
-		namespace DetailTree
-		{
-			static TSharedPtr<SDetailTree> SDetailsViewBase::* Pointer;
-		
-			template<typename Tag, typename Tag::Type Ptr>
-			struct THacker
-			{
-				struct FFiller
-				{
-					FFiller()
-					{
-						Pointer = Ptr;
-					}
-				};
-				static FFiller Filler;
-			};
-
-			template<typename Tag, typename Tag::Type Ptr>
-			typename THacker<Tag, Ptr>::FFiller THacker<Tag, Ptr>::Filler;
-
-			struct FRootTreeNodesTag
-			{
-				typedef TSharedPtr<SDetailTree> SDetailsViewBase::*Type;
-			};
-			template struct THacker<FRootTreeNodesTag, &SDetailsViewBase::DetailTree>;
-		}
-		
-		namespace RootTreeNodes
-		{
-			static FDetailNodeList SDetailsViewBase::* Pointer;
-		
-			template<typename Tag, typename Tag::Type Ptr>
-			struct THacker
-			{
-				struct FFiller
-				{
-					FFiller()
-					{
-						Pointer = Ptr;
-					}
-				};
-				static FFiller Filler;
-			};
-
-			template<typename Tag, typename Tag::Type Ptr>
-			typename THacker<Tag, Ptr>::FFiller THacker<Tag, Ptr>::Filler;
-
-			struct FRootTreeNodesTag
-			{
-				typedef FDetailNodeList SDetailsViewBase::*Type;
-			};
-			template struct THacker<FRootTreeNodesTag, &SDetailsViewBase::RootTreeNodes>;
-		}
+		HACK_INACCESSIBLE_PROPERTY(TSharedPtr<SDetailTree>, SDetailsViewBase, DetailTree)
+		HACK_INACCESSIBLE_PROPERTY(FDetailNodeList, SDetailsViewBase, RootTreeNodes)
+		HACK_INACCESSIBLE_PROPERTY(FDetailsObjectSet, FDetailMultiTopLevelObjectRootNode, RootObjectSet)
 	}
 	
 	TSharedPtr<SDetailTree> FDetailsViewBaseAccessor::ExtractDetailTree(TSharedRef<SDetailsViewBase> DetailsViewBase)
 	{
-		return DetailsViewBase.Get().*DetailsViewBaseAccessor::DetailTree::Pointer;
+		return Hack::DetailTree::Extract(DetailsViewBase.Get());
 	}
 	
 	FDetailNodeList& FDetailsViewBaseAccessor::ExtractRootTreeNodes(TSharedRef<SDetailsViewBase> DetailsViewBase)
 	{
-		return DetailsViewBase.Get().*DetailsViewBaseAccessor::RootTreeNodes::Pointer;
+		return Hack::RootTreeNodes::Extract(DetailsViewBase.Get());
+	}
+
+	TArray<const UObject*>& FDetailsViewBaseAccessor::ExtractRootObjectSet(TSharedRef<FDetailTreeNode> DetailTreeNode)
+	{
+		check(DetailTreeNode->GetNodeType() == EDetailNodeType::Object);
+
+		const TSharedRef<FDetailMultiTopLevelObjectRootNode> DetailMultiTopLevelObjectRootNode = StaticCastSharedRef<FDetailMultiTopLevelObjectRootNode>(DetailTreeNode);
+		FDetailsObjectSet& DetailsObjects = Hack::RootObjectSet::Extract(DetailMultiTopLevelObjectRootNode.Get());
+		return DetailsObjects.RootObjects;
 	}
 
 	FDetailsPanelPrinter::FDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
@@ -125,6 +123,16 @@ namespace GraphPrinter
 		return GP_CAST_SLATE_WIDGET(SDetailsView, SearchTarget);
 	}
 
+	bool FDetailsPanelPrinter::SupportsEditingObjectClass(const UClass* EditingObjectClass) const
+	{
+		if (IsValid(EditingObjectClass))
+		{
+			return EditingObjectClass->IsChildOf<UObject>();
+		}
+
+		return false;
+	}
+
 	FActorDetailsPanelPrinter::FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 		: Super(InPrintOptions, InOnPrinterProcessingFinished)
 	{
@@ -155,6 +163,20 @@ namespace GraphPrinter
 		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
 	}
 
+	bool FActorDetailsPanelPrinter::SupportsEditingObjectClass(const UClass* EditingObjectClass) const
+	{
+		if (IsValid(EditingObjectClass))
+		{
+			return (
+				EditingObjectClass->IsChildOf<AActor>() &&
+				// AWorldSettings is a class that inherits from AActor, but exclude it since it will be using the normal details panel.
+				!EditingObjectClass->IsChildOf<AWorldSettings>()
+			);
+		}
+
+		return false;
+	}
+
 	bool FActorDetailsPanelPrinter::CalculateDrawSize(FVector2D& DrawSize)
 	{
 		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
@@ -176,3 +198,5 @@ namespace GraphPrinter
 		return bSuperResult;
 	}
 }
+
+#undef HACK_INACCESSIBLE_PROPERTY

@@ -3,6 +3,7 @@
 #include "DetailsPanelPrinter/WidgetPrinters/DetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterSettings.h"
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
+#include "DetailsPanelPrinter/Types/RestoreDetailsPanelOptions.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
 
 int32 UDetailsPanelPrinter::GetPriority() const
@@ -25,6 +26,23 @@ UPrintWidgetOptions* UDetailsPanelPrinter::CreateDefaultPrintOptions(
 			PrintGraphOptions->bIsIncludeExpansionStateInImageFile = Settings.bIsIncludeExpansionStateInImageFile;
 
 			return PrintGraphOptions;
+		}
+	}
+
+	return nullptr;
+}
+
+URestoreWidgetOptions* UDetailsPanelPrinter::CreateDefaultRestoreOptions() const
+{
+	if (URestoreWidgetOptions* RestoreWidgetOptions = Super::CreateDefaultRestoreOptions())
+	{
+		if (auto* RestoreDetailsPanelOptions = RestoreWidgetOptions->Duplicate<URestoreDetailsPanelOptions>())
+		{
+			auto& Settings = UDetailsPanelPrinterSettings::Get();
+			
+			RestoreDetailsPanelOptions->bWhetherToAlsoRestoreExpandedStates = Settings.bWhetherToAlsoRestoreExpandedStates;
+
+			return RestoreDetailsPanelOptions;
 		}
 	}
 

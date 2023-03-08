@@ -163,7 +163,7 @@ namespace GraphPrinter
 	)
 	{
 		// Get the OS-level window handle of the editor's mainframe.
-		void* WindowHandle = nullptr;
+		const void* WindowHandle = nullptr;
 
 		const auto& MainFrameModule = IMainFrameModule::Get();
 		const TSharedPtr<SWindow> MainWindow = MainFrameModule.GetParentWindow();
@@ -198,5 +198,36 @@ namespace GraphPrinter
 			(bIsMultiple ? EFileDialogFlags::Multiple : EFileDialogFlags::None),
 			Filenames
 		);
+	}
+
+	bool FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(FString& String, const FString& BeginningOfString)
+	{
+		int32 StartPosition = 0;
+		const int32 TextLength = String.Len();
+		const int32 HeaderLength = BeginningOfString.Len();
+		for (int32 Index = 0; Index < TextLength - HeaderLength; Index++)
+		{
+			bool bIsMatch = true;
+			for (int32 Offset = 0; Offset < HeaderLength; Offset++)
+			{
+				if (String[Index + Offset] != BeginningOfString[Offset])
+				{
+					bIsMatch = false;
+				}
+			}
+
+			if (bIsMatch)
+			{
+				StartPosition = Index;
+				break;
+			}
+		}
+		if (StartPosition > 0)
+		{
+			String.MidInline(StartPosition, TextLength - StartPosition);
+			return true;
+		}
+
+		return false;
 	}
 }

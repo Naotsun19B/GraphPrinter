@@ -5,6 +5,7 @@
 UDetailsPanelPrinterSettings::UDetailsPanelPrinterSettings()
 	: Padding(50.f)
 	, bIsIncludeExpansionStateInImageFile(true)
+	, bWhetherToAlsoRestoreExpandedStates(true)
 {
 }
 

@@ -137,7 +137,7 @@ namespace GraphPrinter
 			}
 
 			// If the restore function cannot be used, the widget information will not be embedded.
-			RestoreOptions = NewObject<URestoreWidgetOptions>();
+			RestoreOptions = NewObject<TRestoreOptions>();
 			if (IsValid(RestoreOptions))
 			{
 				RestoreOptions->SearchTarget = PrintOptions->SearchTarget;

@@ -25,6 +25,7 @@ public:
 		const UPrintWidgetOptions::EPrintScope PrintScope,
 		const UPrintWidgetOptions::EExportMethod ExportMethod
 	) const override;
+	virtual URestoreWidgetOptions* CreateDefaultRestoreOptions() const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	// End of UWidgetPrinter interface.

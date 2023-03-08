@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "Expansion State")
 	bool bIsIncludeExpansionStateInImageFile;
 
+	// Whether to also restore the expanded state when restoring.
+	UPROPERTY(EditAnywhere, Config, Category = "Expansion State")
+	bool bWhetherToAlsoRestoreExpandedStates;
+
 public:
 	// Constructor.
 	UDetailsPanelPrinterSettings();

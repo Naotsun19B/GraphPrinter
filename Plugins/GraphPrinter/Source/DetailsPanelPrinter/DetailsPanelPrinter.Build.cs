@@ -34,6 +34,8 @@ public class DetailsPanelPrinter : ModuleRules
                 "UnrealEd",
                 "MainFrame",
                 "SubobjectEditor",
+                "Json",
+                "JsonUtilities",
 
                 "GraphPrinterGlobals",
                 "WidgetPrinter",

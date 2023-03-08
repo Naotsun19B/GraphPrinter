@@ -17,13 +17,16 @@
 namespace GraphPrinter
 {
 #ifdef WITH_TEXT_CHUNK_HELPER
-	namespace TextChunkDefine
+	namespace GenericGraphPrinter
 	{
-		// Key used when writing to a text chunk of a png file.
-		static const FString PngTextChunkKey = TEXT("GraphEditor");
+		namespace TextChunkDefine
+		{
+			// Key used when writing to a text chunk of a png file.
+			static const FString PngTextChunkKey = TEXT("GraphEditor");
 
-		// The beginning of the node information.
-		static const FString NodeInfoHeader = TEXT("Begin Object");
+			// The beginning of the node information.
+			static const FString NodeInfoHeader = TEXT("Begin Object");
+		}
 	}
 #endif
 	
@@ -222,7 +225,7 @@ namespace GraphPrinter
 
 			// Write data to png file using helper class.
 			TMap<FString, FString> MapToWrite;
-			MapToWrite.Add(TextChunkDefine::PngTextChunkKey, ExportedText);
+			MapToWrite.Add(GenericGraphPrinter::TextChunkDefine::PngTextChunkKey, ExportedText);
 
 			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
 			if (!TextChunk.IsValid())
@@ -250,37 +253,14 @@ namespace GraphPrinter
 			}
 
 			// Find information on valid nodes.
-			if (!MapToRead.Contains(TextChunkDefine::PngTextChunkKey))
+			if (!MapToRead.Contains(GenericGraphPrinter::TextChunkDefine::PngTextChunkKey))
 			{
 				return false;
 			}
-			FString TextToImport = MapToRead[TextChunkDefine::PngTextChunkKey];
+			FString TextToImport = MapToRead[GenericGraphPrinter::TextChunkDefine::PngTextChunkKey];
 
 			// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
-			int32 StartPosition = 0;
-			const int32 TextLength = TextToImport.Len();
-			const int32 HeaderLength = TextChunkDefine::NodeInfoHeader.Len();
-			for (int32 Index = 0; Index < TextLength - HeaderLength; Index++)
-			{
-				bool bIsMatch = true;
-				for (int32 Offset = 0; Offset < HeaderLength; Offset++)
-				{
-					if (TextToImport[Index + Offset] != TextChunkDefine::NodeInfoHeader[Offset])
-					{
-						bIsMatch = false;
-					}
-				}
-
-				if (bIsMatch)
-				{
-					StartPosition = Index;
-					break;
-				}
-			}
-			if (StartPosition > 0)
-			{
-				TextToImport = TextToImport.Mid(StartPosition, TextLength - StartPosition);
-			}
+			FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(TextToImport, GenericGraphPrinter::TextChunkDefine::NodeInfoHeader);
 
 			if (!FEdGraphUtilities::CanImportNodesFromText(Widget->GetCurrentGraph(), TextToImport))
 			{

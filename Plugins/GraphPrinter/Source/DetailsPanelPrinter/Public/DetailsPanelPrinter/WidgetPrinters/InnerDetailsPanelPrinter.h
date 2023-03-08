@@ -4,14 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
-#include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
+#include "DetailsPanelPrinter/Types/RestoreDetailsPanelOptions.h"
+#include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
 #include "SDetailsView.h"
 #include "SActorDetails.h"
 #include "EdGraphUtilities.h"
 
+#ifdef WITH_TEXT_CHUNK_HELPER
+#include "TextChunkHelper/ITextChunkHelper.h"
+#endif
+
 namespace GraphPrinter
 {
+#ifdef WITH_TEXT_CHUNK_HELPER
+	namespace DetailsPanelPrinter
+	{
+		namespace TextChunkDefine
+		{
+			// Key used when writing to a text chunk of a png file.
+			static const FString PropertiesChunkKey = TEXT("DetailsPanel-Properties");
+			static const FString ExpansionStatesChunkKey = TEXT("DetailsPanel-ExpansionStates");
+
+			// The beginning of the widget information.
+			static const FString PropertiesInfoHeader = TEXT("Properties");
+			static const FString ExpansionStatesInfoHeader = TEXT("ExpansionStates");
+		}
+	}
+#endif
+	
 	/**
 	 * I want to hide the implementation to the cpp file side in order to forcibly access the protected property.
 	 */
@@ -22,6 +43,7 @@ namespace GraphPrinter
 		// Therefore, it is implemented in a specialized child class.
 		static TSharedPtr<SDetailTree> ExtractDetailTree(TSharedRef<SDetailsViewBase> DetailsViewBase);
 		static FDetailNodeList& ExtractRootTreeNodes(TSharedRef<SDetailsViewBase> DetailsViewBase);
+		static TArray<const UObject*>& ExtractRootObjectSet(TSharedRef<FDetailTreeNode> DetailTreeNode);
 	};
 	
 	/**
@@ -68,6 +90,25 @@ namespace GraphPrinter
 				Super::PrintWidget();
 			}
 		}
+		virtual bool CanPrintWidget() const override
+		{
+			if (Super::CanPrintWidget() && IsValid(PrintOptions))
+			{
+				const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(FindTargetWidget(PrintOptions->SearchTarget));
+				if (DetailsView.IsValid())
+				{
+					if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+					{
+						if (const UClass* EditingObjectClass = EditingObject->GetClass())
+						{
+							return SupportsEditingObjectClass(EditingObjectClass);
+						}
+					}
+				}
+			}
+
+			return false;
+		}
 		virtual void RestoreWidget() override
 		{
 			if (!IsValid(RestoreOptions))
@@ -88,7 +129,16 @@ namespace GraphPrinter
 				const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(FindTargetWidget(RestoreOptions->SearchTarget));
 				if (DetailsView.IsValid())
 				{
-					return DetailsView->IsPropertyEditingEnabled();
+					if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+					{
+						if (const UClass* EditingObjectClass = EditingObject->GetClass())
+						{
+							if (SupportsEditingObjectClass(EditingObjectClass))
+							{
+								return DetailsView->IsPropertyEditingEnabled();
+							}
+						}
+					}
 				}
 			}
 
@@ -162,56 +212,73 @@ namespace GraphPrinter
 		}
 		virtual FString GetWidgetTitle() override
 		{
-			// Do special handling if it contains multiple objects, such as editor preferences.
-			if (DetailsPanelPrinterParams.DetailsView->ContainsMultipleTopLevelObjects())
+			UObject* EditingObject = GetSingleEditingObject();
+			if (!IsValid(EditingObject))
 			{
-				const FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
-				if (RootTreeNodes.IsValidIndex(0))
-				{
-					const TSharedRef<FDetailTreeNode> RootTreeNode = RootTreeNodes[0];
-					if (RootTreeNode->GetNodeType() == EDetailNodeType::Object)
-					{
-						return RootTreeNode->GetNodeName().ToString();
-					}
-				}
+				return TEXT("EmptyDetailsPanel");
 			}
 			
-			TArray<TWeakObjectPtr<UObject>> SelectedObjects = DetailsPanelPrinterParams.DetailsView->GetSelectedObjects();
-			if (SelectedObjects.IsValidIndex(0))
+			// For default objects use the class name to remove the prefix.
+			if (EditingObject->HasAnyFlags(RF_ClassDefaultObject))
 			{
-				const TWeakObjectPtr<UObject>& SelectedObject = SelectedObjects[0];
-				if (SelectedObject.IsValid())
+				if (const UClass* SelectedObjectClass = EditingObject->GetClass())
 				{
-					// For default objects use the class name to remove the prefix.
-					if (SelectedObject->HasAnyFlags(RF_ClassDefaultObject))
+					FString SelectedObjectClassName = SelectedObjectClass->GetName();
+					if (SelectedObjectClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint))
 					{
-						if (const UClass* SelectedObjectClass = SelectedObject->GetClass())
-						{
-							FString SelectedObjectClassName = SelectedObjectClass->GetName();
-							if (SelectedObjectClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint))
-							{
-								SelectedObjectClassName.RemoveFromEnd(TEXT("_C"));
-							}
-							return SelectedObjectClassName;
-						}
+						SelectedObjectClassName.RemoveFromEnd(TEXT("_C"));
 					}
-
-					// For actors, return the label displayed in the outliner instead of the name of the object.
-					if (const auto* SelectedActor = Cast<AActor>(SelectedObject))
-					{
-						return SelectedActor->GetActorLabel();
-					}
-							
-					return SelectedObject->GetName();
+					return SelectedObjectClassName;
 				}
 			}
 
-			return TEXT("EmptyDetailsPanel");
+			// For actors, return the label displayed in the outliner instead of the name of the object.
+			if (const auto* SelectedActor = Cast<AActor>(EditingObject))
+			{
+				return SelectedActor->GetActorLabel();
+			}
+							
+			return EditingObject->GetName();
 		}
 		virtual bool WriteWidgetInfoToTextChunk() override
 		{
 #ifdef WITH_TEXT_CHUNK_HELPER
-			return true;
+			TMap<FString, FString> MapToWrite;
+			{
+				UObject* EditingObject = GetSingleEditingObject();
+				if (!IsValid(EditingObject))
+				{
+					return false;
+				}
+
+				FString PropertiesJsonString;
+				if (!FDetailsPanelPrinterUtils::ExportObjectPropertiesAsJsonString(EditingObject, PropertiesJsonString))
+				{
+					return false;
+				}
+				PropertiesJsonString = DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader + PropertiesJsonString;
+				MapToWrite.Add(DetailsPanelPrinter::TextChunkDefine::PropertiesChunkKey, PropertiesJsonString);
+			}
+			if (PrintOptions->bIsIncludeExpansionStateInImageFile)
+			{
+				FString ExpansionStatesString;
+				for (const auto& Pair : DetailsPanelPrinterParams.ExpansionStateMap)
+				{
+					const FString PropertyNodePath = Pair.Key;
+					const bool bIsExpanded = Pair.Value;
+					ExpansionStatesString += FString::Printf(TEXT("%s:%d,"), *PropertyNodePath, static_cast<int32>(bIsExpanded));
+				}
+				ExpansionStatesString = DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader + ExpansionStatesString;
+				MapToWrite.Add(DetailsPanelPrinter::TextChunkDefine::ExpansionStatesChunkKey, ExpansionStatesString);
+			}
+
+			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
+			if (!TextChunk.IsValid())
+			{
+				return false;
+			}
+			
+			return TextChunk->Write(MapToWrite);
 #else
 			return false;
 #endif
@@ -219,6 +286,115 @@ namespace GraphPrinter
 		virtual bool RestoreWidgetFromTextChunk() override
 		{
 #ifdef WITH_TEXT_CHUNK_HELPER
+			// Read data from png file using helper class.
+			TMap<FString, FString> MapToRead;
+			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
+			if (!TextChunk.IsValid())
+			{
+				return false;
+			}
+			if (!TextChunk->Read(MapToRead))
+			{
+				return false;
+			}
+
+			// Applies read property data to object properties.
+			{
+				if (!MapToRead.Contains(DetailsPanelPrinter::TextChunkDefine::PropertiesChunkKey))
+				{
+					return false;
+				}
+
+				FString PropertiesJsonString = MapToRead[DetailsPanelPrinter::TextChunkDefine::PropertiesChunkKey];
+
+				// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
+				FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(
+					PropertiesJsonString,
+					DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader
+				);
+				const int32 PropertiesInfoHeaderLength = DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader.Len();
+				PropertiesJsonString.MidInline(
+					PropertiesInfoHeaderLength,
+					PropertiesJsonString.Len() - PropertiesInfoHeaderLength
+				);
+
+				UObject* EditingObject = GetSingleEditingObject();
+				if (!IsValid(EditingObject))
+				{
+					return false;
+				}
+			
+				if (!FDetailsPanelPrinterUtils::ImportObjectPropertiesFromJsonString(EditingObject, PropertiesJsonString))
+				{
+					return false;
+				}
+			}
+
+			// Applies read expansion states data to details panel expansion states.
+			if (RestoreOptions->bWhetherToAlsoRestoreExpandedStates &&
+				MapToRead.Contains(DetailsPanelPrinter::TextChunkDefine::ExpansionStatesChunkKey))
+			{
+				FString ExpansionStatesString = MapToRead[DetailsPanelPrinter::TextChunkDefine::ExpansionStatesChunkKey];
+				
+				// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
+				FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(
+					ExpansionStatesString,
+					DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader
+				);
+				const int32 ExpansionStatesInfoHeaderLength = DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader.Len();
+				ExpansionStatesString.MidInline(
+					ExpansionStatesInfoHeaderLength,
+					ExpansionStatesString.Len() - ExpansionStatesInfoHeaderLength
+				);
+
+				TArray<FString> ExpansionStatePairsString;
+				ExpansionStatesString.ParseIntoArray(ExpansionStatePairsString, TEXT(","));
+
+				DetailsPanelPrinterParams.ExpansionStateMap.Reserve(ExpansionStatePairsString.Num());
+				
+				for (const auto& ExpansionStatePairString : ExpansionStatePairsString)
+				{
+					FString PropertyNodePath;
+					FString IsExpandedString;
+					if (!ExpansionStatePairString.Split(TEXT(":"), &PropertyNodePath, &IsExpandedString))
+					{
+						continue;
+					}
+
+					const bool bIsExpanded = (FCString::Atoi(*IsExpandedString) > 0);
+					DetailsPanelPrinterParams.ExpansionStateMap.Add(PropertyNodePath, bIsExpanded);
+				}
+
+				const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+				TFunction<void(FDetailNodeList&, const FString&)> ApplyExpansionStateRecursive =
+					[&](FDetailNodeList& Nodes, const FString& ParentNodeName)
+					{
+						for (const auto& Node : Nodes)
+						{
+							const FString NodeName = Node->GetNodeName().ToString();
+							FString CombinedNodeName = NodeName;
+							if (!ParentNodeName.IsEmpty())
+							{
+								CombinedNodeName = FString::Join(TArray<FString>{ CombinedNodeName, NodeName }, TEXT("-"));
+							}
+							
+							if (const bool* IsExpandedPtr = DetailsPanelPrinterParams.ExpansionStateMap.Find(CombinedNodeName))
+							{
+								DetailsTree->SetItemExpansion(Node, *IsExpandedPtr);
+							}
+
+							FDetailNodeList Children;
+							Node->GetChildren(Children);
+							ApplyExpansionStateRecursive(Children, NodeName);
+						}
+					};
+
+				FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+				ApplyExpansionStateRecursive(RootTreeNodes, TEXT(""));
+
+				DetailsTree->RequestTreeRefresh();
+			}
+
 			return true;
 #else
 			return false;
@@ -233,17 +409,79 @@ namespace GraphPrinter
 	protected:
 		// Finds and returns SDetailsView from the searched widget.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const = 0;
+
+		// Returns whether the class of the object being edited supports this printer.
+		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const = 0;
+		
+		// Returns one object that the details view is editing.
+		UObject* GetSingleEditingObject(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
+		{
+			if (!DetailsViewBase.IsValid())
+			{
+				DetailsViewBase = DetailsPanelPrinterParams.DetailsView;
+			}
+			check(DetailsViewBase.IsValid());
+			
+			// Do special handling if it contains multiple objects, such as editor preferences.
+			if (DetailsViewBase->ContainsMultipleTopLevelObjects())
+			{
+				TArray<UObject*> RootObjectSet = GetRootObjectSet(DetailsViewBase);
+				if (RootObjectSet.IsValidIndex(0))
+				{
+					return RootObjectSet[0];
+				}
+			}
+			else
+			{
+				TArray<TWeakObjectPtr<UObject>> SelectedObjects = DetailsViewBase->GetSelectedObjects();
+				if (SelectedObjects.IsValidIndex(0))
+				{
+					return SelectedObjects[0].Get();
+				}
+			}
+
+			return nullptr;
+		}
 		
 		// Functions that access protected properties of the DetailsView.
-		TSharedRef<SDetailTree> GetDetailTree() const
+		TSharedRef<SDetailTree> GetDetailTree(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
 		{
-			const TSharedPtr<SDetailTree> DetailTree = ExtractDetailTree(DetailsPanelPrinterParams.DetailsView.ToSharedRef());
+			if (!DetailsViewBase.IsValid())
+			{
+				DetailsViewBase = DetailsPanelPrinterParams.DetailsView;
+			}
+			check(DetailsViewBase.IsValid());
+			
+			const TSharedPtr<SDetailTree> DetailTree = ExtractDetailTree(DetailsViewBase.ToSharedRef());
 			check(DetailTree.IsValid());
 			return DetailTree.ToSharedRef();
 		}
-		FDetailNodeList& GetRootTreeNodes() const
+		FDetailNodeList& GetRootTreeNodes(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
 		{
-			return ExtractRootTreeNodes(DetailsPanelPrinterParams.DetailsView.ToSharedRef());
+			if (!DetailsViewBase.IsValid())
+			{
+				DetailsViewBase = DetailsPanelPrinterParams.DetailsView;
+			}
+			check(DetailsViewBase.IsValid());
+			
+			return ExtractRootTreeNodes(DetailsViewBase.ToSharedRef());
+		}
+		TArray<UObject*> GetRootObjectSet(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
+		{
+			TArray<UObject*> RootObjectSet;
+			
+			FDetailNodeList& RootTreeNodes = GetRootTreeNodes(DetailsViewBase);
+			for (const TSharedRef<FDetailTreeNode>& RootTreeNode : RootTreeNodes)
+			{
+				TArray<const UObject*> ConstRootObjectSet = ExtractRootObjectSet(RootTreeNode);
+				RootObjectSet.Reserve(RootObjectSet.Num() + RootTreeNodes.Num());
+				for (const auto* ConstRootObject : ConstRootObjectSet)
+				{
+					RootObjectSet.Add(const_cast<UObject*>(ConstRootObject));
+				}
+			}
+			
+			return RootObjectSet;
 		}
 		
 	protected:
@@ -268,10 +506,10 @@ namespace GraphPrinter
 	/**
 	 * An inner class with the ability to print and restore details panel.
 	 */
-	class DETAILSPANELPRINTER_API FDetailsPanelPrinter : public TDetailsPanelPrinter<SDetailsView, UPrintDetailsPanelOptions, URestoreWidgetOptions>
+	class DETAILSPANELPRINTER_API FDetailsPanelPrinter : public TDetailsPanelPrinter<SDetailsView, UPrintDetailsPanelOptions, URestoreDetailsPanelOptions>
 	{
 	public:
-		using Super = TDetailsPanelPrinter<SDetailsView, UPrintDetailsPanelOptions, URestoreWidgetOptions>;
+		using Super = TDetailsPanelPrinter<SDetailsView, UPrintDetailsPanelOptions, URestoreDetailsPanelOptions>;
 
 	public:
 		// Constructor.
@@ -285,16 +523,17 @@ namespace GraphPrinter
 
 		// TDetailsPanelPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
+		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const override;
 		// End of TDetailsPanelPrinter interface.
 	};
 	
 	/**
 	 * An inner class with the ability to print and restore actor details panel.
 	 */
-	class DETAILSPANELPRINTER_API FActorDetailsPanelPrinter : public TDetailsPanelPrinter<SActorDetails, UPrintDetailsPanelOptions, URestoreWidgetOptions>
+	class DETAILSPANELPRINTER_API FActorDetailsPanelPrinter : public TDetailsPanelPrinter<SActorDetails, UPrintDetailsPanelOptions, URestoreDetailsPanelOptions>
 	{
 	public:
-		using Super = TDetailsPanelPrinter<SActorDetails, UPrintDetailsPanelOptions, URestoreWidgetOptions>;
+		using Super = TDetailsPanelPrinter<SActorDetails, UPrintDetailsPanelOptions, URestoreDetailsPanelOptions>;
 		
 	public:
 		// Constructor.
@@ -308,6 +547,7 @@ namespace GraphPrinter
 
 		// TDetailsPanelPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
+		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const override;
 		// End of TDetailsPanelPrinter interface.
 	};
 }
