@@ -1,6 +1,7 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
+#include "GraphPrinterEditorExtension/UIExtensions/StreamDeckMenu.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterEditorExtensionSettings.h"
@@ -72,6 +73,9 @@ namespace GraphPrinter
 	{
 		FMenuBuilder MenuBuilder(true, FGraphPrinterCommands::Get().CommandBindings);
 		FGraphPrinterCommands::FillMenuBuilder(MenuBuilder);
+#ifdef WITH_STREAM_DECK
+		FStreamDeckMenu::FillMenuBuilder(MenuBuilder);
+#endif
 		return MenuBuilder.MakeWidget();
 	}
 

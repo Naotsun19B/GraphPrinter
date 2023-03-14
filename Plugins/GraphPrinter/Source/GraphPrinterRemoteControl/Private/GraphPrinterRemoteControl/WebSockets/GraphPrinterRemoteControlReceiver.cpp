@@ -24,7 +24,7 @@ namespace GraphPrinter
 		const auto& Settings = UGraphPrinterRemoteControlSettings::Get();
 		if (Settings.bEnableRemoteControl)
 		{
-			Instance->ConnectToServer(Settings.ServerURL, Settings.ServerProtocol);
+			Instance->ConnectToServer(Settings.ServerURL);
 		}
 	}
 
@@ -36,16 +36,16 @@ namespace GraphPrinter
 		Instance.Reset();
 	}
 
-	void FGraphPrinterRemoteControlReceiver::ConnectToServer(const FString ServerURL, const FString ServerProtocol)
+	void FGraphPrinterRemoteControlReceiver::ConnectToServer(const FString ServerURL)
 	{
 		DisconnectFromServer();
 		
-		Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL, ServerProtocol);
+		Socket = FWebSocketsModule::Get().CreateWebSocket(ServerURL);
 		check(Socket.IsValid());
 
 		Socket->OnConnected().AddRaw(
 			this, &FGraphPrinterRemoteControlReceiver::HandleOnConnected,
-			ServerURL, ServerProtocol
+			ServerURL
 		);
 		Socket->OnConnectionError().AddRaw(this, &FGraphPrinterRemoteControlReceiver::HandleOnConnectionError);
 		Socket->OnClosed().AddRaw(this, &FGraphPrinterRemoteControlReceiver::HandleOnClosed);
@@ -63,9 +63,9 @@ namespace GraphPrinter
 		Socket.Reset();
 	}
 
-	void FGraphPrinterRemoteControlReceiver::HandleOnConnected(const FString ServerURL, const FString ServerProtocol)
+	void FGraphPrinterRemoteControlReceiver::HandleOnConnected(const FString ServerURL)
 	{
-		UE_LOG(LogGraphPrinter, Log, TEXT("Connected to server (URL: %s | Protocol: %s)"), *ServerURL, *ServerProtocol);
+		UE_LOG(LogGraphPrinter, Log, TEXT("Connected to server (URL: %s)"), *ServerURL);
 	}
 
 	void FGraphPrinterRemoteControlReceiver::HandleOnConnectionError(const FString& Error)

@@ -24,15 +24,10 @@ public:
 	// Disable remote control once to edit.
 	UPROPERTY(EditAnywhere, Config, Category = "Remote Control", meta = (EditCondition = "!bEnableRemoteControl"))
 	FString ServerURL;
-	
-	// The WebServer protocol you want to use.
-	// Disable remote control once to edit.
-	UPROPERTY(EditAnywhere, Config, Category = "Remote Control", meta = (EditCondition = "!bEnableRemoteControl"))
-	FString ServerProtocol;
 
 public:
 	// The event called when remote control is enabled.
-	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnRemoteControlEnabled, const FString /* ServerURL */, const FString /* ServerProtocol */);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnRemoteControlEnabled, const FString /* ServerURL */);
 	static FOnRemoteControlEnabled OnRemoteControlEnabled;
 
 	// The event called when remote control is disabled.

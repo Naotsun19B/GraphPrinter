@@ -33,7 +33,7 @@ namespace GraphPrinter
 			const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(PluginName.ToString());
 			check(Plugin.IsValid());
 			StyleContentRoot = FPaths::ConvertRelativePathToFull(
-				Plugin->GetBaseDir() / TEXT("Resources")
+				Plugin->GetBaseDir() / TEXT("Resources") / TEXT("Icons")
 			);
 		}
 		

@@ -25,13 +25,13 @@ namespace GraphPrinter
 
 	private:
 		// Called when remote control is enabled.
-		void ConnectToServer(const FString ServerURL, const FString ServerProtocol);
+		void ConnectToServer(const FString ServerURL);
 
 		// Called when remote control is disabled.
 		void DisconnectFromServer();
 
 		// Callback functions for events emitted from web sockets.
-		void HandleOnConnected(const FString ServerURL, const FString ServerProtocol);
+		void HandleOnConnected(const FString ServerURL);
 		void HandleOnConnectionError(const FString& Error);
 		void HandleOnClosed(int32 StatusCode, const FString& Reason, bool bWasClean);
 		void HandleOnMessage(const FString& Message);

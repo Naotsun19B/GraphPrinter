@@ -8,7 +8,6 @@ UGraphPrinterRemoteControlSettings::FOnRemoteControlDisabled UGraphPrinterRemote
 UGraphPrinterRemoteControlSettings::UGraphPrinterRemoteControlSettings()
 	: bEnableRemoteControl(false)
 	, ServerURL(TEXT("ws://127.0.0.1:3000/"))
-	, ServerProtocol(TEXT("ws"))
 {
 }
 
@@ -32,7 +31,7 @@ void UGraphPrinterRemoteControlSettings::PostEditChangeProperty(FPropertyChanged
 	{
 		if (bEnableRemoteControl)
 		{
-			OnRemoteControlEnabled.Broadcast(ServerURL, ServerProtocol);
+			OnRemoteControlEnabled.Broadcast(ServerURL);
 		}
 		else
 		{
