@@ -32,6 +32,7 @@ public class GraphPrinterEditorExtension : ModuleRules
 				"WidgetPrinter",
                 "TextChunkHelper",
                 "ClipboardImageExtension",
+                "GraphPrinterStreamDeck",
 			}
 		);
 	}

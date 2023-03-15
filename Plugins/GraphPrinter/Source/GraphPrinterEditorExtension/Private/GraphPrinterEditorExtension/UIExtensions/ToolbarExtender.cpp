@@ -1,10 +1,10 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
-#include "GraphPrinterEditorExtension/UIExtensions/StreamDeckMenu.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterEditorExtensionSettings.h"
+#include "GraphPrinterStreamDeck/UIExtensions/StreamDeckMenu.h"
 #include "Toolkits/AssetEditorToolkit.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Framework/MultiBox/MultiBoxExtender.h"

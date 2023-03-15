@@ -37,12 +37,5 @@ public class GraphPrinterGlobals : ModuleRules
 				Path.Combine(EngineDirectory, "Source", "Runtime", "Launch", "Resources"),
 			}
 		);
-		
-		// #TODO: Allows the use of the Stream Deck plugin on Mac.
-		if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows))
-		{
-			// #TODO: Avoid adding functionality to the editor until the Stream Deck plugin is complete.
-			// PublicDefinitions.Add("WITH_STREAM_DECK");
-		}
 	}
 }
