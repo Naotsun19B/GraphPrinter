@@ -17,7 +17,7 @@ namespace GraphPrinter
 		}
 		
 		MenuBuilder.AddMenuEntry(
-			LOCTEXT("InstallPluginTitle", "Instal Stream Deck Plugin"),
+			LOCTEXT("InstallPluginTitle", "Install Stream Deck Plugin"),
 			LOCTEXT("InstallPluginTooltip", "Install the Stream Deck plugin that works with this plugin on the Stream Deck.\nIf this item fails to run, it is already installed.\nIf you don't see the Graph Printer item in the Stream Deck application, restart the Stream Deck application."),
 			FSlateIcon(),
 			FUIAction(
