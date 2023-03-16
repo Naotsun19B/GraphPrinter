@@ -1,7 +1,6 @@
 ﻿// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
-#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "ImageWriteTypes.h"
 #include "Engine/Texture.h"
@@ -91,7 +90,11 @@ void UWidgetPrinterSettings::PostEditChangeProperty(FPropertyChangedEvent& Prope
 	}
 }
 
+#if UE_4_25_OR_LATER
 bool UWidgetPrinterSettings::CanEditChange(const FProperty* InProperty) const
+#else
+bool UWidgetPrinterSettings::CanEditChange(const UProperty* InProperty) const
+#endif
 {
 	if (InProperty != nullptr)
 	{

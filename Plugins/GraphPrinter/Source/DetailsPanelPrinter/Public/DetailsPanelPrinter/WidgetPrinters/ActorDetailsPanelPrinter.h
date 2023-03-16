@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DetailsPanelPrinter/WidgetPrinters/DetailsPanelPrinter.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "ActorDetailsPanelPrinter.generated.h"
 
 /**
@@ -20,7 +21,9 @@ public:
 	
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
+#if UE_5_00_OR_LATER
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
+#endif
 	// End of UWidgetPrinter interface.
 };

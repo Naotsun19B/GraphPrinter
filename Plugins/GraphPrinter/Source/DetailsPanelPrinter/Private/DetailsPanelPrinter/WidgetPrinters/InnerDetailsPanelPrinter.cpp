@@ -1,6 +1,7 @@
 ﻿// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
+#if UE_5_00_OR_LATER
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "DetailMultiTopLevelObjectRootNode.h"
@@ -69,7 +70,7 @@ namespace GraphPrinter
 		FDetailsObjectSet& DetailsObjects = Hack::RootObjectSet::Extract(DetailMultiTopLevelObjectRootNode.Get());
 		return DetailsObjects.RootObjects;
 	}
-
+	
 	FDetailsPanelPrinter::FDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 		: Super(InPrintOptions, InOnPrinterProcessingFinished)
 	{
@@ -200,3 +201,4 @@ namespace GraphPrinter
 }
 
 #undef HACK_INACCESSIBLE_PROPERTY
+#endif

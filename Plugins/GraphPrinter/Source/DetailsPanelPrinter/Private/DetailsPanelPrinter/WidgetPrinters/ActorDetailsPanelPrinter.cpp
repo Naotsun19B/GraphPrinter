@@ -2,7 +2,6 @@
 
 #include "DetailsPanelPrinter/WidgetPrinters/ActorDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
-#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
 UActorDetailsPanelPrinter::UActorDetailsPanelPrinter()
 {
@@ -19,6 +18,7 @@ int32 UActorDetailsPanelPrinter::GetPriority() const
 	return DetailsPanelPrinterPriority + 1;
 }
 
+#if UE_5_00_OR_LATER
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UActorDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FActorDetailsPanelPrinter>(
@@ -34,3 +34,4 @@ TSharedRef<GraphPrinter::IInnerWidgetPrinter> UActorDetailsPanelPrinter::CreateR
 		OnPrinterProcessingFinished
 	);
 }
+#endif

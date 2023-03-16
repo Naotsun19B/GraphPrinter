@@ -19,7 +19,7 @@ namespace ClipboardImageExtension
 		// End of FGenericClipboardImageExtension interface.
 	};
 
-#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
+#if PLATFORM_WINDOWS
 	using FClipboardImageExtension = FWindowsClipboardImageExtension;
 #endif
 }

@@ -7,13 +7,13 @@
 #include "Misc/FileHelper.h"
 #include "Modules/ModuleManager.h"
 
-#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
+#if PLATFORM_WINDOWS
 #include "Windows/WindowsApplication.h"
 #endif
 
 namespace ClipboardImageExtension
 {
-#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
+#if PLATFORM_WINDOWS
 	namespace ClipboardImageExtensionInternal
 	{
 		HBITMAP LoadBitmapImage(const FString& Filename)
@@ -68,7 +68,7 @@ namespace ClipboardImageExtension
 	
 	bool FWindowsClipboardImageExtension::ClipboardCopy(const FString& Filename)
 	{
-#if WINDOWS_USE_FEATURE_APPLICATIONMISC_CLASS
+#if PLATFORM_WINDOWS
 		const HBITMAP Bitmap = ClipboardImageExtensionInternal::LoadBitmapImage(Filename);
 		if (Bitmap == nullptr)
 		{

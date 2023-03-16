@@ -3,6 +3,7 @@
 #include "WidgetPrinter/Types/RestoreWidgetOptions.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#include "UObject/Package.h"
 #include "Misc/Paths.h"
 #include "ImageWriteTypes.h"
 

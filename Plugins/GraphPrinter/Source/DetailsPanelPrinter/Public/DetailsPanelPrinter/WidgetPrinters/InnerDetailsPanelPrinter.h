@@ -15,6 +15,7 @@
 #include "TextChunkHelper/ITextChunkHelper.h"
 #endif
 
+#if UE_5_00_OR_LATER
 namespace GraphPrinter
 {
 #ifdef WITH_TEXT_CHUNK_HELPER
@@ -313,7 +314,7 @@ namespace GraphPrinter
 					DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader
 				);
 				const int32 PropertiesInfoHeaderLength = DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader.Len();
-				PropertiesJsonString.MidInline(
+				PropertiesJsonString = PropertiesJsonString.Mid(
 					PropertiesInfoHeaderLength,
 					PropertiesJsonString.Len() - PropertiesInfoHeaderLength
 				);
@@ -342,7 +343,7 @@ namespace GraphPrinter
 					DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader
 				);
 				const int32 ExpansionStatesInfoHeaderLength = DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader.Len();
-				ExpansionStatesString.MidInline(
+				ExpansionStatesString = ExpansionStatesString.Mid(
 					ExpansionStatesInfoHeaderLength,
 					ExpansionStatesString.Len() - ExpansionStatesInfoHeaderLength
 				);
@@ -551,3 +552,4 @@ namespace GraphPrinter
 		// End of TDetailsPanelPrinter interface.
 	};
 }
+#endif

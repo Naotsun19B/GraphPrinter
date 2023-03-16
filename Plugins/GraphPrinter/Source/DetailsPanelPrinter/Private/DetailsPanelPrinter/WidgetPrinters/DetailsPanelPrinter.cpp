@@ -5,7 +5,6 @@
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
 #include "DetailsPanelPrinter/Types/RestoreDetailsPanelOptions.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
-#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
 UDetailsPanelPrinter::UDetailsPanelPrinter()
 {
@@ -60,6 +59,7 @@ URestoreWidgetOptions* UDetailsPanelPrinter::CreateDefaultRestoreOptions() const
 	return nullptr;
 }
 
+#if UE_5_00_OR_LATER
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FDetailsPanelPrinter>(
@@ -75,3 +75,4 @@ TSharedRef<GraphPrinter::IInnerWidgetPrinter> UDetailsPanelPrinter::CreateRestor
 		OnPrinterProcessingFinished
 	);
 }
+#endif

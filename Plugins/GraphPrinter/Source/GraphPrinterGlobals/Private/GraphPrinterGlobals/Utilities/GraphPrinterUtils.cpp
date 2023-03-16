@@ -24,14 +24,6 @@ namespace GraphPrinter
 		}
 	}
 
-	void FNotificationHandle::Pulse(const FLinearColor& GlowColor)
-	{
-		if (NotificationItem.IsValid())
-		{
-			NotificationItem->Pulse(GlowColor);
-		}
-	}
-
 	FNotificationInteraction::FNotificationInteraction(
 		EInteractionType InType,
 		const FText& InText,
@@ -224,7 +216,7 @@ namespace GraphPrinter
 		}
 		if (StartPosition > 0)
 		{
-			String.MidInline(StartPosition, TextLength - StartPosition);
+			String = String.Mid(StartPosition, TextLength - StartPosition);
 			return true;
 		}
 

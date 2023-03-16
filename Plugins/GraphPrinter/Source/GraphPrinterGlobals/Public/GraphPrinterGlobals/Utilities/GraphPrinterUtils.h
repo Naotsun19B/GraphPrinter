@@ -18,9 +18,6 @@ namespace GraphPrinter
 
 		// Begin the fade out,
 		void Fadeout();
-
-		// Pulse the notification with a certain outline glow color while it is still pending.
-		void Pulse(const FLinearColor& GlowColor);
 			
 	private:
 		// Indirectly operated SNotificationItem.

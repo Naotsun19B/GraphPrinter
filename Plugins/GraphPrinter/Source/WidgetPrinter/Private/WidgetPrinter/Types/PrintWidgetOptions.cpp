@@ -1,6 +1,7 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
+#include "UObject/Package.h"
 
 UPrintWidgetOptions::UPrintWidgetOptions()
 	: PrintScope(EPrintScope::All)

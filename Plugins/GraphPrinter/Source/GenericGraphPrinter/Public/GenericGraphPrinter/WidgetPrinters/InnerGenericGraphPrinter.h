@@ -9,6 +9,7 @@
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
 #include "SGraphEditorImpl.h"
 #include "EdGraphUtilities.h"
+#include "Widgets/Text/STextBlock.h"
 
 #ifdef WITH_TEXT_CHUNK_HELPER
 #include "TextChunkHelper/ITextChunkHelper.h"

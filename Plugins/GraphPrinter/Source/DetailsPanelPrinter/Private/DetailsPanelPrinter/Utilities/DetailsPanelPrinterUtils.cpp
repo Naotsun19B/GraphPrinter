@@ -163,7 +163,7 @@ namespace GraphPrinter
 #endif
 		const FVector2D LocalSize = Geometry.GetLocalSize();
 
-#if UE_5_00_OR_LATER
+#if UE_5_01_OR_LATER
 		if (DesiredSize.ComponentwiseAllGreaterThan(LocalSize))
 #else
 		if (DesiredSize > LocalSize)
@@ -258,7 +258,7 @@ namespace GraphPrinter
 #if UE_4_25_OR_LATER
 		for (auto* Property : TFieldRange<FProperty>(Class, EFieldIteratorFlags::IncludeSuper, EFieldIteratorFlags::ExcludeDeprecated))
 #else
-		for (auto* Property : TFieldRange<UProperty>(Class, EFieldIterationFlags::IncludeAll))
+		for (auto* Property : TFieldRange<UProperty>(Class, EFieldIteratorFlags::IncludeSuper, EFieldIteratorFlags::ExcludeDeprecated))
 #endif
 		{
 			if (Property == nullptr)
@@ -375,7 +375,7 @@ namespace GraphPrinter
 #if UE_4_25_OR_LATER
 		for (auto* Property : TFieldRange<FProperty>(Class, EFieldIteratorFlags::IncludeSuper, EFieldIteratorFlags::ExcludeDeprecated))
 #else
-		for (auto* Property : TFieldRange<UProperty>(Class, EFieldIterationFlags::IncludeAll))
+		for (auto* Property : TFieldRange<UProperty>(Class, EFieldIteratorFlags::IncludeSuper, EFieldIteratorFlags::ExcludeDeprecated))
 #endif
 		{
 			if (Property == nullptr)
