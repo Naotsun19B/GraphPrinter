@@ -33,7 +33,7 @@ namespace GraphPrinter
 			const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(PluginName.ToString());
 			check(Plugin.IsValid());
 			StyleContentRoot = FPaths::ConvertRelativePathToFull(
-				Plugin->GetBaseDir() / TEXT("Resources") / TEXT("Icons")
+				Plugin->GetBaseDir() / TEXT("Resources")
 			);
 		}
 		
@@ -43,7 +43,7 @@ namespace GraphPrinter
 		
 		Instance->Set(
 			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::PluginIcon),
-			new IMAGE_BRUSH("Icon128", IconSize::Icon64x64)
+			new IMAGE_BRUSH("Plugin128", IconSize::Icon64x64)
 		);
 		Instance->Set(
 			GetPropertyNameFromIconType(EGraphPrinterStyleIconType::CopyAllAreaOfWidgetToClipboard),

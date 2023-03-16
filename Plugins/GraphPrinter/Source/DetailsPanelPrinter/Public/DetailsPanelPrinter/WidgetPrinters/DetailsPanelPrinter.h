@@ -19,6 +19,9 @@ public:
 	static constexpr int32 DetailsPanelPrinterPriority = 200;
 	
 public:
+	// Constructor.
+	UDetailsPanelPrinter();
+	
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(

@@ -1,12 +1,19 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterSettings.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
 UDetailsPanelPrinterSettings::UDetailsPanelPrinterSettings()
 	: Padding(50.f)
 	, bIsIncludeExpansionStateInImageFile(true)
 	, bWhetherToAlsoRestoreExpandedStates(true)
 {
+#if !UE_5_00_OR_LATER
+	if (UClass* Class = GetClass())
+	{
+		Class->ClassFlags |= CLASS_Abstract;
+	}
+#endif
 }
 
 const UDetailsPanelPrinterSettings& UDetailsPanelPrinterSettings::Get()

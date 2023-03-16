@@ -12,7 +12,9 @@
 #include "SDetailsView.h"
 #include "SDetailsViewBase.h"
 #include "SActorDetails.h"
+#if UE_5_00_OR_LATER
 #include "SSubobjectInstanceEditor.h"
+#endif
 #include "Engine/UserDefinedStruct.h"
 #include "Serialization/JsonSerializer.h"
 #include "JsonObjectConverter.h"
@@ -126,7 +128,8 @@ namespace GraphPrinter
 	TSharedPtr<SWidget> FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(TSharedPtr<SActorDetails> SearchTarget)
 	{
 		TSharedPtr<SWidget> FoundSubobjectInstanceEditor = nullptr;
-		
+
+#if UE_5_00_OR_LATER
 		FWidgetPrinterUtils::EnumerateChildWidgets(
 			SearchTarget,
 			[&FoundSubobjectInstanceEditor](const TSharedPtr<SWidget> ChildWidget) -> bool
@@ -137,10 +140,11 @@ namespace GraphPrinter
 					FoundSubobjectInstanceEditor = SubobjectInstanceEditor;
 					return false;
 				}
-
+		
 				return true;
 			}
 		);
+#endif
 
 		return FoundSubobjectInstanceEditor;
 	}
@@ -159,7 +163,11 @@ namespace GraphPrinter
 #endif
 		const FVector2D LocalSize = Geometry.GetLocalSize();
 
+#if UE_5_00_OR_LATER
 		if (DesiredSize.ComponentwiseAllGreaterThan(LocalSize))
+#else
+		if (DesiredSize > LocalSize)
+#endif
 		{
 			return (DesiredSize - LocalSize);
 		}
@@ -248,7 +256,7 @@ namespace GraphPrinter
 		int32 NumOfProperties = 0;
 		const TSharedRef<FJsonObject> PropertiesJsonObject = PropertiesJsonObjectPtr->ToSharedRef();
 #if UE_4_25_OR_LATER
-		for (auto* Property : TFieldRange<FProperty>(Class, EFieldIterationFlags::IncludeAll))
+		for (auto* Property : TFieldRange<FProperty>(Class, EFieldIteratorFlags::IncludeSuper, EFieldIteratorFlags::ExcludeDeprecated))
 #else
 		for (auto* Property : TFieldRange<UProperty>(Class, EFieldIterationFlags::IncludeAll))
 #endif
@@ -365,7 +373,7 @@ namespace GraphPrinter
 		int32 NumOfProperties = 0;
 		const TSharedRef<FJsonObject> PropertiesJsonObject = MakeShared<FJsonObject>();
 #if UE_4_25_OR_LATER
-		for (auto* Property : TFieldRange<FProperty>(Class, EFieldIterationFlags::IncludeAll))
+		for (auto* Property : TFieldRange<FProperty>(Class, EFieldIteratorFlags::IncludeSuper, EFieldIteratorFlags::ExcludeDeprecated))
 #else
 		for (auto* Property : TFieldRange<UProperty>(Class, EFieldIterationFlags::IncludeAll))
 #endif

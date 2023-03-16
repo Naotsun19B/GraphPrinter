@@ -7,6 +7,11 @@
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
+#if UE_5_00_OR_LATER
+#include "Styling/AppStyle.h"
+#else
+#include "EditorStyle.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "GraphPrinterCommands"
 
@@ -82,7 +87,14 @@ namespace GraphPrinter
 			LOCTEXT("OpenPluginSettingsSubMenuTooltip", "Open the Graph Printer settings screen in the editor preferences."),
 			FNewMenuDelegate::CreateStatic(&FGraphPrinterCommands::OnExtendOpenSettingsSubMenu),
 			false,
-			FSlateIcon(FAppStyle::Get().GetStyleSetName(), TEXT("Icons.Settings"))
+			FSlateIcon(
+#if UE_5_00_OR_LATER
+				FAppStyle::GetAppStyleSetName(),
+#else
+				FEditorStyle::GetStyleSetName(),
+#endif
+				TEXT("Icons.Settings")
+			)
 		);
 		MenuBuilder.EndSection();
 	}

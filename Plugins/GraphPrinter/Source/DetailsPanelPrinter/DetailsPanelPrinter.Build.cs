@@ -33,7 +33,9 @@ public class DetailsPanelPrinter : ModuleRules
                 "Engine",
                 "UnrealEd",
                 "MainFrame",
+#if UE_5_00_OR_LATER
                 "SubobjectEditor",
+#endif
                 "Json",
                 "JsonUtilities",
 

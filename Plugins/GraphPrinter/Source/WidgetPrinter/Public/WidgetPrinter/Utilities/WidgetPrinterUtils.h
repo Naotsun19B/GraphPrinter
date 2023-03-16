@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 class SWidget;
+class SWindow;
 class SOverlay;
 class SStandaloneAssetEditorToolkitHost;
 

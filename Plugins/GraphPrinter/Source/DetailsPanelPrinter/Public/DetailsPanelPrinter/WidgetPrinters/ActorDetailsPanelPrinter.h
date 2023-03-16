@@ -15,6 +15,9 @@ class DETAILSPANELPRINTER_API UActorDetailsPanelPrinter : public UDetailsPanelPr
 	GENERATED_BODY()
 
 public:
+	// Constructor.
+	UActorDetailsPanelPrinter();
+	
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;

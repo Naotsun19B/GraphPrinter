@@ -2,6 +2,17 @@
 
 #include "DetailsPanelPrinter/WidgetPrinters/ActorDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+
+UActorDetailsPanelPrinter::UActorDetailsPanelPrinter()
+{
+#if !UE_5_00_OR_LATER
+	if (UClass* Class = GetClass())
+	{
+		Class->ClassFlags |= CLASS_Abstract;
+	}
+#endif
+}
 
 int32 UActorDetailsPanelPrinter::GetPriority() const
 {
