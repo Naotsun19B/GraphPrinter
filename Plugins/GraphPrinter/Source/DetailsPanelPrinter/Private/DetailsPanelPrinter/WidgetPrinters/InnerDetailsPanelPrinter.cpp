@@ -1,11 +1,12 @@
 ﻿// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
-#if UE_5_00_OR_LATER
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "DetailMultiTopLevelObjectRootNode.h"
 #include "GameFramework/WorldSettings.h"
+
+#ifdef WITH_DETAILS_PANEL_PRINTER
 
 #define HACK_INACCESSIBLE_PROPERTY(PropertyType, ClassType, PropertyName) \
 	namespace PropertyName \

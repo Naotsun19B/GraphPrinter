@@ -1,7 +1,9 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterStreamDeck/UIExtensions/StreamDeckMenu.h"
+#ifdef WITH_STREAM_DECK
 #include "GraphPrinterStreamDeck/HAL/StreamDeckUtils.h"
+#endif
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 
 #ifdef WITH_STREAM_DECK

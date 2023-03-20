@@ -33,9 +33,6 @@ public class DetailsPanelPrinter : ModuleRules
                 "Engine",
                 "UnrealEd",
                 "MainFrame",
-#if UE_5_00_OR_LATER
-                "SubobjectEditor",
-#endif
                 "Json",
                 "JsonUtilities",
 
@@ -45,6 +42,10 @@ public class DetailsPanelPrinter : ModuleRules
                 "ClipboardImageExtension",
             }
         );
+        if (Target.Version.MajorVersion >= 5)
+        {
+            PrivateDependencyModuleNames.Add("SubobjectEditor");
+        }
         
         PublicIncludePaths.AddRange(
             new string[]
@@ -56,5 +57,14 @@ public class DetailsPanelPrinter : ModuleRules
                 Path.Combine(EngineDirectory, "Source", "Editor", "LevelEditor", "Private"),
             }
         );
+        
+        // #TODO: Allows the use of details panel printer on Mac and before UE4.27.
+        if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows) || Target.IsInPlatformGroup(UnrealPlatformGroup.Linux))
+        {
+            if (Target.Version.MajorVersion >= 5)
+            {
+                PublicDefinitions.Add("WITH_DETAILS_PANEL_PRINTER");
+            }
+        }
     }
 }

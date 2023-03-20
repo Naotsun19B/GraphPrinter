@@ -15,7 +15,7 @@
 #include "TextChunkHelper/ITextChunkHelper.h"
 #endif
 
-#if UE_5_00_OR_LATER
+#ifdef WITH_DETAILS_PANEL_PRINTER
 namespace GraphPrinter
 {
 #ifdef WITH_TEXT_CHUNK_HELPER

@@ -5,7 +5,7 @@
 
 UActorDetailsPanelPrinter::UActorDetailsPanelPrinter()
 {
-#if !UE_5_00_OR_LATER
+#ifndef WITH_DETAILS_PANEL_PRINTER
 	if (UClass* Class = GetClass())
 	{
 		Class->ClassFlags |= CLASS_Abstract;
@@ -18,7 +18,7 @@ int32 UActorDetailsPanelPrinter::GetPriority() const
 	return DetailsPanelPrinterPriority + 1;
 }
 
-#if UE_5_00_OR_LATER
+#ifdef WITH_DETAILS_PANEL_PRINTER
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UActorDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FActorDetailsPanelPrinter>(

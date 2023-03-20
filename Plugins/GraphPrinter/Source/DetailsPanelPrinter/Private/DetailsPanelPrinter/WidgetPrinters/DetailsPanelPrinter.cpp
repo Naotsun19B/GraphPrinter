@@ -8,7 +8,7 @@
 
 UDetailsPanelPrinter::UDetailsPanelPrinter()
 {
-#if !UE_5_00_OR_LATER
+#ifndef WITH_DETAILS_PANEL_PRINTER
 	if (UClass* Class = GetClass())
 	{
 		Class->ClassFlags |= CLASS_Abstract;
@@ -59,7 +59,7 @@ URestoreWidgetOptions* UDetailsPanelPrinter::CreateDefaultRestoreOptions() const
 	return nullptr;
 }
 
-#if UE_5_00_OR_LATER
+#ifdef WITH_DETAILS_PANEL_PRINTER
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FDetailsPanelPrinter>(

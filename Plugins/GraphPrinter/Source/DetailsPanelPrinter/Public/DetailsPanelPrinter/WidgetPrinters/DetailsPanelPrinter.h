@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "DetailsPanelPrinter.generated.h"
 
 /**
@@ -30,7 +29,7 @@ public:
 		const UPrintWidgetOptions::EExportMethod ExportMethod
 	) const override;
 	virtual URestoreWidgetOptions* CreateDefaultRestoreOptions() const override;
-#if UE_5_00_OR_LATER
+#ifdef WITH_DETAILS_PANEL_PRINTER
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 #endif
