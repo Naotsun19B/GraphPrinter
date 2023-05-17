@@ -2,6 +2,7 @@
 
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "Slate/WidgetRenderer.h"
+#include "RenderingThread.h"
 
 namespace GraphPrinter
 {

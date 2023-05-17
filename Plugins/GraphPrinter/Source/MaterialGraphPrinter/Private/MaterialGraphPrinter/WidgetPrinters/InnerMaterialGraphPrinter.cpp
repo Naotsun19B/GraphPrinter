@@ -5,10 +5,9 @@
 #include "MaterialGraph/MaterialGraph.h"
 #include "SGraphEditorImpl.h"
 #include "Widgets/SBoxPanel.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Images/SImage.h"
-#include "Framework/Docking/SDockingTabStack.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
-
 #if !UE_5_00_OR_LATER
 #include "MaterialGraph/MaterialGraphNode_Root.h"
 #endif

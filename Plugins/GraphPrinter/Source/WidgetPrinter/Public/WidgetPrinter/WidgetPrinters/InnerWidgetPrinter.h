@@ -8,14 +8,15 @@
 #include "WidgetPrinter/Types/OneWayBool.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
+#include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"
+#endif
 #include "UObject/StrongObjectPtr.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "HAL/FileManager.h"
 #include "EdGraph/EdGraph.h"
-
-#ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-#include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"
-#endif
+#include "Misc/Paths.h"
+#include "Widgets/SWidget.h"
 
 #define LOCTEXT_NAMESPACE "InnerPrinter"
 

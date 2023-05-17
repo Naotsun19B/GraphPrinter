@@ -7,13 +7,12 @@
 #include "DetailsPanelPrinter/Types/PrintDetailsPanelOptions.h"
 #include "DetailsPanelPrinter/Types/RestoreDetailsPanelOptions.h"
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
-#include "SDetailsView.h"
-#include "SActorDetails.h"
-#include "EdGraphUtilities.h"
-
 #ifdef WITH_TEXT_CHUNK_HELPER
 #include "TextChunkHelper/ITextChunkHelper.h"
 #endif
+#include "SDetailsView.h"
+#include "SActorDetails.h"
+#include "GameFramework/Actor.h"
 
 #ifdef WITH_DETAILS_PANEL_PRINTER
 namespace GraphPrinter
