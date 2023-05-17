@@ -10,7 +10,7 @@
 #if UE_5_00_OR_LATER
 #include "Styling/AppStyle.h"
 #else
-#include "EditorStyle.h"
+#include "EditorStyleSet.h"
 #endif
 
 #define LOCTEXT_NAMESPACE "GraphPrinterCommands"
