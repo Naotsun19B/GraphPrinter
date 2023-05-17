@@ -8,7 +8,6 @@
 #include "WidgetPrinter/Types/OneWayBool.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
-#include "Slate/WidgetRenderer.h"
 #include "UObject/StrongObjectPtr.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "HAL/FileManager.h"
@@ -35,13 +34,13 @@ namespace GraphPrinter
 		// Destructor.
 		virtual ~IInnerWidgetPrinter() = default;
 		
-		// Draw and export the widget with arguments.
+		// Draws and export the widget with arguments.
 		virtual void PrintWidget() = 0;
 	
 		// Returns whether the target widget can be printed.
 		virtual bool CanPrintWidget() const = 0;
 	
-		// Restore the state of the widget from the image file.
+		// Restores the state of the widget from the image file.
 		virtual void RestoreWidget() = 0;
 
 		// Returns whether the target widget can be restored.
@@ -51,7 +50,7 @@ namespace GraphPrinter
 		void SetOnRendered(const FOnRendered& InOnRendered);
 
 	protected:
-		// Draw the widget on the render target.
+		// Draws the widget on the render target.
 		static UTextureRenderTarget2D* DrawWidgetToRenderTargetInternal(
 			const TSharedRef<SWidget>& Widget,
 			const FVector2D& DrawSize,
@@ -60,7 +59,7 @@ namespace GraphPrinter
 			const float RenderingScale
 		);
 
-		// Export the render target that draws the graph editor to image file.
+		// Exports the render target that draws the graph editor to image file.
 		static void ExportRenderTargetToImageFileInternal(
 			UTextureRenderTarget2D* RenderTarget,
 			const FString& Filename,
@@ -68,10 +67,10 @@ namespace GraphPrinter
 		);
 		
 	protected:
-		// Event when receiving the drawing result without outputting the render target.
+		// The event when receiving the drawing result without outputting the render target.
 		FOnRendered OnRendered;
 		
-		// Number of attempts to draw the widget on the render target.
+		// The number of attempts to draw the widget on the render target.
 		// The drawing result may be corrupted once.
 		// Probably if draw twice, the drawing result will not be corrupted.
 		static constexpr int32 DrawTimes = 2;
@@ -323,7 +322,7 @@ namespace GraphPrinter
 		// Called before calculating the size of the widget to draw.
 		virtual void PreCalculateDrawSize() {}
 
-		// Calculate the size to use when drawing the widget.
+		// Calculates the size to use when drawing the widget.
 		virtual bool CalculateDrawSize(FVector2D& DrawSize)
 		{
 			const FGeometry& Geometry =
@@ -365,7 +364,7 @@ namespace GraphPrinter
 			return true;
 		}
 	
-		// Draw the widget on the render target.
+		// Draws the widget on the render target.
 		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget()
 		{
 			return DrawWidgetToRenderTargetInternal(
@@ -380,7 +379,7 @@ namespace GraphPrinter
 		// Performs processing after draw the widget.
 		virtual void PostDrawWidget() {}
 
-		// Prepare for copying to the clipboard.
+		// Prepares for copying to the clipboard.
 		virtual void PrepareCopyToClipboard()
 		{
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
@@ -392,7 +391,7 @@ namespace GraphPrinter
 #endif
 		}
 
-		// Create a file path from options.
+		// Creates a file path from options.
 		virtual FString CreateFilename()
 		{
 			FString Filename = FPaths::ConvertRelativePathToFull(
@@ -440,7 +439,7 @@ namespace GraphPrinter
 			return {};
 		}
 
-		// Export the render target that draws the widget to image file.
+		// Exports the render target that draws the widget to image file.
 		virtual void ExportRenderTargetToImageFile()
 		{
 			if (PrintOptions->ExportMethod == UPrintWidgetOptions::EExportMethod::RenderTarget)
@@ -532,7 +531,7 @@ namespace GraphPrinter
 			OnPrinterProcessingFinished.ExecuteIfBound();
 		}
 
-		// Copy the image file that draws the widget to clipboard.
+		// Copies the image file that draws the widget to clipboard.
 		virtual bool CopyImageFileToClipboard()
 		{
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
@@ -542,13 +541,13 @@ namespace GraphPrinter
 #endif
 		}
 
-		// Write the drawn widget information to the text chunk.
+		// Writes the drawn widget information to the text chunk.
 		virtual bool WriteWidgetInfoToTextChunk()
 		{
 			return false;
 		}
 
-		// Read information from the text chunk and restore the widget.
+		// Reads information from the text chunk and restore the widget.
 		virtual bool RestoreWidgetFromTextChunk()
 		{
 			return false;
@@ -561,13 +560,13 @@ namespace GraphPrinter
 		}
 		
 	protected:
-		// An event that notifies the end of processing.
+		// The event that notifies the end of processing.
 		FSimpleDelegate OnPrinterProcessingFinished;
 		
-		// Optional class for print processing.
+		// The optional class for print processing.
 		TPrintOptions* PrintOptions;
 
-		// Optional class for restore processing.
+		// The optional class for restore processing.
 		TRestoreOptions* RestoreOptions;
 
 		// The widget to draw.
@@ -579,7 +578,7 @@ namespace GraphPrinter
 			// The size of the image to output.
 			FVector2D DrawSize;
 
-			// A render target that holds the drawing results to be output.
+			// The render target that holds the drawing results to be output.
 			TStrongObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
 		
 			// The full path of the output file.

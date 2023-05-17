@@ -23,7 +23,7 @@ namespace GraphPrinter
 	{
 		namespace TextChunkDefine
 		{
-			// Key used when writing to a text chunk of a png file.
+			// The key used when writing to a text chunk of a png file.
 			static const FString PropertiesChunkKey = TEXT("DetailsPanel-Properties");
 			static const FString ExpansionStatesChunkKey = TEXT("DetailsPanel-ExpansionStates");
 
@@ -35,7 +35,7 @@ namespace GraphPrinter
 #endif
 	
 	/**
-	 * I want to hide the implementation to the cpp file side in order to forcibly access the protected property.
+	 * The class that must be inherited to access the protected properties of the SDetailsViewBase.
 	 */
 	class FDetailsViewBaseAccessor
 	{
@@ -489,16 +489,16 @@ namespace GraphPrinter
 		// A group of parameters that must be retained for processing.
 		struct FDetailsPanelPrinterParams
 		{
-			// Details view to print.
+			// The details view to print.
 			TSharedPtr<SDetailsView> DetailsView;
 
-			// Width before pre calculate draw size.
+			// The width before pre calculate draw size.
 			float PreCalculateDetailsViewWidth = 0.f;
 			
-			// Details view scrollbar position.
+			// The details view scrollbar position.
 			float ScrollOffset = 0.f;
 			
-			// Expanded state for each item.
+			// The expanded state for each item.
 			TMap<FString, bool> ExpansionStateMap;
 		};
 		FDetailsPanelPrinterParams DetailsPanelPrinterParams;

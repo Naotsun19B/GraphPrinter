@@ -59,7 +59,7 @@ namespace GraphPrinter
 	};
 	
 	/**
-	 * Misc utility functions used in this plugin.
+	 * A utility class that defines utility functions used in this plugin.
 	 */
 	class GRAPHPRINTERGLOBALS_API FGraphPrinterUtils
 	{

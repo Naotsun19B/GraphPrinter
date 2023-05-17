@@ -31,7 +31,7 @@ UWidgetPrinterSettings::UWidgetPrinterSettings()
 	OutputDirectory.Path = FPaths::ConvertRelativePathToFull(
 		FPaths::Combine(
 			FPaths::ProjectSavedDir(),
-			GraphPrinter::PluginName.ToString()
+			GraphPrinter::Global::PluginName.ToString()
 		)
 	);
 }

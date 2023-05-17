@@ -15,7 +15,7 @@ class DETAILSPANELPRINTER_API UDetailsPanelPrinterSettings : public UGraphPrinte
 	GENERATED_BODY()
 
 public:
-	// Height margin when drawing the details view.
+	// The height margin when drawing the details view.
 	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0.f, ClampMin = 0.f))
 	float Padding;
 	

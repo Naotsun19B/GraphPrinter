@@ -29,11 +29,11 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	EDesiredImageFormat Format;
 
-	// An image format specific compression setting. Either 0 (Default) or 1 (Uncompressed) for EXRs, or a value between 0 and 100.
+	// The image format specific compression setting. Either 0 (Default) or 1 (Uncompressed) for EXRs, or a value between 0 and 100.
 	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0, UIMax = 100))
 	int32 CompressionQuality;
 
-	// Texture filtering mode to use when outputting.
+	// The texture filtering mode to use when outputting.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	TEnumAsByte<TextureFilter> FilteringMode;
 	
@@ -41,12 +41,13 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	bool bUseGamma;
 
-	// Set the maximum size of the output image. There is no limit at (0.f, 0.f).
+	// The maximum size of the output image.
+	// There is no limit at (0.f, 0.f).
 	// If set it too high, you may run out of video memory and crash.
 	UPROPERTY(EditAnywhere, Config, Category = "Image")
 	FVector2D MaxImageSize;
 
-	// If the scale for drawing the graph is 0.5, it will be drawn at half the resolution.
+	// The drawing scale of the output image.
 	// Decrease the value if you want to draw a graph larger than MaxImageSize.
 	// Decreasing the value may cause defects in the drawing result.
 	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (ClampMin = 0.1f, ClampMax = 1.f, UIMin = 0.1f, UIMax = 1.f))
@@ -56,7 +57,7 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "File")
 	bool bCanOverwriteFileWhenExport;
 
-	// Directory path where the image file is output.
+	// The directory path where the image file is output.
 	UPROPERTY(EditAnywhere, Config, Category = "File")
 	FDirectoryPath OutputDirectory;	
 	

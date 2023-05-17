@@ -23,7 +23,7 @@ public:
 	// End of UPrintWidgetOptions interface.
 
 public:
-	// Margins when drawing the graph editor.
+	// The margins when drawing the graph editor.
 	float Padding;
 	
 	// Whether to hide the title bar of the graph editor and the text of the graph type in the lower right.

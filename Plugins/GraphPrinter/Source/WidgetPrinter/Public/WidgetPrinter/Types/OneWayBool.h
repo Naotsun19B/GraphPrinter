@@ -12,7 +12,7 @@ namespace GraphPrinter
 	struct FOneWayBool
 	{
 	public:
-		FOneWayBool(bool bInDefaultValue)
+		FOneWayBool(const bool bInDefaultValue)
 			: bDefaultValue(bInDefaultValue)
 			, bValue(bInDefaultValue)
 		{

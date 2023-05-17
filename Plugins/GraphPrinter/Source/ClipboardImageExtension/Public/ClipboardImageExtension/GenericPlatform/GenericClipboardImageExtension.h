@@ -8,7 +8,7 @@
 namespace ClipboardImageExtension
 {
 	/**
-	 * Extension class for working with images on the clipboard.
+	 * A extension class for working with images on the clipboard.
 	 */
 	class CLIPBOARDIMAGEEXTENSION_API FGenericClipboardImageExtension
 	{

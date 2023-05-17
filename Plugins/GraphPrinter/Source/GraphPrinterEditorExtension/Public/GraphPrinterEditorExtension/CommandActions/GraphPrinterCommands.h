@@ -12,7 +12,7 @@ class FMenuBuilder;
 namespace GraphPrinter
 {
 	/**
-	 * Class to register the shortcut key used in this plugin.
+	 * A class to register the shortcut key used in this plugin.
 	 */
 	class GRAPHPRINTEREDITOREXTENSION_API FGraphPrinterCommands : public TCommands<FGraphPrinterCommands>
 	{
@@ -24,20 +24,20 @@ namespace GraphPrinter
 		virtual void RegisterCommands() override;
 		// End of TCommands interface.
 
-		// Is the command registered here bound.
+		// Returns whether the commands registered here are bound.
 		static bool IsBound();
 
-		// Processing of command binding.
+		// Binds commands registered here.
 		static void Bind();
 
-		// Fill the menu builder with the commands of this plugin.
+		// Fills the menu builder with the commands of this plugin.
 		static void FillMenuBuilder(FMenuBuilder& MenuBuilder);
 
 		// Returns commands with names matching the specified name.
 		TSharedPtr<FUICommandInfo> FindCommandByName(const FName& CommandName) const;
 		
 	protected:
-		// Internal processing of command binding.
+		// Binds commands actually registered here.
 		virtual void BindCommands();
 
 	private:
@@ -45,7 +45,7 @@ namespace GraphPrinter
 		static void OnExtendOpenSettingsSubMenu(FMenuBuilder& MenuBuilder);
 		
 	public:
-		// A list of shortcut keys used by this plugin.
+		// The list of shortcut keys used by this plugin.
 		TSharedRef<FUICommandList> CommandBindings;
 		
 		// Instances of bound commands.
@@ -61,7 +61,7 @@ namespace GraphPrinter
 		TSharedPtr<FUICommandInfo> OpenExportDestinationFolder;
 
 	private:
-		// Is the command registered here bound.
+		// Whether the commands registered here are bound.
 		bool bIsBound;
 	};
 }

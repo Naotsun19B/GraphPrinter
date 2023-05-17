@@ -33,7 +33,7 @@ namespace GraphPrinter
 		// A group of parameters that must be retained for processing.
 		struct FPreviewViewportPrinterParams
 		{
-			// Keep the original visibility to temporarily hide the viewport menu widget.
+			// The original visibility to temporarily hide the viewport menu widget.
 			EVisibility PreviousVisibility;
 		};
 		FPreviewViewportPrinterParams PreviewViewportPrinterParams;

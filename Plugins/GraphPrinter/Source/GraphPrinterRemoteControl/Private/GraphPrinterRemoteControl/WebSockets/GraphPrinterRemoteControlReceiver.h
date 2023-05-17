@@ -9,7 +9,7 @@ class IWebSocket;
 namespace GraphPrinter
 {
 	/**
-	 * The receiver class that utilizes the functionality of this plugin externally via a web socket.
+	 * A receiver class that utilizes the functionality of this plugin externally via a web socket.
 	 * 
 	 * The format of the request from the server is as follows:
 	 * UnrealEngine-GraphPrinter-[CommandName]
@@ -19,7 +19,7 @@ namespace GraphPrinter
 	class GRAPHPRINTERREMOTECONTROL_API FGraphPrinterRemoteControlReceiver
 	{
 	public:
-		// Register - unregister the remote control receiver.
+		// Registers-Unregisters the remote control receiver.
 		static void Register();
 		static void Unregister();
 

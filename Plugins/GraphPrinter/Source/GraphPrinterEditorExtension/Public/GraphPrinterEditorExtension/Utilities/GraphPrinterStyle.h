@@ -8,7 +8,7 @@
 
 struct FSlateIcon;
 
-// The type of icon registered in this style set.
+// An enum class that defines type of icon registered in this style set.
 UENUM()
 enum class EGraphPrinterStyleIconType : uint8
 {
@@ -31,23 +31,28 @@ namespace GraphPrinter
 	public:
 		// Constructor.
 		FGraphPrinterStyle();
-		
-		// Register-Unregister and instance getter this class.
+
+	private:
+		// The actual registration process for this class.
+		void RegisterInternal();
+
+	public:
+		// Registers-Unregisters and instance getter this class.
 		static void Register();
 		static void Unregister();
 		static const ISlateStyle& Get();
 
 		// Returns slate brush of specified icon type.
-		static const FSlateBrush* GetBrushFromIconType(EGraphPrinterStyleIconType IconType);
+		static const FSlateBrush* GetBrushFromIconType(const EGraphPrinterStyleIconType IconType);
 
 		// Returns slate icon of specified icon type.
-		static FSlateIcon GetSlateIconFromIconType(EGraphPrinterStyleIconType IconType);
+		static FSlateIcon GetSlateIconFromIconType(const EGraphPrinterStyleIconType IconType);
 		
 		// Returns property name of specified icon type.
-		static FName GetPropertyNameFromIconType(EGraphPrinterStyleIconType IconType);
+		static FName GetPropertyNameFromIconType(const EGraphPrinterStyleIconType IconType);
 		
 	private:
-		// An instance of this style class.
-		static TSharedPtr<FGraphPrinterStyle> Instance;
+		// The instance of this style class.
+		static TUniquePtr<FGraphPrinterStyle> Instance;
 	};
 }

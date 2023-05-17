@@ -5,7 +5,6 @@
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Misc/FileHelper.h"
 #include "IImageWrapperModule.h"
-
 #if WITH_UNREALPNG
 #include "TextChunkHelper/Png/PngTextChunk.h"
 #endif
@@ -33,7 +32,7 @@ namespace TextChunkHelper
 		// End of ITextChunkHelper interface.
 
 	private:
-		// Text chunk generation process for each image format.
+		// The text chunk generation process for each image format.
 		TMap<EDesiredImageFormat, FOnCreateTextChunk> GenerationProcesses;
 	};
 	
@@ -113,7 +112,7 @@ namespace TextChunkHelper
 			return nullptr;
 		}
 
-		ITextChunk::FInitializer Initializer(TextChunk.Get());
+		const ITextChunk::FInitializer Initializer(TextChunk.Get());
 		if (!Initializer.Initialize(InFilename, CompressedData.GetData(), CompressedData.Num()))
 		{
 			return nullptr;

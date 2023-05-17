@@ -1,6 +1,7 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
+#include "Slate/WidgetRenderer.h"
 
 namespace GraphPrinter
 {

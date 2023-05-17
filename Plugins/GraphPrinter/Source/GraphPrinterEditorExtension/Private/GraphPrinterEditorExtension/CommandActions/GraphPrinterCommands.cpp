@@ -34,15 +34,15 @@ namespace GraphPrinter
 	{
 		// Register command here.
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		UI_COMMAND(CopyAllAreaOfWidgetToClipboard, "Copy All Area Of Widget To Clipboard", "Copy the entire target widget as an image to the clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F7, EModifierKey::Control));
-		UI_COMMAND(CopySelectedAreaOfWidgetToClipboard, "Copy Selected Area Of Widget To Clipboard", "Copy the selected area of the target widget to the clipboard as an image.", EUserInterfaceActionType::Button, FInputChord(EKeys::F8, EModifierKey::Control));
+		UI_COMMAND(CopyAllAreaOfWidgetToClipboard, "Copies All Area Of Widget To Clipboard", "Copy the entire target widget as an image to the clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F7, EModifierKey::Control));
+		UI_COMMAND(CopySelectedAreaOfWidgetToClipboard, "Copies Selected Area Of Widget To Clipboard", "Copy the selected area of the target widget to the clipboard as an image.", EUserInterfaceActionType::Button, FInputChord(EKeys::F8, EModifierKey::Control));
 #endif
-		UI_COMMAND(PrintAllAreaOfWidget, "Print All Area Of Widget", "Outputs the entire target widget as an image file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F9, EModifierKey::Control));
-		UI_COMMAND(PrintSelectedAreaOfWidget, "Print Selected Area Of Widget", "Outputs the selected area of the target widget as an image file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F10, EModifierKey::Control));
+		UI_COMMAND(PrintAllAreaOfWidget, "Prints All Area Of Widget", "Outputs the entire target widget as an image file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F9, EModifierKey::Control));
+		UI_COMMAND(PrintSelectedAreaOfWidget, "Prints Selected Area Of Widget", "Outputs the selected area of the target widget as an image file.", EUserInterfaceActionType::Button, FInputChord(EKeys::F10, EModifierKey::Control));
 #ifdef WITH_TEXT_CHUNK_HELPER
-		UI_COMMAND(RestoreWidgetFromImageFile, "Restore Widget From Image File", "Restores the state of the widget from the image file.\nYou can only restore from images output from this plugin.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
+		UI_COMMAND(RestoreWidgetFromImageFile, "Restores Widget From Image File", "Restores the state of the widget from the image file.\nYou can only restore from images output from this plugin.", EUserInterfaceActionType::Button, FInputChord(EKeys::F11, EModifierKey::Control));
 #endif
-		UI_COMMAND(OpenExportDestinationFolder, "Open Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::Button, FInputChord(EKeys::F12, EModifierKey::Control));
+		UI_COMMAND(OpenExportDestinationFolder, "Opens Export Destination Folder", "Open the folder containing the images saved by this plugin in Explorer.", EUserInterfaceActionType::Button, FInputChord(EKeys::F12, EModifierKey::Control));
 	}
 
 	bool FGraphPrinterCommands::IsBound()

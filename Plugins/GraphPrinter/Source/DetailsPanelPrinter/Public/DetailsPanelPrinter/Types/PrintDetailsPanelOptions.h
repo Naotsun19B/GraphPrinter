@@ -23,7 +23,7 @@ public:
 	// End of UPrintWidgetOptions interface.
 
 public:
-	// Height margin when drawing the details view.
+	// The height margin when drawing the details view.
 	float Padding;
 	
 	// Whether to embed the expanded state of each item in the image file and restore the expanded state of each item when restoring.

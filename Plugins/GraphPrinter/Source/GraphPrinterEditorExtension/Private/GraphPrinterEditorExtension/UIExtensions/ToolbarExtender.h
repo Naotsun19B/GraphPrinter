@@ -16,7 +16,7 @@ namespace GraphPrinter
 	class FToolbarExtender
 	{
 	public:
-		// Register-Unregister the toolbar extension.
+		// Registers-Unregisters the toolbar extension.
 		static void Register();
 		static void Unregister();
 
@@ -31,7 +31,7 @@ namespace GraphPrinter
 		static TSharedRef<SWidget> OnGetComboBoxContent();
 
 	private:
-		// Toolbar extension point.
+		// The toolbar extension point.
 		static TSharedPtr<FExtender> Extender;
 	};
 }

@@ -15,15 +15,15 @@ namespace TextChunkHelper
 		// Destructor.
 		virtual ~ITextChunk() = default;
 		
-		// Write to text chunk of image file.
+		// Writes to text chunk of image file.
 		virtual bool Write(const TMap<FString, FString>& MapToWrite) = 0;
 
-		// Read into text chunks in image files.
+		// Reads into text chunks in image files.
 		virtual bool Read(TMap<FString, FString>& MapToRead) = 0;
 
 	protected:
-		// Copy loaded data to member variables.
-		virtual bool Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize) = 0;
+		// Copies loaded data to member variables.
+		virtual bool Initialize(const FString& InFilename, const void* InCompressedData, const int64 InCompressedSize) = 0;
 
 	public:
 		// Partial friend for calling initialization from the factory class of the module class.
@@ -34,7 +34,7 @@ namespace TextChunkHelper
 			ITextChunk* This = nullptr;
 
 			explicit FInitializer(ITextChunk* InThis) : This(InThis) { check(This != nullptr); }
-			bool Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize)
+			bool Initialize(const FString& InFilename, const void* InCompressedData, const int64 InCompressedSize) const
 			{
 				return This->Initialize(InFilename, InCompressedData, InCompressedSize);
 			}

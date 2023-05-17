@@ -15,7 +15,7 @@ class UGenericGraphPrinterSettings : public UGraphPrinterSettings
 	GENERATED_BODY()
 
 public:
-	// Wide margin when drawing the graph editor.
+	// The wide margin when drawing the graph editor.
 	UPROPERTY(EditAnywhere, Config, Category = "Image", meta = (UIMin = 0.f, ClampMin = 0.f))
 	float Padding;
 	

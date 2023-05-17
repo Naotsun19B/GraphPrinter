@@ -6,7 +6,7 @@
 #include "MaterialGraphExportMethod.generated.h"
 
 /**
- * How to output a graph in the material editor.
+ * An enum that defines how to output a graph in the material editor.
  */
 UENUM()
 enum class EMaterialGraphExportMethod : uint8

@@ -11,12 +11,12 @@ class SGraphEditorImpl;
 namespace GraphPrinter
 {
 	/**
-	 * Misc utility functions used in generic graph printer classes.
+	 * A utility class that defines utility functions used in generic graph printer classes.
 	 */
 	class GENERICGRAPHPRINTER_API FGenericGraphPrinterUtils
 	{
 	public:
-		// Find the widget that is the graph editor and nearest child of SearchTarget.
+		// Finds the widget that is the graph editor and nearest child of SearchTarget.
 		static TSharedPtr<SGraphEditorImpl> FindNearestChildGraphEditor(TSharedPtr<SWidget> SearchTarget);
 
 		// Returns the graph editor contained in the currently active tab.

@@ -9,7 +9,7 @@
 class SWindow;
 
 /**
- * Editor settings for this plugin.
+ * A editor preferences class for this plugin.
  */
 UCLASS(Abstract, Config = Editor)
 class GRAPHPRINTERGLOBALS_API UGraphPrinterSettings : public UObject
@@ -44,17 +44,17 @@ public:
 	};
 	
 public:
-	// Register - unregister in the editor setting item.
+	// Registers-Unregisters in the editor setting item.
 	static void Register();
 	static void Unregister();
 
 	// Returns all registered editor settings classes about GraphPrinter.
 	static const TArray<FSettingsInfo>& GetAllSettings();
 	
-	// Open the settings menu for this plugin.
+	// Opens the settings menu for this plugin.
 	static void OpenSettings(FName SectionName);
 
-	// The section name to register in the editor preference.
+	// Returns the section name to register in the editor preference.
 	virtual FSettingsInfo GetSettingsInfo() const PURE_VIRTUAL(UGraphPrinterSettings::GetSectionName, { return FSettingsInfo(NAME_None); });
 	
 private:
@@ -62,13 +62,13 @@ private:
 	static void HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow);
 
 private:
-	// All registered editor settings classes about GraphPrinter.
+	// The list of all registered editor settings classes about GraphPrinter.
 	static TArray<FSettingsInfo> AllSettings;
 };
 
 namespace GraphPrinter
 {
-	// Open the settings menu for this plugin.
+	// Opens the settings menu for this plugin.
 	template<class TSettings>
 	static void OpenSettings()
 	{

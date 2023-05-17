@@ -22,7 +22,7 @@ namespace GraphPrinter
 	{
 		namespace TextChunkDefine
 		{
-			// Key used when writing to a text chunk of a png file.
+			// The key used when writing to a text chunk of a png file.
 			static const FString PngTextChunkKey = TEXT("GraphEditor");
 
 			// The beginning of the node information.
@@ -318,19 +318,19 @@ namespace GraphPrinter
 			// The size of the image to output.
 			FVector2D ViewLocation;
 
-			// A minimap widget for graph editors added by the GraphMinimap plugin.
+			// The minimap widget for graph editors added by the GraphMinimap plugin.
 			TSharedPtr<SWidget> Minimap;
 
-			// Original visibility of the minimap in the graph editor.
+			// The original visibility of the minimap in the graph editor.
 			TOptional<EVisibility> PreviousMinimapVisibility;
 
-			// A title bar widget that appears at the top of the graph editor.
+			// The title bar widget that appears at the top of the graph editor.
 			TSharedPtr<SWidget> TitleBar;
 
-			// Original visibility of title bar in graph editor
+			// The original visibility of title bar in graph editor
 			TOptional<EVisibility> PreviousTitleBarVisibility;
 
-			// Original visibility of text in graph editor overlays.
+			// The original visibility of text in graph editor overlays.
 			TMap<TSharedPtr<STextBlock>, EVisibility> PreviousChildTextBlockVisibilities;
 		};
 		FGenericGraphPrinterParams GenericGraphPrinterParams;

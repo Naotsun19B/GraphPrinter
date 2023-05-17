@@ -7,7 +7,7 @@
 #include "GraphPrinterEditorExtensionSettings.generated.h"
 
 /**
- * Settings related to the editor extension of this plugin.
+ * A editor preferences class related to the editor extension of this plugin.
  */
 UCLASS()
 class UGraphPrinterEditorExtensionSettings : public UGraphPrinterSettings

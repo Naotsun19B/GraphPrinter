@@ -58,7 +58,7 @@ public:
 	// The file type that you can select in the dialog window where you can specify the file that the user will use for the restore.
 	FString FileTypes;
 	
-	// Used when you want to specify the widget to print as an argument.
+	// The widget to search for a graph editor to draw on.
 	TSharedPtr<SWidget> SearchTarget;
 
 private:

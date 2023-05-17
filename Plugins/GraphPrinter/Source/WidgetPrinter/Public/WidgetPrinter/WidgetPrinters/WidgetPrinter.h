@@ -32,7 +32,7 @@ public:
 		// The size of the image to output.
 		FVector2D DrawSize;
 
-		// A render target that holds the drawing results to be output.
+		// The render target that holds the drawing results to be output.
 		TStrongObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
 		
 		// The full path of the output file.
@@ -50,20 +50,20 @@ public:
 	// Constructor.
 	UWidgetPrinter();
 	
-	// Draw and export the widget with arguments.
+	// Draws and export the widget with arguments.
 	void PrintWidget(UPrintWidgetOptions* Options);
 	
 	// Returns whether the target widget can be printed.
 	bool CanPrintWidget(UPrintWidgetOptions* Options);
 	
-	// Restore the state of the widget from the image file.
+	// Restores the state of the widget from the image file.
 	void RestoreWidget(URestoreWidgetOptions* Options);
 
 	// Returns whether the target widget can be restored.
 	bool CanRestoreWidget(URestoreWidgetOptions* Options);
 	
 	// Returns the printer priority.
-	// Check if the printer can be executed from the one with the highest priority.
+	// Checks if the printer can be executed from the one with the highest priority.
 	virtual int32 GetPriority() const;
 	static int32 GetPriority(const TSubclassOf<UWidgetPrinter>& Class);
 	
@@ -85,11 +85,11 @@ protected:
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const;
 	
-	// Get optional classes.
+	// Gets optional classes.
 	UPrintWidgetOptions* GetPrintOptions() const;
 	URestoreWidgetOptions* GetRestoreOptions() const;
 
-	// Discard the cached option class.
+	// Discards the cached option class.
 	void CleanupPrinter();
 	
 private:
@@ -99,7 +99,7 @@ private:
 	UPROPERTY()
 	URestoreWidgetOptions* CachedRestoreOptions;
 
-	// Keep the inner printer running so that it is not destroyed.
+	// The inner printer running so that it is not destroyed.
 	TSharedPtr<GraphPrinter::IInnerWidgetPrinter> InnerPrinter;
 };
 

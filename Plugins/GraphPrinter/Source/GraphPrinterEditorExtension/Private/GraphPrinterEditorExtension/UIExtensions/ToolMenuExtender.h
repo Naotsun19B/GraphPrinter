@@ -15,7 +15,7 @@ namespace GraphPrinter
 	class FToolMenuExtender
 	{
 	public:
-		// Register-Unregister the toolbar extension.
+		// Registers-Unregisters the toolbar extension.
 		static void Register();
 		static void Unregister();
 
@@ -27,7 +27,7 @@ namespace GraphPrinter
 		static void OnExtendSubMenu(FMenuBuilder& MenuBuilder);
 
 	private:
-		// Toolbar extension point.
+		// The toolbar extension point.
 		static TSharedPtr<FExtender> Extender;
 	};
 }

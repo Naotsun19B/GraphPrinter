@@ -9,11 +9,11 @@
 
 namespace TextChunkHelper
 {
-	// Define a delegate for the text chunk generation process.
+	// Define the event for the text chunk generation process.
 	DECLARE_DELEGATE_RetVal(TSharedPtr<ITextChunk>, FOnCreateTextChunk);
 	
 	/**
-	 * The public interface to the TextChunkHelper module.
+	 * A public interface to the TextChunkHelper module.
 	 */
 	class ITextChunkHelper : public IModuleInterface
 	{

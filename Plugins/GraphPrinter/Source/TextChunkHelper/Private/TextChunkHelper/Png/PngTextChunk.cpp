@@ -117,7 +117,7 @@ namespace TextChunkHelper
 			png_infop InfoPtr;
 		};
 
-		// Copy compression levels, IHDR chunks, row pointers, channels.
+		// Copies compression levels, IHDR chunks, row pointers, channels.
 		void CopyPngInfoStruct(
 			png_structp DestinationPngPtr,
 			png_infop DestinationInfoPtr,
@@ -155,7 +155,7 @@ namespace TextChunkHelper
 			}
 		}
 
-		// Check if either the key or value is empty and if the key and value string contains \0.
+		// Checks if either the key or value is empty and if the key and value string contains \0.
 		bool ValidateMap(const TMap<FString, FString>& Map)
 		{
 			auto HasEscapeSequence = [](const FString& String) -> bool

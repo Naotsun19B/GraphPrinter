@@ -197,7 +197,7 @@ namespace GraphPrinter
 	void FWindowsStreamDeckUtils::InstallStreamDeckPlugin()
 	{
 #if PLATFORM_WINDOWS
-		const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(PluginName.ToString());
+		const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(Global::PluginName.ToString());
 		check(Plugin.IsValid());
 		const FString StreamDeckPluginFilePath = FPaths::ConvertRelativePathToFull(
 			Plugin->GetBaseDir() / TEXT("Resources") / TEXT("StreamDeck") / TEXT("com.naotsun.graphprinter.streamDeckPlugin")

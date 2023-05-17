@@ -13,11 +13,11 @@ namespace GraphPrinter
 	{
 	public:
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		// Copy the entire target widget as an image to the clipboard.
+		// Copies the entire target widget as an image to the clipboard.
 		static void CopyAllAreaOfWidgetToClipboard();
 		static bool CanCopyAllAreaOfWidgetToClipboard();
 
-		// Copy the selected area of the target widget to the clipboard as an image.
+		// Copies the selected area of the target widget to the clipboard as an image.
 		static void CopySelectedAreaOfWidgetToClipboard();
 		static bool CanCopySelectedAreaOfWidgetToClipboard();
 #endif
@@ -37,7 +37,7 @@ namespace GraphPrinter
 		static bool CanExecuteRestoreWidget();
 #endif
 
-		// Open the folder containing the images saved by this plugin in explorer.
+		// Opens the folder containing the images saved by this plugin in explorer.
 		static void OpenExportDestinationFolder();
 		static bool CanOpenExportDestinationFolder();
 	};

@@ -37,11 +37,11 @@ namespace GraphPrinter
 		void HandleOnHotReload(bool bWasTriggeredAutomatically);
 #endif
 		
-		// Collect instances of inherited classes of all existing UWidgetPrinter class.
+		// Collects instances of inherited classes of all existing UWidgetPrinter class.
 		void CollectWidgetPrinters();
 		
 	private:
-		// All existing classes that inherits from UWidgetPrinters.
+		// The list of all existing classes that inherits from UWidgetPrinters.
 		TArray<TSubclassOf<UWidgetPrinter>> WidgetPrinterClasses;
 	};
 	

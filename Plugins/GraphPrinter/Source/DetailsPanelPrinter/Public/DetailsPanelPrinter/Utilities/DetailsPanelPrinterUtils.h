@@ -12,7 +12,7 @@ class FJsonObject;
 namespace GraphPrinter
 {
 	/**
-	 * Misc utility functions used in details panel printer classes.
+	 *  A utility class that defines utility functions used in details panel printer classes.
 	 */
 	class DETAILSPANELPRINTER_API FDetailsPanelPrinterUtils
 	{
@@ -35,10 +35,10 @@ namespace GraphPrinter
 		// Returns the difference between the widget's actual visible size and its overall size.
 		static FVector2D GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(TSharedPtr<SWidget> Widget);
 		
-		// Import properties of UObject from Json formatted string.
+		// Imports properties of UObject from Json formatted string.
 		static bool ImportObjectPropertiesFromJsonString(UObject* Object, const FString& JsonString);
 
-		// Export properties of UObject as Json formatted string.
+		// Exports properties of UObject as Json formatted string.
 		static bool ExportObjectPropertiesAsJsonString(UObject* Object, FString& JsonString);
 
 		// Writes all properties recorded in the json object to the UObject and returns the number of properties read.

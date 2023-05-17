@@ -13,7 +13,7 @@ namespace GraphPrinter
 	class WIDGETPRINTER_API IWidgetPrinterRegistry
 	{
 	public:
-		// Register-Unregister and instance getter this class.
+		// Registers-Unregisters and instance getter this class.
 		static void Register();
 		static void Unregister();
 		static IWidgetPrinterRegistry& Get();

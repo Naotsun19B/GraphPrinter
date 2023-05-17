@@ -7,7 +7,7 @@
 #include "GraphPrinterRemoteControlSettings.generated.h"
 
 /**
- * Settings related to the remote control of this plugin.
+ * A editor preferences class related to the remote control of this plugin.
  */
 UCLASS()
 class UGraphPrinterRemoteControlSettings : public UGraphPrinterSettings

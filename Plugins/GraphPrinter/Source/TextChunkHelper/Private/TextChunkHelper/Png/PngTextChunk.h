@@ -8,7 +8,7 @@
 #if WITH_UNREALPNG
 
 THIRD_PARTY_INCLUDES_START
-// make sure no other versions of libpng headers are picked up.
+// Make sure no other versions of libpng headers are picked up.
 #if WITH_LIBPNG_1_6
 #include "ThirdParty/libPNG/libPNG-1.6.37/png.h"
 #include "ThirdParty/libPNG/libPNG-1.6.37/pngstruct.h"
@@ -21,7 +21,7 @@ THIRD_PARTY_INCLUDES_END
 namespace TextChunkHelper
 {
 	/**
-	 * Helper class for accessing text chunks in png files.
+	 * A helper class for accessing text chunks in png files.
 	 */
 	class TEXTCHUNKHELPER_API FPngTextChunk : public ITextChunk
 	{
@@ -36,7 +36,7 @@ namespace TextChunkHelper
 		virtual bool Initialize(const FString& InFilename, const void* InCompressedData, int64 InCompressedSize) override;
 		// End of ITextChunk interface.
 
-		// Check if the format of the loaded image file is png.
+		// Checks if the format of the loaded image file is png.
 		virtual bool IsPng() const;
 
 		// Callbacks for the libpng.
@@ -50,10 +50,10 @@ namespace TextChunkHelper
 		// End of callbacks for the libpng.
 
 	protected:
-		// File path of the original file.
+		// The file path of the original file.
 		FString Filename;
 
-		// Arrays of compressed data.
+		// The compressed raw data.
 		TArray<uint8> CompressedData;
 
 		// The read offset into our array.
