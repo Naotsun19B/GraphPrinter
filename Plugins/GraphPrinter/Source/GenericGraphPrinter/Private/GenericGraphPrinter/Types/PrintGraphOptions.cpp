@@ -1,6 +1,10 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(PrintGraphOptions)
+#endif
 
 UPrintGraphOptions::UPrintGraphOptions()
 	: Super()

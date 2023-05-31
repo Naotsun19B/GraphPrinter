@@ -2,6 +2,9 @@
 
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(DetailsPanelPrinterSettings)
+#endif
 
 UDetailsPanelPrinterSettings::UDetailsPanelPrinterSettings()
 	: Padding(50.f)

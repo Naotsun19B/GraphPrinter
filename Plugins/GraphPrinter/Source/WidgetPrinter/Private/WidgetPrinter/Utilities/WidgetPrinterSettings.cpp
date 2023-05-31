@@ -1,15 +1,18 @@
 ﻿// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(WidgetPrinterSettings)
+#endif
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#ifdef WITH_TEXT_CHUNK_HELPER
+#include "TextChunkHelper/ITextChunkHelper.h"
+#endif
 #include "ImageWriteTypes.h"
 #include "Engine/Texture.h"
 #include "Misc/Paths.h"
 #include "HAL/FileManager.h"
-
-#ifdef WITH_TEXT_CHUNK_HELPER
-#include "TextChunkHelper/ITextChunkHelper.h"
-#endif
 
 #define LOCTEXT_NAMESPACE "WidgetPrinterSettings"
 

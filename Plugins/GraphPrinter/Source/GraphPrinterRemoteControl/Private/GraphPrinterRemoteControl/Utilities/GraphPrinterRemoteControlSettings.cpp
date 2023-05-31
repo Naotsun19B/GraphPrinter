@@ -1,6 +1,10 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterRemoteControl/Utilities/GraphPrinterRemoteControlSettings.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GraphPrinterRemoteControlSettings)
+#endif
 
 UGraphPrinterRemoteControlSettings::FOnRemoteControlEnabled UGraphPrinterRemoteControlSettings::OnRemoteControlEnabled;
 UGraphPrinterRemoteControlSettings::FOnRemoteControlDisabled UGraphPrinterRemoteControlSettings::OnRemoteControlDisabled;

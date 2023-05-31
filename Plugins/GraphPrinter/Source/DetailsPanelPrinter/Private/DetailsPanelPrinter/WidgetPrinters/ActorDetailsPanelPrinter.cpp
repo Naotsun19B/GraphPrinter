@@ -2,6 +2,10 @@
 
 #include "DetailsPanelPrinter/WidgetPrinters/ActorDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ActorDetailsPanelPrinter)
+#endif
 
 UActorDetailsPanelPrinter::UActorDetailsPanelPrinter()
 {

@@ -10,6 +10,7 @@
 #endif
 #include "Textures/SlateIcon.h"
 #include "Misc/Paths.h"
+
 namespace GraphPrinter
 {
 #if !UE_5_00_OR_LATER

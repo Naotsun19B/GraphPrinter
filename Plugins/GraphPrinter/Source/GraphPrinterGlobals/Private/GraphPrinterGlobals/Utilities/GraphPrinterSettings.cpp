@@ -2,6 +2,9 @@
 
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GraphPrinterSettings)
+#endif
 #include "ISettingsModule.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IMainFrameModule.h"
