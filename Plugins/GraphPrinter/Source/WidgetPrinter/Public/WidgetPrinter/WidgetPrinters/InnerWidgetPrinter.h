@@ -158,14 +158,14 @@ namespace GraphPrinter
 				return;
 			}
 
-			// Adjust the draw size according to the rendering scale.
+			// Adjusts the draw size according to the rendering scale.
 			WidgetPrinterParams.DrawSize *= PrintOptions->RenderingScale;
 
 			PreDrawWidget();
 
 			const bool bIsPrintableSize = IsPrintableSize();
 
-			// Draw the widget on the render target.
+			// Draws the widget on the render target.
 			if (bIsPrintableSize)
 			{
 				WidgetPrinterParams.RenderTarget = TStrongObjectPtr<UTextureRenderTarget2D>(DrawWidgetToRenderTarget());
@@ -212,16 +212,16 @@ namespace GraphPrinter
 			PrepareCopyToClipboard();
 #endif
 
-			// Create output options and file path and output as image file.
+			// Creates output options and file path and output as image file.
 			WidgetPrinterParams.Filename = CreateFilename();
 
-			// Bind the event when the operation is completed.
+			// Binds the event when the operation is completed.
 			PrintOptions->ImageWriteOptions.NativeOnComplete = [=](bool bIsSucceeded)
 			{
 				OnExportRenderTargetFinished(bIsSucceeded);
 			};
 
-			// Export the render target in the specified file format.
+			// Exports the render target in the specified file format.
 			ExportRenderTargetToImageFile();
 		}
 		virtual bool CanPrintWidget() const override
@@ -253,7 +253,7 @@ namespace GraphPrinter
 				return;
 			}
 
-			// Launch the file browser and select the iamge file.
+			// Launches the file browser and select the iamge file.
 			if (RestoreOptions->HasValidSourceImageFilePath())
 			{
 				WidgetPrinterParams.Filename = RestoreOptions->GetSourceImageFilePath();
@@ -344,7 +344,7 @@ namespace GraphPrinter
 		// Returns whether the widget size is drawable.
 		virtual bool IsPrintableSize() const
 		{
-			// Check draw size.
+			// Checks draw size.
 #if UE_5_01_OR_LATER
 			if (PrintOptions->MaxImageSize.ComponentwiseAllGreaterThan(FVector2D::ZeroVector))
 #else
@@ -384,7 +384,7 @@ namespace GraphPrinter
 		virtual void PrepareCopyToClipboard()
 		{
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-			// When copying to the clipboard, set the image format so that it can be copied.
+			// When copying to the clipboard, sets the image format so that it can be copied.
 			if (PrintOptions->ExportMethod == UPrintWidgetOptions::EExportMethod::Clipboard)
 			{
 				PrintOptions->ImageWriteOptions.Format = ClipboardImageExtension::FClipboardImageExtension::GetCopyableImageFormat();
@@ -407,7 +407,7 @@ namespace GraphPrinter
 				return {};
 			}
 
-			// If the file cannot be overwritten, add a number after the file name.
+			// If the file cannot be overwritten, adds a number after the file name.
 			if (!PrintOptions->ImageWriteOptions.bOverwriteFile)
 			{
 				if (IFileManager::Get().FileExists(*FString(Filename + Extension)))

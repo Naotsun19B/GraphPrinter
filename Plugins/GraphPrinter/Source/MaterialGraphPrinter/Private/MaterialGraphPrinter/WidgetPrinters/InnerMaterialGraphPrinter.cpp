@@ -69,7 +69,7 @@ namespace GraphPrinter
 			return RenderedGraph;
 		}
 
-		// Re-render the widget that concatenates the two render targets.
+		// Re-renders the widget that concatenates the two render targets.
 		const TSharedPtr<FSlateBrush> PreviewViewportBrush = MakeShared<FSlateBrush>();
 		PreviewViewportBrush->SetResourceObject(RenderingResult.RenderTarget.Get());
 		const TSharedPtr<FSlateBrush> GraphBrush = MakeShared<FSlateBrush>();
@@ -116,7 +116,7 @@ namespace GraphPrinter
 			CombinedWidget,
 			CombinedSize,
 			PrintOptions->FilteringMode,
-			false, // If draw with gamma twice, it will be too bright, so gamma is not used here.
+			false, // If draws with gamma twice, it will be too bright, so gamma is not used here.
 			PrintOptions->RenderingScale
 		);
 	}

@@ -29,13 +29,13 @@ namespace GraphPrinter
 		static const FString PropertiesFieldName	= TEXT("Properties");
 	}
 	
-	TSharedPtr<SDetailsView> FDetailsPanelPrinterUtils::FindNearestChildDetailsView(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SDetailsView> FDetailsPanelPrinterUtils::FindNearestChildDetailsView(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SDetailsView> FoundDetailsView = nullptr;
 		
 		FWidgetPrinterUtils::EnumerateChildWidgets(
 			SearchTarget,
-			[&FoundDetailsView](const TSharedPtr<SWidget> ChildWidget) -> bool
+			[&FoundDetailsView](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				const TSharedPtr<SDetailsView> DetailsView = GP_CAST_SLATE_WIDGET(SDetailsView, ChildWidget);
 				if (DetailsView.IsValid())
@@ -77,13 +77,13 @@ namespace GraphPrinter
 		return nullptr;
 	}
 
-	TSharedPtr<SActorDetails> FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SActorDetails> FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SActorDetails> FoundActorDetailsView = nullptr;
 		
 		FWidgetPrinterUtils::EnumerateChildWidgets(
 			SearchTarget,
-			[&FoundActorDetailsView](const TSharedPtr<SWidget> ChildWidget) -> bool
+			[&FoundActorDetailsView](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				const TSharedPtr<SActorDetails> ActorDetailsView = GP_CAST_SLATE_WIDGET(SActorDetails, ChildWidget);
 				if (ActorDetailsView.IsValid())
@@ -125,14 +125,14 @@ namespace GraphPrinter
 		return nullptr;
 	}
 
-	TSharedPtr<SWidget> FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(TSharedPtr<SActorDetails> SearchTarget)
+	TSharedPtr<SWidget> FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(const TSharedPtr<SActorDetails>& SearchTarget)
 	{
 		TSharedPtr<SWidget> FoundSubobjectInstanceEditor = nullptr;
 
 #if UE_5_00_OR_LATER
 		FWidgetPrinterUtils::EnumerateChildWidgets(
 			SearchTarget,
-			[&FoundSubobjectInstanceEditor](const TSharedPtr<SWidget> ChildWidget) -> bool
+			[&FoundSubobjectInstanceEditor](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				const TSharedPtr<SSubobjectInstanceEditor> SubobjectInstanceEditor = GP_CAST_SLATE_WIDGET(SSubobjectInstanceEditor, ChildWidget);
 				if (SubobjectInstanceEditor.IsValid())
@@ -217,9 +217,9 @@ namespace GraphPrinter
 		return FJsonSerializer::Serialize(JsonObject, Writer);
 	}
 
-	int32 FDetailsPanelPrinterUtils::JsonObjectToUObject(UObject& Object, TSharedRef<FJsonObject> JsonObject)
+	int32 FDetailsPanelPrinterUtils::JsonObjectToUObject(UObject& Object, const TSharedRef<FJsonObject>& JsonObject)
 	{
-		// Check if the class recorded in Json and the class of the passed object match.
+		// Checks if the class recorded in Json and the class of the passed object match.
 		bool bIsMatchesClass = false;
 		FString ClassName;
 		check((JsonObject->TryGetStringField(JsonFieldNames::ClassFieldName, ClassName)));
@@ -357,7 +357,7 @@ namespace GraphPrinter
 
 	int32 FDetailsPanelPrinterUtils::UObjectToJsonObject(
 		UObject& Object,
-		TSharedRef<FJsonObject> JsonObject,
+		const TSharedRef<FJsonObject>& JsonObject,
 		const int64 CheckFlags /* = 0 */,
 		const int64 SkipFlags /* = 0 */
 	)

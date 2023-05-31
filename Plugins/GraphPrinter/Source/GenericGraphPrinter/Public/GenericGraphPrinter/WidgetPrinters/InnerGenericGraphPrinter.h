@@ -110,7 +110,7 @@ namespace GraphPrinter
 			// Holds the node selected by the user for printing and then restoring.
 			GenericGraphPrinterParams.PreviousSelectedNodes = Widget->GetSelectedNodes();
 
-			// Get the range of the selected node and the position of the camera to use when drawing.
+			// Gets the range of the selected node and the position of the camera to use when drawing.
 			if (PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::All)
 			{
 				Widget->SelectAllNodes();
@@ -122,16 +122,16 @@ namespace GraphPrinter
 		}
 		virtual void PreDrawWidget() override
 		{
-			// Set the camera position to the upper left of the drawing range and set the zoom magnification to 1:1.
+			// Sets the camera position to the upper left of the drawing range and set the zoom magnification to 1:1.
 			Widget->GetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
 			Widget->SetViewLocation(GenericGraphPrinterParams.ViewLocation, 1.f);
 
 			GenericGraphPrinterParams.NodesToPrint = Widget->GetSelectedNodes();
 	
-			// Erase the drawing result so that the frame for which the node is selected does not appear.
+			// Erases the drawing result so that the frame for which the node is selected does not appear.
 			Widget->ClearSelectionSet();
 
-			// If there is a minimap, hide it only while drawing.
+			// If there is a minimap, hides it only while drawing.
 			GenericGraphPrinterParams.Minimap = FGenericGraphPrinterUtils::FindNearestChildMinimap(Widget);
 			if (GenericGraphPrinterParams.Minimap.IsValid())
 			{
@@ -139,7 +139,7 @@ namespace GraphPrinter
 				GenericGraphPrinterParams.Minimap->SetVisibility(EVisibility::Collapsed);
 			}
 	
-			// If there is a title bar, hide it only while drawing.
+			// If there is a title bar, hides it only while drawing.
 			GenericGraphPrinterParams.TitleBar = Widget->GetTitleBar();
 			if (PrintOptions->bDrawOnlyGraph && GenericGraphPrinterParams.TitleBar.IsValid())
 			{
@@ -147,7 +147,7 @@ namespace GraphPrinter
 				GenericGraphPrinterParams.TitleBar->SetVisibility(EVisibility::Collapsed);
 			}
 
-			// Hide zoom magnification and graph type text while drawing.
+			// Hides zoom magnification and graph type text while drawing.
 			if (PrintOptions->bDrawOnlyGraph)
 			{
 				const TSharedPtr<SOverlay> Overlay = FWidgetPrinterUtils::FindNearestChildOverlay(Widget);
@@ -164,8 +164,7 @@ namespace GraphPrinter
 		}
 		virtual void PostDrawWidget() override
 		{
-			// Restores the visibility of the title bar,
-			// zoom magnification text, and graph type text.
+			// Restores the visibility of the title bar, zoom magnification text, and graph type text.
 			if (GenericGraphPrinterParams.Minimap.IsValid() && GenericGraphPrinterParams.PreviousMinimapVisibility.IsSet())
 			{
 				GenericGraphPrinterParams.Minimap->SetVisibility(GenericGraphPrinterParams.PreviousMinimapVisibility.GetValue());
@@ -189,10 +188,10 @@ namespace GraphPrinter
 				}
 			}
 			
-			// Restore camera position and zoom magnification.
+			// Restores camera position and zoom magnification.
 			Widget->SetViewLocation(GenericGraphPrinterParams.PreviousViewLocation, GenericGraphPrinterParams.PreviousZoomAmount);
 
-			// Restore the node selection status.
+			// Restores the node selection status.
 			Widget->ClearSelectionSet();
 			for (const auto& SelectedNode : GenericGraphPrinterParams.PreviousSelectedNodes)
 			{
@@ -224,7 +223,7 @@ namespace GraphPrinter
 				return false;
 			}
 
-			// Write data to png file using helper class.
+			// Writes data to png file using helper class.
 			TMap<FString, FString> MapToWrite;
 			MapToWrite.Add(GenericGraphPrinter::TextChunkDefine::PngTextChunkKey, ExportedText);
 
@@ -241,7 +240,7 @@ namespace GraphPrinter
 		virtual bool RestoreWidgetFromTextChunk() override
 		{
 #ifdef WITH_TEXT_CHUNK_HELPER
-			// Read data from png file using helper class.
+			// Reads data from png file using helper class.
 			TMap<FString, FString> MapToRead;
 			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
 			if (!TextChunk.IsValid())
@@ -253,14 +252,14 @@ namespace GraphPrinter
 				return false;
 			}
 
-			// Find information on valid nodes.
+			// Finds information on valid nodes.
 			if (!MapToRead.Contains(GenericGraphPrinter::TextChunkDefine::PngTextChunkKey))
 			{
 				return false;
 			}
 			FString TextToImport = MapToRead[GenericGraphPrinter::TextChunkDefine::PngTextChunkKey];
 
-			// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
+			// Unnecessary characters may be mixed in at the beginning of the text, so inspects and corrects it.
 			FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(TextToImport, GenericGraphPrinter::TextChunkDefine::NodeInfoHeader);
 
 			if (!FEdGraphUtilities::CanImportNodesFromText(Widget->GetCurrentGraph(), TextToImport))
@@ -283,7 +282,7 @@ namespace GraphPrinter
 		// End of TInnerWidgetPrinter interface.
 
 	protected:
-		// Calculate the range and view location to use when drawing the graph editor.
+		// Calculates the range and view location to use when drawing the graph editor.
 		virtual bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation)
 		{
 			const TSet<UObject*>& SelectedNodes = Widget->GetSelectedNodes();

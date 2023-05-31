@@ -17,7 +17,7 @@ class GRAPHPRINTERGLOBALS_API UGraphPrinterSettings : public UObject
 	GENERATED_BODY()
 
 public:
-	// Information on registered settings.
+	// A struct that information on registered settings.
 	struct GRAPHPRINTERGLOBALS_API FSettingsInfo
 	{
 	public:
@@ -52,7 +52,7 @@ public:
 	static const TArray<FSettingsInfo>& GetAllSettings();
 	
 	// Opens the settings menu for this plugin.
-	static void OpenSettings(FName SectionName);
+	static void OpenSettings(const FName SectionName);
 
 	// Returns the section name to register in the editor preference.
 	virtual FSettingsInfo GetSettingsInfo() const PURE_VIRTUAL(UGraphPrinterSettings::GetSectionName, { return FSettingsInfo(NAME_None); });

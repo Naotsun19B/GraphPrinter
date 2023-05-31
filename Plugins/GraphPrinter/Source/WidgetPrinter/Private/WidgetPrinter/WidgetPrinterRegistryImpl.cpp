@@ -47,7 +47,7 @@ namespace GraphPrinter
 	
 	FWidgetPrinterRegistryImpl::FWidgetPrinterRegistryImpl()
 	{
-		// Collect widget printers and try to recollect them at hot reload.
+		// Collects widget printers and try to recollect them at hot reload.
 		IMainFrameModule::Get().OnMainFrameCreationFinished().AddRaw(this, &FWidgetPrinterRegistryImpl::HandleOnMainFrameCreationFinished);
 		
 #if UE_5_00_OR_LATER

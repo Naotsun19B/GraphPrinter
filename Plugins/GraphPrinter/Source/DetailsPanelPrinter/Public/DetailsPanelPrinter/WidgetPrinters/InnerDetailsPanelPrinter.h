@@ -34,16 +34,16 @@ namespace GraphPrinter
 #endif
 	
 	/**
-	 * The class that must be inherited to access the protected properties of the SDetailsViewBase.
+	 * A class that must be inherited to access the protected properties of the SDetailsViewBase.
 	 */
 	class FDetailsViewBaseAccessor
 	{
 	protected:
 		// I want to hide the implementation to the cpp file side in order to forcibly access the protected property.
 		// Therefore, it is implemented in a specialized child class.
-		static TSharedPtr<SDetailTree> ExtractDetailTree(TSharedRef<SDetailsViewBase> DetailsViewBase);
-		static FDetailNodeList& ExtractRootTreeNodes(TSharedRef<SDetailsViewBase> DetailsViewBase);
-		static TArray<const UObject*>& ExtractRootObjectSet(TSharedRef<FDetailTreeNode> DetailTreeNode);
+		static TSharedPtr<SDetailTree> ExtractDetailTree(const TSharedRef<SDetailsViewBase>& DetailsViewBase);
+		static FDetailNodeList& ExtractRootTreeNodes(const TSharedRef<SDetailsViewBase>& DetailsViewBase);
+		static TArray<const UObject*>& ExtractRootObjectSet(const TSharedRef<FDetailTreeNode>& DetailTreeNode);
 	};
 	
 	/**
@@ -153,7 +153,7 @@ namespace GraphPrinter
 			
 			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
 
-			// Cache the expanded state of each item if necessary.
+			// Caches the expanded state of each item if necessary.
 			if (PrintOptions->bIsIncludeExpansionStateInImageFile)
 			{
 				TFunction<void(FDetailNodeList&, const FString&)> CacheExpansionStateRecursive =
@@ -199,7 +199,7 @@ namespace GraphPrinter
 			// When drawing a large details view, the width becomes smaller according to the height, so the width before scrolling is used.
 			DrawSize.X = DetailsPanelPrinterParams.PreCalculateDetailsViewWidth;
 			
-			// Increase the height by the amount of padding in the editor preferences.
+			// Increases the height by the amount of padding in the editor preferences.
 			WidgetPrinterParams.DrawSize.Y += PrintOptions->Padding;
 			
 			return true;
@@ -218,7 +218,7 @@ namespace GraphPrinter
 				return TEXT("EmptyDetailsPanel");
 			}
 			
-			// For default objects use the class name to remove the prefix.
+			// For default objects uses the class name to remove the prefix.
 			if (EditingObject->HasAnyFlags(RF_ClassDefaultObject))
 			{
 				if (const UClass* SelectedObjectClass = EditingObject->GetClass())
@@ -232,7 +232,7 @@ namespace GraphPrinter
 				}
 			}
 
-			// For actors, return the label displayed in the outliner instead of the name of the object.
+			// For actors, returns the label displayed in the outliner instead of the name of the object.
 			if (const auto* SelectedActor = Cast<AActor>(EditingObject))
 			{
 				return SelectedActor->GetActorLabel();
@@ -286,7 +286,7 @@ namespace GraphPrinter
 		virtual bool RestoreWidgetFromTextChunk() override
 		{
 #ifdef WITH_TEXT_CHUNK_HELPER
-			// Read data from png file using helper class.
+			// Reads data from png file using helper class.
 			TMap<FString, FString> MapToRead;
 			const TSharedPtr<TextChunkHelper::ITextChunk> TextChunk = TextChunkHelper::ITextChunkHelper::Get().CreateTextChunk(WidgetPrinterParams.Filename);
 			if (!TextChunk.IsValid())
@@ -307,7 +307,7 @@ namespace GraphPrinter
 
 				FString PropertiesJsonString = MapToRead[DetailsPanelPrinter::TextChunkDefine::PropertiesChunkKey];
 
-				// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
+				// Unnecessary characters may be mixed in at the beginning of the text, so inspects and corrects it.
 				FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(
 					PropertiesJsonString,
 					DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader

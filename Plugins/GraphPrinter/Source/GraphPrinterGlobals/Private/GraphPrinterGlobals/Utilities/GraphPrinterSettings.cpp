@@ -78,7 +78,7 @@ const TArray<UGraphPrinterSettings::FSettingsInfo>& UGraphPrinterSettings::GetAl
 	return AllSettings;
 }
 
-void UGraphPrinterSettings::OpenSettings(FName SectionName)
+void UGraphPrinterSettings::OpenSettings(const FName SectionName)
 {
 	if (ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule())
 	{

@@ -4,6 +4,7 @@
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Misc/Paths.h"
 #include "HAL/PlatformProcess.h"
 #include "DesktopPlatformModule.h"
@@ -24,7 +25,7 @@ namespace GraphPrinter
 	}
 
 	FNotificationInteraction::FNotificationInteraction(
-		EInteractionType InType,
+		const EInteractionType InType,
 		const FText& InText,
 		const FText& InTooltip,
 		const FSimpleDelegate& InCallback
@@ -149,18 +150,18 @@ namespace GraphPrinter
 		const FString& DialogTitle /* = TEXT("Open File Dialog") */,
 		const FString& DefaultPath /* = TEXT("") */,
 		const FString& DefaultFile /* = TEXT("") */,
-		const FString& FileTypes /* = TEXT("All (*)|*.*") */, 
-		bool bIsMultiple /* = false */
+		const FString& FileTypes /* = TEXT("All (*)|*.*") */,
+		const bool bIsMultiple /* = false */
 	)
 	{
-		// Get the OS-level window handle of the editor's mainframe.
+		// Gets the OS-level window handle of the editor's mainframe.
 		const void* ParentWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
 		if (ParentWindowHandle == nullptr)
 		{
 			return false;
 		}
 
-		// Launch the file browser.
+		// Launches the file browser.
 		IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 		if (DesktopPlatform == nullptr)
 		{

@@ -42,7 +42,7 @@ namespace GraphPrinter
 			RenderTarget->UpdateResourceImmediate(true);
 		}
 
-		// Since the drawing result may be corrupted the first time, draw multiple times.
+		// Since the drawing result may be corrupted the first time, draws multiple times.
 		for (int32 Count = 0; Count < DrawTimes; Count++)
 		{
 			WidgetRenderer->DrawWidget(
@@ -78,7 +78,7 @@ namespace GraphPrinter
 		);
 
 		// As a symptomatic treatment for the problem that the first image output after startup is whitish,
-		// the first output is re-output as many times as NumberOfRedrawsWhenFirstTime.
+		// the first output is re-outputs as many times as NumberOfRedrawsWhenFirstTime.
 		if (IsFirstOutput.GetValue())
 		{
 			for (int32 Count = 0; Count < NumberOfReOutputWhenFirstTime; Count++)

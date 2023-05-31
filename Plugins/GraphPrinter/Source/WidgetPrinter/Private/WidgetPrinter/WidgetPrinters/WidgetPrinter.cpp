@@ -13,8 +13,7 @@ UWidgetPrinter::UWidgetPrinter()
 {
 	if (!IsTemplate())
 	{
-		// Temporarily exclude the instance from garbage collection to prevent
-		// the instance from being destroyed during printer processing.
+		// Temporarily excludes the instance from garbage collection to prevent the instance from being destroyed during printer processing.
 		AddToRoot();
 	}
 }
@@ -185,6 +184,6 @@ void UWidgetPrinter::CleanupPrinter()
 	CachedRestoreOptions = nullptr;
 	InnerPrinter.Reset();
 
-	// Since it is no longer necessary to keep an instance of the printer, it is subject to garbage collection.
+	// Since it is no longer necessary to keep an instance of the printer, it is subjects to garbage collection.
 	RemoveFromRoot();
 }

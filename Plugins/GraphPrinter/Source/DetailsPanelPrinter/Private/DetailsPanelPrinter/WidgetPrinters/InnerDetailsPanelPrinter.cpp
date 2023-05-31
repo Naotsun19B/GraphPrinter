@@ -53,17 +53,17 @@ namespace GraphPrinter
 		HACK_INACCESSIBLE_PROPERTY(FDetailsObjectSet, FDetailMultiTopLevelObjectRootNode, RootObjectSet)
 	}
 	
-	TSharedPtr<SDetailTree> FDetailsViewBaseAccessor::ExtractDetailTree(TSharedRef<SDetailsViewBase> DetailsViewBase)
+	TSharedPtr<SDetailTree> FDetailsViewBaseAccessor::ExtractDetailTree(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
 	{
 		return Hack::DetailTree::Extract(DetailsViewBase.Get());
 	}
 	
-	FDetailNodeList& FDetailsViewBaseAccessor::ExtractRootTreeNodes(TSharedRef<SDetailsViewBase> DetailsViewBase)
+	FDetailNodeList& FDetailsViewBaseAccessor::ExtractRootTreeNodes(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
 	{
 		return Hack::RootTreeNodes::Extract(DetailsViewBase.Get());
 	}
 
-	TArray<const UObject*>& FDetailsViewBaseAccessor::ExtractRootObjectSet(TSharedRef<FDetailTreeNode> DetailTreeNode)
+	TArray<const UObject*>& FDetailsViewBaseAccessor::ExtractRootObjectSet(const TSharedRef<FDetailTreeNode>& DetailTreeNode)
 	{
 		check(DetailTreeNode->GetNodeType() == EDetailNodeType::Object);
 
@@ -96,7 +96,7 @@ namespace GraphPrinter
 	{
 		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
 
-		// There is a difference in the height of the drawing size, so adjust by adding the height of one item.
+		// There is a difference in the height of the drawing size, so adjusts by adding the height of one item.
 		TOptional<float> ItemHeight;
 		{
 			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
@@ -171,7 +171,7 @@ namespace GraphPrinter
 		{
 			return (
 				EditingObjectClass->IsChildOf<AActor>() &&
-				// AWorldSettings is a class that inherits from AActor, but exclude it since it will be using the normal details panel.
+				// AWorldSettings is a class that inherits from AActor, but excludes it since it will be using the normal details panel.
 				!EditingObjectClass->IsChildOf<AWorldSettings>()
 			);
 		}
@@ -184,7 +184,7 @@ namespace GraphPrinter
 		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
 
 		// Since the actor detail panel has a different structure than other detail panels,
-		// add the difference between the displayed size of subobject instance editor and details view and the actual size.
+		// adds the difference between the displayed size of subobject instance editor and details view and the actual size.
 		const TSharedPtr<SWidget> SubobjectInstanceEditor = FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(Widget);
 		if (!SubobjectInstanceEditor.IsValid())
 		{

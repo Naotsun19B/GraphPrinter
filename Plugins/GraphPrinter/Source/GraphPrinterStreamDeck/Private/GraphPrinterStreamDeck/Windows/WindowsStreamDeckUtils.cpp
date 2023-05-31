@@ -42,7 +42,7 @@ namespace GraphPrinter
 		struct FScopedKey
 		{
 		public:
-			explicit FScopedKey(HKEY Root, LPCWSTR SubKey, REGSAM Desired = KEY_READ)
+			explicit FScopedKey(const HKEY Root, const LPCWSTR SubKey, const REGSAM Desired = KEY_READ)
 			{
 				const LSTATUS Result = RegOpenKeyExW(
                 	Root,
@@ -119,7 +119,7 @@ namespace GraphPrinter
 				return false;
 			}
 
-			bool GetStringValue(LPCWSTR PropertyName, FString& Value) const
+			bool GetStringValue(const LPCWSTR PropertyName, FString& Value) const
 			{
 				DWORD DataSize = 0;
 				LSTATUS Result = RegGetValueW(

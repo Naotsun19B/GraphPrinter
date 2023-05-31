@@ -27,7 +27,7 @@ THIRD_PARTY_INCLUDES_START
 #include <setjmp.h>
 THIRD_PARTY_INCLUDES_END
 
-// Disable warning "interaction between '_setjmp' and C++ object destruction is non-portable".
+// Disables warning "interaction between '_setjmp' and C++ object destruction is non-portable".
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4611)
@@ -247,7 +247,7 @@ namespace TextChunkHelper
 	{
 		check(IsPng());
 
-		// Determine if the map is useable.
+		// Determines if the map is useable.
 		if (!PngTextChunkInternal::ValidateMap(MapToWrite))
 		{
 			UE_LOG(LogGraphPrinter, Warning, TEXT("Writing to a text chunk is not possible because either the key or value is empty, or the key and value string contains \0."));
@@ -257,10 +257,10 @@ namespace TextChunkHelper
 		// Only allow one thread to use libpng at a time.
 		FScopeLock PngLock(&PngTextChunkInternal::PngTextChunkHelperSection);
 	
-		// Reset to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
+		// Resets to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
 		ReadOffset = 0;
 
-		// Read the png_info of the original image file.
+		// Reads the png_info of the original image file.
 		const PngTextChunkInternal::FPngReadGuard ReadGuard(
 			this,
 			FPngTextChunk::UserError,
@@ -281,7 +281,7 @@ namespace TextChunkHelper
 
 		png_read_png(ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr(), PNG_TRANSFORM_IDENTITY, nullptr);
 
-		// Prepare png_struct etc. for writing.
+		// Prepares png_struct etc. for writing.
 		const PngTextChunkInternal::FPngWriteGuard WriteGuard(
 			this,
 			FPngTextChunk::UserError,
@@ -299,13 +299,13 @@ namespace TextChunkHelper
 			return false;
 		}
 
-		// Copy the read original png_info to png_info used for write.
+		// Copies the read original png_info to png_info used for write.
 		PngTextChunkInternal::CopyPngInfoStruct(
 			WriteGuard.GetWritePtr(), WriteGuard.GetInfoPtr(),
 			ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr()
 		);
 	
-		// Create text chunk data and set it to png.
+		// Creates text chunk data and set it to png.
 		// When converting from FString to png_charp, most of the time the escape sequences are mixed first.
 		const int32 NumText = MapToWrite.Num();
 		TArray<png_text> TextPtr;
@@ -341,7 +341,7 @@ namespace TextChunkHelper
 		}
 		png_set_text(WriteGuard.GetWritePtr(), WriteGuard.GetInfoPtr(), TextPtr.GetData(), NumText);
 
-		// Write the data prepared so far to the png file.
+		// Writes the data prepared so far to the png file.
 		CompressedData.Empty();
 		png_write_png(WriteGuard.GetWritePtr(), WriteGuard.GetInfoPtr(), PNG_TRANSFORM_IDENTITY, nullptr);
 
@@ -355,10 +355,10 @@ namespace TextChunkHelper
 		// Only allow one thread to use libpng at a time.
 		FScopeLock PngLock(&PngTextChunkInternal::PngTextChunkHelperSection);
 
-		// Reset to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
+		// Resets to the beginning of file so we can use png_read_png(), which expects to start at the beginning.
 		ReadOffset = 0;
 
-		// Read png_info.
+		// Reads png_info.
 		const PngTextChunkInternal::FPngReadGuard ReadGuard(
 			this, 
 			FPngTextChunk::UserError, 
@@ -379,7 +379,7 @@ namespace TextChunkHelper
 
 		png_read_info(ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr());
 
-		// Transfer the text chunk data to the argument map.
+		// Transfers the text chunk data to the argument map.
 		/**
 		 * png_textp TextPtr;
 		 * int32 NumText;
@@ -399,7 +399,7 @@ namespace TextChunkHelper
 		// so if an escape sequence is mixed in during writing, the data will be lost.
 		// Therefore, the data in the text chuck is taken out in the following roundabout way.
 
-		// Find out the number of texts.
+		// Finds out the number of texts.
 		png_textp UnusedTextPtr;
 		int32 NumText;
 		if (!png_get_text(ReadGuard.GetReadPtr(), ReadGuard.GetInfoPtr(), &UnusedTextPtr, &NumText))
@@ -407,7 +407,7 @@ namespace TextChunkHelper
 			return false;
 		}
 
-		// Since there are as many text chunks as there are NumText, split the data by \0 by the amount of NumText.
+		// Since there are as many text chunks as there are NumText, splits the data by \0 by the amount of NumText.
 		TArray<TArray<uint8>> SplitTextChunks;
 		int32 SearchStartPosition = 0;
 		for (int32 Count = 0; Count < NumText; Count++)
@@ -447,7 +447,7 @@ namespace TextChunkHelper
 			SearchStartPosition = SectionEnd;
 		}
 
-		// Fail if the number of carved data is not the number of NumText x2.
+		// Fails if the number of carved data is not the number of NumText x2.
 		if (SplitTextChunks.Num() != NumText * 2)
 		{
 			UE_LOG(LogGraphPrinter, Error, TEXT("------ The text could not be read correctly ------"));
@@ -457,7 +457,7 @@ namespace TextChunkHelper
 			return false;
 		}
 
-		// Convert from a byte array to a string map.
+		// Converts from a byte array to a string map.
 		for (int32 Index = 0; Index < SplitTextChunks.Num(); Index += 2)
 		{
 			check(SplitTextChunks.IsValidIndex(Index) && SplitTextChunks.IsValidIndex(Index + 1));
@@ -560,7 +560,7 @@ namespace TextChunkHelper
 	}
 }
 
-// Renable warning "interaction between '_setjmp' and C++ object destruction is non-portable".
+// Renables warning "interaction between '_setjmp' and C++ object destruction is non-portable".
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif

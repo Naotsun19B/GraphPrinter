@@ -17,7 +17,7 @@ namespace GraphPrinter
 		static const FName GraphMinimapClassName = TEXT("SGraphMinimap");
 	}
 	
-	TSharedPtr<SGraphEditorImpl> FGenericGraphPrinterUtils::FindNearestChildGraphEditor(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SGraphEditorImpl> FGenericGraphPrinterUtils::FindNearestChildGraphEditor(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SGraphEditorImpl> FoundGraphEditor = nullptr;
 		
@@ -65,13 +65,13 @@ namespace GraphPrinter
 		return nullptr;
 	}
 
-	TSharedPtr<SWidget> FGenericGraphPrinterUtils::FindNearestChildMinimap(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SWidget> FGenericGraphPrinterUtils::FindNearestChildMinimap(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SWidget> FoundMinimap = nullptr;
 		
 		FWidgetPrinterUtils::EnumerateChildWidgets(
 			SearchTarget,
-			[&FoundMinimap](const TSharedPtr<SWidget> ChildWidget) -> bool
+			[&FoundMinimap](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				const TSharedPtr<SWidget> Minimap = Private::CastSlateWidget<SWidget>(
 					ChildWidget,
@@ -90,7 +90,7 @@ namespace GraphPrinter
 		return FoundMinimap;
 	}
 
-	TArray<TSharedPtr<STextBlock>> FGenericGraphPrinterUtils::GetVisibleChildTextBlocks(TSharedPtr<SWidget> SearchTarget)
+	TArray<TSharedPtr<STextBlock>> FGenericGraphPrinterUtils::GetVisibleChildTextBlocks(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		if (!SearchTarget.IsValid())
 		{

@@ -16,8 +16,8 @@ namespace GraphPrinter
 	}
 	
 	void FWidgetPrinterUtils::EnumerateChildWidgets(
-		TSharedPtr<SWidget> SearchTarget,
-		TFunction<bool(const TSharedPtr<SWidget> ChildWidget)> Predicate
+		const TSharedPtr<SWidget>& SearchTarget,
+		const TFunction<bool(const TSharedPtr<SWidget>& ChildWidget)>& Predicate
 	)
 	{
 		if (!SearchTarget.IsValid())
@@ -45,8 +45,8 @@ namespace GraphPrinter
 	}
 
 	void FWidgetPrinterUtils::EnumerateParentWidgets(
-		TSharedPtr<SWidget> SearchTarget,
-		TFunction<bool(const TSharedPtr<SWidget> ParentWidget)> Predicate
+		const TSharedPtr<SWidget>& SearchTarget,
+		const TFunction<bool(const TSharedPtr<SWidget>& ParentWidget)>& Predicate
 	)
 	{
 		if (!SearchTarget.IsValid())
@@ -66,13 +66,13 @@ namespace GraphPrinter
 		}
 	}
 
-	TSharedPtr<SWidget> FWidgetPrinterUtils::FindNearestParentDockingTabStack(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SWidget> FWidgetPrinterUtils::FindNearestParentDockingTabStack(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SDockingTabStack> FoundDockingTabStack = nullptr;
 		
 		EnumerateParentWidgets(
 			SearchTarget,
-			[&FoundDockingTabStack](const TSharedPtr<SWidget> ParentWidget) -> bool
+			[&FoundDockingTabStack](const TSharedPtr<SWidget>& ParentWidget) -> bool
 			{
 				const TSharedPtr<SDockingTabStack> DockingTabStack = GP_CAST_SLATE_WIDGET(SDockingTabStack, ParentWidget);
 				if (DockingTabStack.IsValid())
@@ -88,13 +88,13 @@ namespace GraphPrinter
 		return FoundDockingTabStack;
 	}
 
-	TSharedPtr<SStandaloneAssetEditorToolkitHost> FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SStandaloneAssetEditorToolkitHost> FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SStandaloneAssetEditorToolkitHost> FoundStandaloneAssetEditorToolkitHost = nullptr;
 		
 		EnumerateParentWidgets(
 			SearchTarget,
-			[&FoundStandaloneAssetEditorToolkitHost](const TSharedPtr<SWidget> ParentWidget) -> bool
+			[&FoundStandaloneAssetEditorToolkitHost](const TSharedPtr<SWidget>& ParentWidget) -> bool
 			{
 				const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = GP_CAST_SLATE_WIDGET(SStandaloneAssetEditorToolkitHost, ParentWidget);
 				if (StandaloneAssetEditorToolkitHost.IsValid())
@@ -110,13 +110,13 @@ namespace GraphPrinter
 		return FoundStandaloneAssetEditorToolkitHost;
 	}
 	
-	TSharedPtr<SOverlay> FWidgetPrinterUtils::FindNearestChildOverlay(TSharedPtr<SWidget> SearchTarget)
+	TSharedPtr<SOverlay> FWidgetPrinterUtils::FindNearestChildOverlay(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SOverlay> FoundOverlay = nullptr;
 		
 		EnumerateChildWidgets(
 			SearchTarget,
-			[&FoundOverlay](const TSharedPtr<SWidget> ChildWidget) -> bool
+			[&FoundOverlay](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				const TSharedPtr<SOverlay> Overlay = GP_CAST_SLATE_WIDGET(SOverlay, ChildWidget);
 				if (Overlay.IsValid())
@@ -132,7 +132,7 @@ namespace GraphPrinter
 		return FoundOverlay;
 	}
 
-	bool FWidgetPrinterUtils::IsMenuStackWindow(TSharedPtr<SWindow> TestWindow)
+	bool FWidgetPrinterUtils::IsMenuStackWindow(const TSharedPtr<SWindow>& TestWindow)
 	{
 		bool bIsMenuStackWindow = false;
 		

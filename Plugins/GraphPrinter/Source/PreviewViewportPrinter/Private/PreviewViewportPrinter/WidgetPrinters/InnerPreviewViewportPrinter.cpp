@@ -37,7 +37,7 @@ namespace GraphPrinter
 		TSharedPtr<SGlobalPlayWorldActions> PreviewViewport = nullptr;
 		FWidgetPrinterUtils::EnumerateChildWidgets(
 			ActualSearchTarget,
-			[&](const TSharedPtr<SWidget> ChildWidget) -> bool
+			[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				const TSharedPtr<SGlobalPlayWorldActions> GlobalPlayWorldActions = GP_CAST_SLATE_WIDGET(SGlobalPlayWorldActions, ChildWidget);
 				if (GlobalPlayWorldActions.IsValid())
@@ -75,8 +75,7 @@ namespace GraphPrinter
 	FString FPreviewViewportPrinter::GetWidgetTitle()
 	{
 		// #TODO: Need to find a way that doesn't go through the graph editor.
-		// Since the object of the asset cannot be obtained from StandaloneAssetEditorToolkitHost etc.,
-		// the name of the asset is obtained from the nearest graph editor.
+		// Since the object of the asset cannot be obtained from StandaloneAssetEditorToolkitHost etc., the name of the asset is obtained from the nearest graph editor.
 		const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);
 		if (StandaloneAssetEditorToolkitHost.IsValid())
 		{

@@ -9,7 +9,7 @@ class SNotificationItem;
 
 namespace GraphPrinter
 {
-	// A structure of notification item handles that can indirectly manipulate SNotificationItem.
+	// A struct of notification item handles that can indirectly manipulate SNotificationItem.
 	struct GRAPHPRINTERGLOBALS_API FNotificationHandle
 	{
 	public:
@@ -24,7 +24,7 @@ namespace GraphPrinter
 		TSharedPtr<SNotificationItem> NotificationItem;
 	};
 		
-	// A structure for adding buttons, hyperlinks, etc. to notifications.
+	// A struct for adding buttons, hyperlinks, etc. to notifications.
 	struct GRAPHPRINTERGLOBALS_API FNotificationInteraction
 	{
 	public:
@@ -48,7 +48,7 @@ namespace GraphPrinter
 	public:
 		// Constructor.
 		FNotificationInteraction(
-			EInteractionType InType,
+			const EInteractionType InType,
 			const FText& InText,
 			const FText& InTooltip,
 			const FSimpleDelegate& InCallback
@@ -92,7 +92,7 @@ namespace GraphPrinter
 			const FString& DefaultPath = TEXT(""),
 			const FString& DefaultFile = TEXT(""),
 			const FString& FileTypes = TEXT("All (*)|*.*"),
-			bool bIsMultiple = false
+			const bool bIsMultiple = false
 		);
 
 		// Cuts out unnecessary character strings mixed in at the beginning of sentences.
