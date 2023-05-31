@@ -11,7 +11,7 @@ class SWindow;
 /**
  * A editor preferences class for this plugin.
  */
-UCLASS(Abstract, Config = Editor)
+UCLASS(Abstract, Config = Editor, GlobalUserConfig)
 class GRAPHPRINTERGLOBALS_API UGraphPrinterSettings : public UObject
 {
 	GENERATED_BODY()
