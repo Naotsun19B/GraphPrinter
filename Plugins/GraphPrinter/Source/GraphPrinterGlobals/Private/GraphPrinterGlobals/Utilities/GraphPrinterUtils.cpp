@@ -6,7 +6,6 @@
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Misc/Paths.h"
 #include "HAL/PlatformProcess.h"
-#include "Interfaces/IMainFrameModule.h"
 #include "DesktopPlatformModule.h"
 
 namespace GraphPrinter
@@ -155,21 +154,8 @@ namespace GraphPrinter
 	)
 	{
 		// Get the OS-level window handle of the editor's mainframe.
-		const void* WindowHandle = nullptr;
-
-		const auto& MainFrameModule = IMainFrameModule::Get();
-		const TSharedPtr<SWindow> MainWindow = MainFrameModule.GetParentWindow();
-
-		if (MainWindow.IsValid())
-		{
-			const TSharedPtr<FGenericWindow> NativeWindow = MainWindow->GetNativeWindow();
-			if (NativeWindow.IsValid())
-			{
-				WindowHandle = NativeWindow->GetOSWindowHandle();
-			}
-		}
-
-		if (WindowHandle == nullptr)
+		const void* ParentWindowHandle = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr);
+		if (ParentWindowHandle == nullptr)
 		{
 			return false;
 		}
@@ -182,7 +168,7 @@ namespace GraphPrinter
 		}
 
 		return DesktopPlatform->OpenFileDialog(
-			WindowHandle,
+			ParentWindowHandle,
 			DialogTitle,
 			DefaultPath,
 			DefaultFile,

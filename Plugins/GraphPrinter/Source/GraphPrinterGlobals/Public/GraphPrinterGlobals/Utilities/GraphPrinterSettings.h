@@ -58,8 +58,8 @@ public:
 	virtual FSettingsInfo GetSettingsInfo() const PURE_VIRTUAL(UGraphPrinterSettings::GetSectionName, { return FSettingsInfo(NAME_None); });
 	
 private:
-	// Called when the editor mainframe has been created.
-	static void HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow);
+	// Called when the end of UEngine::Init, right before loading PostEngineInit modules for both normal execution and commandlets
+	static void HandleOnPostEngineInit();
 
 private:
 	// The list of all registered editor settings classes about GraphPrinter.

@@ -7,7 +7,7 @@
 #endif
 #include "ISettingsModule.h"
 #include "Modules/ModuleManager.h"
-#include "Interfaces/IMainFrameModule.h"
+#include "Misc/CoreDelegates.h"
 #include "UObject/UObjectIterator.h"
 
 namespace GraphPrinter
@@ -52,7 +52,7 @@ FText UGraphPrinterSettings::FSettingsInfo::GetFormattedDisplayName() const
 
 void UGraphPrinterSettings::Register()
 {
-	IMainFrameModule::Get().OnMainFrameCreationFinished().AddStatic(&UGraphPrinterSettings::HandleOnMainFrameCreationFinished);
+	FCoreDelegates::OnPostEngineInit.AddStatic(&UGraphPrinterSettings::HandleOnPostEngineInit);
 }
 
 void UGraphPrinterSettings::Unregister()
@@ -90,7 +90,7 @@ void UGraphPrinterSettings::OpenSettings(FName SectionName)
 	}
 }
 
-void UGraphPrinterSettings::HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow)
+void UGraphPrinterSettings::HandleOnPostEngineInit()
 {
 	ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule();
 	if (SettingsModule == nullptr)

@@ -24,7 +24,6 @@ public class GraphPrinterGlobals : ModuleRules
 				"SlateCore",
 				"Settings",
 				"SettingsEditor",
-				"MainFrame",
 				"DesktopPlatform",
 				"ImageWriteQueue",
 			}
