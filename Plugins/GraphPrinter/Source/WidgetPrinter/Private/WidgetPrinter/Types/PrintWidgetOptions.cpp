@@ -2,10 +2,11 @@
 
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "UObject/Package.h"
+
 #if UE_5_01_OR_LATER
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PrintWidgetOptions)
 #endif
-#include "UObject/Package.h"
 
 UPrintWidgetOptions::UPrintWidgetOptions()
 	: PrintScope(EPrintScope::All)

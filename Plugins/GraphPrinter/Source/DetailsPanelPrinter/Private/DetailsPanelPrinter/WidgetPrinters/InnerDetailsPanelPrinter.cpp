@@ -1,4 +1,4 @@
-﻿// Copyright 2020-2023 Naotsun. All Rights Reserved.
+// Copyright 2020-2023 Naotsun. All Rights Reserved.
 
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"

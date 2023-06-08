@@ -3,13 +3,14 @@
 #include "WidgetPrinter/Types/RestoreWidgetOptions.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#if UE_5_01_OR_LATER
-#include UE_INLINE_GENERATED_CPP_BY_NAME(RestoreWidgetOptions)
-#endif
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "UObject/Package.h"
 #include "Misc/Paths.h"
 #include "ImageWriteTypes.h"
+
+#if UE_5_01_OR_LATER
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RestoreWidgetOptions)
+#endif
 
 URestoreWidgetOptions::URestoreWidgetOptions()
 	: DialogTitle(TEXT("Select the png file that contains the widget info"))

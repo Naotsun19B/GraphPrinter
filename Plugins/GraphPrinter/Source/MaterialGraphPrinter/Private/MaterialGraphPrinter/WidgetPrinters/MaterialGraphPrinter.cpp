@@ -5,6 +5,7 @@
 #include "MaterialGraphPrinter/Types/PrintMaterialGraphOptions.h"
 #include "MaterialGraphPrinter/Utilities/MaterialGraphPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+
 #if UE_5_01_OR_LATER
 #include UE_INLINE_GENERATED_CPP_BY_NAME(MaterialGraphPrinter)
 #endif
