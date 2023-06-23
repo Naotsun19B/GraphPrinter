@@ -12,6 +12,9 @@
 #include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"
 #endif
 #include "UObject/StrongObjectPtr.h"
+#if UE_5_02_OR_LATER
+#include "Engine/TextureDefines.h"
+#endif
 #include "Engine/TextureRenderTarget2D.h"
 #include "HAL/FileManager.h"
 #include "EdGraph/EdGraph.h"

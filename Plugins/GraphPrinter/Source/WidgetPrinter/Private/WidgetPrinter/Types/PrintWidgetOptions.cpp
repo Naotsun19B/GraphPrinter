@@ -2,6 +2,11 @@
 
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_02_OR_LATER
+#include "Engine/TextureDefines.h"
+#else
+#include "Engine/Texture.h"
+#endif
 #include "UObject/Package.h"
 
 #if UE_5_01_OR_LATER
@@ -17,7 +22,7 @@ UPrintWidgetOptions::UPrintWidgetOptions()
 	, bUseGamma(true)
 	, MaxImageSize(FVector2D::ZeroVector)
 	, RenderingScale(1.f)
-	, FilteringMode(TextureFilter::TF_Default)
+	, FilteringMode(TF_Default)
 	, SearchTarget(nullptr)
 {
 	ImageWriteOptions.bAsync = true;

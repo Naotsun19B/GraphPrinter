@@ -6,9 +6,14 @@
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Engine/EngineTypes.h"
+#if UE_5_02_OR_LATER
+#include "Engine/TextureDefines.h"
+#endif
 #include "WidgetPrinterSettings.generated.h"
 
+#if !UE_5_02_OR_LATER
 enum TextureFilter;
+#endif
 enum class EDesiredImageFormat : uint8;
 
 /**

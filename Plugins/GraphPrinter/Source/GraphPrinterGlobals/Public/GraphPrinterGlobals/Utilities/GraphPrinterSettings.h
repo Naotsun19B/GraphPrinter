@@ -6,8 +6,6 @@
 #include "UObject/NoExportTypes.h"
 #include "GraphPrinterSettings.generated.h"
 
-class SWindow;
-
 /**
  * A editor preferences class for this plugin.
  */

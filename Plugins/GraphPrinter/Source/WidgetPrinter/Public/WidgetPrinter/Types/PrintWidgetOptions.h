@@ -4,11 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Engine/Texture.h"
 #include "ImageWriteBlueprintLibrary.h"
+#include "Templates/SubclassOf.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "PrintWidgetOptions.generated.h"
 
 class SWidget;
+#if UE_5_02_OR_LATER
+enum TextureFilter : int;
+#else
+enum TextureFilter;
+#endif
 
 /**
  * An optional class to specify when printing the widget.
