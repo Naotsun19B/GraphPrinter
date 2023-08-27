@@ -1,6 +1,5 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
-using System.IO;
 using UnrealBuildTool;
 
 public class TextChunkHelper : ModuleRules
@@ -8,13 +7,9 @@ public class TextChunkHelper : ModuleRules
 	public TextChunkHelper(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		PrivateIncludePaths.AddRange(
-			new string[] 
-			{
-				Path.Combine(ModuleDirectory, "Private"),
-			}
-		);
+#if UE_5_2_OR_LATER
+		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+#endif
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
