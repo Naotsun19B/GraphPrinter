@@ -7,12 +7,13 @@
 #include "ImageWriteBlueprintLibrary.h"
 #include "Templates/SubclassOf.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#if UE_5_02_OR_LATER
+#include "Engine/TextureDefines.h"
+#endif
 #include "PrintWidgetOptions.generated.h"
 
 class SWidget;
-#if UE_5_02_OR_LATER
-enum TextureFilter : int;
-#else
+#if !UE_5_02_OR_LATER
 enum TextureFilter;
 #endif
 

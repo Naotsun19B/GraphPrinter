@@ -11,6 +11,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GraphPrinterSettings)
 #endif
 
+#define LOCTEXT_NAMESPACE "GraphPrinterSettings"
+
 namespace GraphPrinter
 {
 	namespace Settings
@@ -20,7 +22,7 @@ namespace GraphPrinter
 
 		ISettingsModule* GetSettingsModule()
 		{
-			return FModuleManager::GetModulePtr<ISettingsModule>("Settings");
+			return FModuleManager::GetModulePtr<ISettingsModule>(TEXT("Settings"));
 		}
 	}
 }
@@ -45,7 +47,7 @@ UGraphPrinterSettings::FSettingsInfo::FSettingsInfo(
 FText UGraphPrinterSettings::FSettingsInfo::GetFormattedDisplayName() const
 {
 	return FText::Format(
-		NSLOCTEXT("GraphPrinterSettings", "DisplayNameFormat", "{0} - {1}"),
+		LOCTEXT("DisplayNameFormat", "{0} - {1}"),
 		FText::FromString(FName::NameToDisplayString(GraphPrinter::Global::PluginName.ToString(), false)),
 		DisplayName
 	);

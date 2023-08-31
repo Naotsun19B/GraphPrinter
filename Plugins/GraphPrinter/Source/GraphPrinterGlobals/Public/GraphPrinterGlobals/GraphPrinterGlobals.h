@@ -18,7 +18,7 @@ namespace GraphPrinter
  * Macros to support each engine version.
  */
 #ifndef UE_5_02_OR_LATER
-#if UE_VERSION_NEWER_THAN(5, 2, 0)
+#if !UE_VERSION_OLDER_THAN(5, 2, 0)
 #define UE_5_02_OR_LATER 1
 #else
 #define UE_5_02_OR_LATER 0
@@ -26,7 +26,7 @@ namespace GraphPrinter
 #endif
 
 #ifndef UE_5_01_OR_LATER
-#if UE_VERSION_NEWER_THAN(5, 1, 0)
+#if !UE_VERSION_OLDER_THAN(5, 1, 0)
 #define UE_5_01_OR_LATER 1
 #else
 #define UE_5_01_OR_LATER 0
@@ -34,7 +34,7 @@ namespace GraphPrinter
 #endif
 
 #ifndef UE_5_00_OR_LATER
-#if UE_VERSION_NEWER_THAN(5, 0, 0)
+#if !UE_VERSION_OLDER_THAN(5, 0, 0)
 #define UE_5_00_OR_LATER 1
 #else
 #define UE_5_00_OR_LATER 0
@@ -42,7 +42,7 @@ namespace GraphPrinter
 #endif
 
 #ifndef UE_4_25_OR_LATER
-#if UE_VERSION_NEWER_THAN(4, 25, 0)
+#if !UE_VERSION_OLDER_THAN(4, 25, 0)
 #define UE_4_25_OR_LATER 1
 #else
 #define UE_4_25_OR_LATER 0
@@ -50,7 +50,7 @@ namespace GraphPrinter
 #endif
 
 #ifndef UE_4_24_OR_LATER
-#if UE_VERSION_NEWER_THAN(4, 24, 0)
+#if !UE_VERSION_OLDER_THAN(4, 24, 0)
 #define UE_4_24_OR_LATER 1
 #else
 #define UE_4_24_OR_LATER 0
@@ -58,7 +58,7 @@ namespace GraphPrinter
 #endif
 
 #ifndef UE_4_22_OR_LATER
-#if UE_VERSION_NEWER_THAN(4, 22, 0)
+#if !UE_VERSION_OLDER_THAN(4, 22, 0)
 #define UE_4_22_OR_LATER 1
 #else
 #define UE_4_22_OR_LATER 0

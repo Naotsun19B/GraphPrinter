@@ -46,9 +46,13 @@ public class DetailsPanelPrinter : ModuleRules
         PublicIncludePaths.AddRange(
             new string[]
             {
+#if UE_5_2_OR_LATER
+                // In UHT for UE5.2 and later, when you use PublicIncludePaths, the base path of the module's include will be replaced with the first value, so add the correct base path of the include first.
+                Path.Combine(ModuleDirectory, ".."),
+#endif
                 // To use SDetailsView.
                 Path.Combine(EngineDirectory, "Source", "Editor", "PropertyEditor", "Private"),
-                
+
                 // To use SActorDetails.
                 Path.Combine(EngineDirectory, "Source", "Editor", "LevelEditor", "Private"),
             }

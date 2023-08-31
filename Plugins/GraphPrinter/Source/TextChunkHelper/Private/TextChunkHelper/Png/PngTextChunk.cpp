@@ -10,16 +10,6 @@
 
 THIRD_PARTY_INCLUDES_START
 
-#if PLATFORM_LINUX || PLATFORM_LINUXAARCH64
-#include "ThirdParty/zlib/v1.2.8/include/Linux/x86_64-unknown-linux-gnu/zlib.h" 
-#else
-#if UE_5_01_OR_LATER
-#include "ThirdParty/zlib/1.2.12/include/zlib.h"
-#else
-#include "ThirdParty/zlib/zlib-1.2.5/Inc/zlib.h"
-#endif
-#endif
-
 #if !WITH_LIBPNG_1_6
 #include "ThirdParty/libPNG/libPNG-1.5.2/pnginfo.h"
 #endif
@@ -130,7 +120,7 @@ namespace TextChunkHelper
 
 			// Set compression level.
 			{
-				png_set_compression_level(DestinationPngPtr, Z_BEST_SPEED);
+				png_set_compression_level(DestinationPngPtr, 1);
 			}
 			// Copy IHDR.
 			{
