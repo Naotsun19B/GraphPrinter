@@ -8,9 +8,7 @@ public class GraphPrinterPluginEditorTarget : TargetRules
 	public GraphPrinterPluginEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-#if UE_4_24_OR_LATER
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-#endif
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
 #if UE_5_2_OR_LATER
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 #endif
