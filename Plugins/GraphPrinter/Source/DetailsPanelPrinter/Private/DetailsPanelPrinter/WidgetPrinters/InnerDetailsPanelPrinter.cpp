@@ -40,7 +40,7 @@
 		\
 		static PropertyType& Extract(ClassType& Class) \
 		{ \
-		return Class.*Inner::Pointer;\
+			return Class.*Inner::Pointer; \
 		} \
 	}
 
@@ -48,9 +48,16 @@ namespace GraphPrinter
 {
 	namespace Hack
 	{
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:5103)
+#endif
 		HACK_INACCESSIBLE_PROPERTY(TSharedPtr<SDetailTree>, SDetailsViewBase, DetailTree)
 		HACK_INACCESSIBLE_PROPERTY(FDetailNodeList, SDetailsViewBase, RootTreeNodes)
 		HACK_INACCESSIBLE_PROPERTY(FDetailsObjectSet, FDetailMultiTopLevelObjectRootNode, RootObjectSet)
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 	}
 	
 	TSharedPtr<SDetailTree> FDetailsViewBaseAccessor::ExtractDetailTree(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
@@ -80,6 +87,77 @@ namespace GraphPrinter
 	FDetailsPanelPrinter::FDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 		: Super(InRestoreOptions, InOnPrinterProcessingFinished)
 	{
+	}
+
+	void FDetailsPanelPrinter::PrintWidget()
+	{
+		if (!IsValid(PrintOptions))
+		{
+			return;
+		}
+			
+		DetailsPanelPrinterParams.DetailsView = FindDetailsView(FindTargetWidget(PrintOptions->SearchTarget));
+		if (DetailsPanelPrinterParams.DetailsView.IsValid())
+		{
+			Super::PrintWidget();
+		}
+	}
+
+	bool FDetailsPanelPrinter::CanPrintWidget() const
+	{
+		if (Super::CanPrintWidget() && IsValid(PrintOptions))
+		{
+			const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(FindTargetWidget(PrintOptions->SearchTarget));
+			if (DetailsView.IsValid())
+			{
+				if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+				{
+					if (const UClass* EditingObjectClass = EditingObject->GetClass())
+					{
+						return SupportsEditingObjectClass(EditingObjectClass);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	void FDetailsPanelPrinter::RestoreWidget()
+	{
+		if (!IsValid(RestoreOptions))
+		{
+			return;
+		}
+			
+		DetailsPanelPrinterParams.DetailsView = FindDetailsView(FindTargetWidget(RestoreOptions->SearchTarget));
+		if (DetailsPanelPrinterParams.DetailsView.IsValid())
+		{
+			Super::RestoreWidget();
+		}
+	}
+
+	bool FDetailsPanelPrinter::CanRestoreWidget() const
+	{
+		if (IsValid(RestoreOptions))
+		{
+			const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(FindTargetWidget(RestoreOptions->SearchTarget));
+			if (DetailsView.IsValid())
+			{
+				if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+				{
+					if (const UClass* EditingObjectClass = EditingObject->GetClass())
+					{
+						if (SupportsEditingObjectClass(EditingObjectClass))
+						{
+							return DetailsView->IsPropertyEditingEnabled();
+						}
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	TSharedPtr<SDetailsView> FDetailsPanelPrinter::FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const
@@ -143,6 +221,77 @@ namespace GraphPrinter
 	FActorDetailsPanelPrinter::FActorDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
 		: Super(InRestoreOptions, InOnPrinterProcessingFinished)
 	{
+	}
+
+	void FActorDetailsPanelPrinter::PrintWidget()
+	{
+		if (!IsValid(PrintOptions))
+		{
+			return;
+		}
+			
+		DetailsPanelPrinterParams.DetailsView = FindDetailsView(FindTargetWidget(PrintOptions->SearchTarget));
+		if (DetailsPanelPrinterParams.DetailsView.IsValid())
+		{
+			Super::PrintWidget();
+		}
+	}
+
+	bool FActorDetailsPanelPrinter::CanPrintWidget() const
+	{
+		if (Super::CanPrintWidget() && IsValid(PrintOptions))
+		{
+			const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(FindTargetWidget(PrintOptions->SearchTarget));
+			if (DetailsView.IsValid())
+			{
+				if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+				{
+					if (const UClass* EditingObjectClass = EditingObject->GetClass())
+					{
+						return SupportsEditingObjectClass(EditingObjectClass);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	void FActorDetailsPanelPrinter::RestoreWidget()
+	{
+		if (!IsValid(RestoreOptions))
+		{
+			return;
+		}
+			
+		DetailsPanelPrinterParams.DetailsView = FindDetailsView(FindTargetWidget(RestoreOptions->SearchTarget));
+		if (DetailsPanelPrinterParams.DetailsView.IsValid())
+		{
+			Super::RestoreWidget();
+		}
+	}
+
+	bool FActorDetailsPanelPrinter::CanRestoreWidget() const
+	{
+		if (IsValid(RestoreOptions))
+		{
+			const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(FindTargetWidget(RestoreOptions->SearchTarget));
+			if (DetailsView.IsValid())
+			{
+				if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+				{
+					if (const UClass* EditingObjectClass = EditingObject->GetClass())
+					{
+						if (SupportsEditingObjectClass(EditingObjectClass))
+						{
+							return DetailsView->IsPropertyEditingEnabled();
+						}
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	TSharedPtr<SActorDetails> FActorDetailsPanelPrinter::FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const

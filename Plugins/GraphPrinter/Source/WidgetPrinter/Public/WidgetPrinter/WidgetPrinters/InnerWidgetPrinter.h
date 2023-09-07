@@ -28,7 +28,7 @@ namespace GraphPrinter
 	/**
 	 * An inner class with the ability to print and restore widgets.
 	 */
-	class WIDGETPRINTER_API IInnerWidgetPrinter
+	class WIDGETPRINTER_API IInnerWidgetPrinter : public TSharedFromThis<IInnerWidgetPrinter>
 	{
 	public:
 		// Defines the event when receiving the drawing result without outputting the render target.
@@ -49,7 +49,10 @@ namespace GraphPrinter
 
 		// Returns whether the target widget can be restored.
 		virtual bool CanRestoreWidget() const = 0;
-
+		
+		// Called when the image file export process is complete.
+		virtual void OnExportRenderTargetFinished(const bool bIsSucceeded) = 0;
+		
 		// Sets event when receiving the drawing result without outputting the render target.
 		void SetOnRendered(const FOnRendered& InOnRendered);
 
@@ -219,9 +222,13 @@ namespace GraphPrinter
 			WidgetPrinterParams.Filename = CreateFilename();
 
 			// Binds the event when the operation is completed.
-			PrintOptions->ImageWriteOptions.NativeOnComplete = [=](bool bIsSucceeded)
+			TWeakPtr<IInnerWidgetPrinter> This = AsShared();
+			PrintOptions->ImageWriteOptions.NativeOnComplete = [This](const bool bIsSucceeded)
 			{
-				OnExportRenderTargetFinished(bIsSucceeded);
+				if (This.IsValid())
+				{
+					This.Pin()->OnExportRenderTargetFinished(bIsSucceeded);
+				}
 			};
 
 			// Exports the render target in the specified file format.
@@ -415,9 +422,9 @@ namespace GraphPrinter
 			{
 				if (IFileManager::Get().FileExists(*FString(Filename + Extension)))
 				{
-					auto CombineFilenameAndIndex = [](const FString& Filename, int32 Index) -> FString
+					auto CombineFilenameAndIndex = [](const FString& FilenameToCombine, const int32 IndexToCombine) -> FString
 					{
-						return FString::Printf(TEXT("%s_%d"), *Filename, Index);
+						return FString::Printf(TEXT("%s_%d"), *FilenameToCombine, IndexToCombine);
 					};
 
 					int32 Index = 0;
@@ -465,8 +472,8 @@ namespace GraphPrinter
 			}
 		}
 
-		// Called when the image file export process is complete.
-		virtual void OnExportRenderTargetFinished(bool bIsSucceeded)
+		// IInnerWidgetPrinter interface.
+		virtual void OnExportRenderTargetFinished(const bool bIsSucceeded) override
 		{
 			if (!bIsSucceeded)
 			{
@@ -534,7 +541,8 @@ namespace GraphPrinter
 
 			OnPrinterProcessingFinished.ExecuteIfBound();
 		}
-
+		// End of IInnerWidgetPrinter interface.
+		
 		// Copies the image file that draws the widget to clipboard.
 		virtual bool CopyImageFileToClipboard()
 		{
