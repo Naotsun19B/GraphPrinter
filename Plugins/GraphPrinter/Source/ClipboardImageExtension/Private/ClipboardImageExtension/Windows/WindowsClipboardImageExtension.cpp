@@ -65,7 +65,12 @@ namespace ClipboardImageExtension
 		}
 #endif
 	}
-	
+
+	bool FWindowsClipboardImageExtension::IsCopyImageToClipboardAvailable()
+	{
+		return true;
+	}
+
 	bool FWindowsClipboardImageExtension::ClipboardCopy(const FString& Filename)
 	{
 #if PLATFORM_WINDOWS

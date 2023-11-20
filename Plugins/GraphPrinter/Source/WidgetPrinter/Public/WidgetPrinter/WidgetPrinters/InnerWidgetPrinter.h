@@ -246,6 +246,16 @@ namespace GraphPrinter
 				return false;
 			}
 
+#ifdef WITH_TEXT_CHUNK_HELPER
+			if (PrintOptions->ExportMethod == UPrintWidgetOptions::EExportMethod::Clipboard)
+			{
+				if (!ClipboardImageExtension::FClipboardImageExtension::IsCopyImageToClipboardAvailable())
+				{
+					return false;
+				}
+			}
+#endif
+
 			const TSharedPtr<TWidget> FoundWidget = FindTargetWidget(PrintOptions->SearchTarget);
 			return FoundWidget.IsValid();
 		}

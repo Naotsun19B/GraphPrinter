@@ -148,7 +148,7 @@ namespace GraphPrinter
 				return TEXT("EmptyDetailsPanel");
 			}
 			
-			// For default objects uses the class name to remove the prefix.
+			// For default objects uses the class name to remove the suffix.
 			if (EditingObject->HasAnyFlags(RF_ClassDefaultObject))
 			{
 				if (const UClass* SelectedObjectClass = EditingObject->GetClass())

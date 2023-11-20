@@ -8,9 +8,9 @@
 namespace ClipboardImageExtension
 {
 	/**
-	 * An extension class for working with clipboard images on Windows.
+	 * An extension class for working with clipboard images on Linux.
 	 */
-	class CLIPBOARDIMAGEEXTENSION_API FWindowsClipboardImageExtension : public FGenericClipboardImageExtension
+	class CLIPBOARDIMAGEEXTENSION_API FLinuxClipboardImageExtension : public FGenericClipboardImageExtension
 	{
 	public:
 		// FGenericClipboardImageExtension interface.
@@ -20,7 +20,7 @@ namespace ClipboardImageExtension
 		// End of FGenericClipboardImageExtension interface.
 	};
 
-#if PLATFORM_WINDOWS
-	using FClipboardImageExtension = FWindowsClipboardImageExtension;
+#if PLATFORM_LINUX
+	using FClipboardImageExtension = FLinuxClipboardImageExtension;
 #endif
 }

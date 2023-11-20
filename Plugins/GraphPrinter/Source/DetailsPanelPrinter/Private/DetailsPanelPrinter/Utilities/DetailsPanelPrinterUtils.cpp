@@ -10,12 +10,10 @@
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/SWindow.h"
 #include "SDetailsView.h"
-#include "SDetailsViewBase.h"
 #include "SActorDetails.h"
 #if UE_5_00_OR_LATER
 #include "SSubobjectInstanceEditor.h"
 #endif
-#include "Engine/UserDefinedStruct.h"
 #include "Serialization/JsonSerializer.h"
 #include "JsonObjectConverter.h"
 

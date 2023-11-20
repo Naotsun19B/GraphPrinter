@@ -13,6 +13,9 @@ namespace ClipboardImageExtension
 	class CLIPBOARDIMAGEEXTENSION_API FGenericClipboardImageExtension
 	{
 	public:
+		// Returns whether the function to copy images to the clipboard is available.
+		static bool IsCopyImageToClipboardAvailable() { return false; }
+		
 		// Copies the image file with the specified path to the clipboard.
 		static bool ClipboardCopy(const FString& Filename) { return false; }
 
