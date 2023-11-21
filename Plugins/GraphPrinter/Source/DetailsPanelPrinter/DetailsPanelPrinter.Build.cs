@@ -58,8 +58,8 @@ public class DetailsPanelPrinter : ModuleRules
             }
         );
         
-        // #TODO: Allows the use of details panel printer on Mac and before UE4.27.
-        if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows) || Target.IsInPlatformGroup(UnrealPlatformGroup.Linux))
+        // #TODO: Allows the use of details panel printer on Mac/Linux and before UE4.27.
+        if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows))
         {
             if (Target.Version.MajorVersion >= 5)
             {
