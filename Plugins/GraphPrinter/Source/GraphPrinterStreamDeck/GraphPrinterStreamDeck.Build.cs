@@ -30,8 +30,6 @@ public class GraphPrinterStreamDeck : ModuleRules
             new string[]
             {
                 "CoreUObject",
-                "Slate",
-                "SlateCore",
                 "Projects",
                 
                 "GraphPrinterGlobals",

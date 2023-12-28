@@ -4,8 +4,6 @@
 #include "Modules/ModuleManager.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
-#include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
-#include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtender.h"
 
 namespace GraphPrinter
 {
@@ -26,18 +24,10 @@ namespace GraphPrinter
 		// Register command actions.
 		FGraphPrinterCommands::Register();
 		FGraphPrinterCommands::Bind();
-		
-		// Register UI extension.
-		FToolbarExtender::Register();
-		FToolMenuExtender::Register();
 	}
 
 	void FGraphPrinterEditorExtensionModule::ShutdownModule()
 	{
-		// Unregister UI extension.
-		FToolMenuExtender::Unregister();
-		FToolbarExtender::Unregister();
-		
 		// Unregister command actions.
 		FGraphPrinterCommands::Unregister();
 

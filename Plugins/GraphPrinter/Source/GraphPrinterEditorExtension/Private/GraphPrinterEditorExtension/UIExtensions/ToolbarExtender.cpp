@@ -1,85 +1,55 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterEditorExtension/UIExtensions/ToolbarExtender.h"
+#include "CoreMinimal.h"
+#include "GraphPrinterEditorExtension/UIExtensions/AutoToolMenuExtender.h"
+#include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtensionConstants.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterEditorExtensionSettings.h"
-#include "GraphPrinterStreamDeck/UIExtensions/StreamDeckMenu.h"
-#include "Toolkits/AssetEditorToolkit.h"
-#include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "Framework/MultiBox/MultiBoxExtender.h"
-#include "Widgets/SWidget.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
 #define LOCTEXT_NAMESPACE "ToolbarExtender"
 
 namespace GraphPrinter
 {
-	void FToolbarExtender::Register()
+	class FToolbarExtension : public FAutoToolMenuExtender
 	{
-		if (Extender.IsValid() || !ShouldExtendToolbar())
+	private:
+		// FAutoToolMenuExtender interface.
+		virtual void ExtendToolMenu() override
 		{
-			return;
-		}
-		
-		Extender = MakeShared<FExtender>();
-		check(Extender.IsValid());
-	
-		const TSharedPtr<FUICommandList>& CommandBindings = FGraphPrinterCommands::Get().CommandBindings;
-	
-		Extender->AddToolBarExtension(
-			TEXT("Asset"),
-			EExtensionHook::After,
-			CommandBindings,
-			FToolBarExtensionDelegate::CreateStatic(&FToolbarExtender::OnExtendToolbar)
-		);
-		
-		const TSharedPtr<FExtensibilityManager>& ExtensibilityManager = FAssetEditorToolkit::GetSharedToolBarExtensibilityManager();
-		if (ExtensibilityManager.IsValid())
-		{
-			ExtensibilityManager->AddExtender(Extender);
-		}
-	}
-
-	void FToolbarExtender::Unregister()
-	{
-		if (Extender.IsValid())
-		{
-			const TSharedPtr<FExtensibilityManager>& ExtensibilityManager = FAssetEditorToolkit::GetSharedToolBarExtensibilityManager();
-			if (ExtensibilityManager.IsValid())
+			if (!UGraphPrinterEditorExtensionSettings::Get().bShowComboButtonInToolbar)
 			{
-				ExtensibilityManager->RemoveExtender(Extender);
+				return;
 			}
+			
+			auto* ToolMenus = UToolMenus::Get();
+			check(IsValid(ToolMenus));
+			
+			UToolMenu* ToolsMenu = ToolMenus->ExtendMenu(TEXT("AssetEditorToolbar.CommonActions"));
+			if (!IsValid(ToolsMenu))
+			{
+				return;
+			}
+			
+			FToolMenuSection& AssetSection = ToolsMenu->FindOrAddSection(TEXT("Asset"));
+			AssetSection.AddEntry(
+				FToolMenuEntry::InitComboButton(
+					Global::PluginName,
+					FToolUIActionChoice(),
+					FNewToolMenuChoice(
+						FNewToolMenuDelegate::CreateStatic(&FGraphPrinterCommands::FillMenuBuilder)
+					),
+					ToolMenuExtensionConstants::ToolMenuLabel,
+					ToolMenuExtensionConstants::ToolMenuTooltip,
+					FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
+				)
+			)
+			.SetCommandList(FGraphPrinterCommands::Get().CommandBindings);
 		}
-	}
-
-	bool FToolbarExtender::ShouldExtendToolbar()
-	{
-		return !UGraphPrinterEditorExtensionSettings::Get().bHideToolbarComboButton;
-	}
-
-	void FToolbarExtender::OnExtendToolbar(FToolBarBuilder& ToolBarBuilder)
-	{
-		ToolBarBuilder.AddSeparator();
-		ToolBarBuilder.AddComboButton(
-			FUIAction(),
-			FOnGetContent::CreateStatic(&FToolbarExtender::OnGetComboBoxContent),
-			LOCTEXT("ComboButtonTitle", "Graph Printer"),
-			LOCTEXT("ComboButtonDescription", "You can perform the functions of Gprah Printer from here."),
-			FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
-		);
-	}
-
-	TSharedRef<SWidget> FToolbarExtender::OnGetComboBoxContent()
-	{
-		FMenuBuilder MenuBuilder(true, FGraphPrinterCommands::Get().CommandBindings);
-		FGraphPrinterCommands::FillMenuBuilder(MenuBuilder);
-#ifdef WITH_STREAM_DECK
-		FStreamDeckMenu::FillMenuBuilder(MenuBuilder);
-#endif
-		return MenuBuilder.MakeWidget();
-	}
-
-	TSharedPtr<FExtender> FToolbarExtender::Extender = nullptr;
+		// End of FAutoToolMenuExtender interface.
+	};
+	static FToolbarExtension Instance;
 }
 	
 #undef LOCTEXT_NAMESPACE

@@ -3,10 +3,13 @@
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
+#if WITH_STREAM_DECK
+#include "GraphPrinterStreamDeck/HAL/StreamDeckUtils.h"
+#endif
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "Interfaces/IMainFrameModule.h"
-#include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "ToolMenu.h"
 #if UE_5_00_OR_LATER
 #include "Styling/AppStyle.h"
 #else
@@ -56,46 +59,94 @@ namespace GraphPrinter
 		Instance.Pin()->BindCommands();
 	}
 
-	void FGraphPrinterCommands::FillMenuBuilder(FMenuBuilder& MenuBuilder)
+	void FGraphPrinterCommands::FillMenuBuilder(UToolMenu* ToolMenu)
 	{
+		if (!IsValid(ToolMenu))
+		{
+			return;
+		}
+		
 		const TSharedPtr<FGraphPrinterCommands> This = Instance.Pin();
 		check(This.IsValid());
 
+		ToolMenu->Context.AppendCommandList(This->CommandBindings);
+		
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
-		MenuBuilder.BeginSection(NAME_None, LOCTEXT("CopyToClipboardSectionName", "Copy To Clipboard"));
-		MenuBuilder.AddMenuEntry(This->CopyAllAreaOfWidgetToClipboard);
-		MenuBuilder.AddMenuEntry(This->CopySelectedAreaOfWidgetToClipboard);
-		MenuBuilder.EndSection();
+		{
+			FToolMenuSection& CopyToClipboardSection = ToolMenu->AddSection(
+				TEXT("CopyToClipboard"),
+				LOCTEXT("CopyToClipboardSectionName", "Copy To Clipboard")
+			);
+			CopyToClipboardSection.AddMenuEntry(This->CopyAllAreaOfWidgetToClipboard);
+			CopyToClipboardSection.AddMenuEntry(This->CopySelectedAreaOfWidgetToClipboard);
+		}
 #endif
-		
-		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ExportToImageFileSectionName", "Export To Image File"));
-		MenuBuilder.AddMenuEntry(This->PrintAllAreaOfWidget);
-		MenuBuilder.AddMenuEntry(This->PrintSelectedAreaOfWidget);
-		MenuBuilder.EndSection();
-
+		{
+			FToolMenuSection& ExportToImageFileSection = ToolMenu->AddSection(
+				TEXT("ExportToImageFile"),
+				LOCTEXT("ExportToImageFileSectionName", "Export To Image File")
+			);
+			ExportToImageFileSection.AddMenuEntry(This->PrintAllAreaOfWidget);
+			ExportToImageFileSection.AddMenuEntry(This->PrintSelectedAreaOfWidget);
+		}
 #ifdef WITH_TEXT_CHUNK_HELPER
-		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ImportFromImageFileSectionName", "Import From Image File"));
-		MenuBuilder.AddMenuEntry(This->RestoreWidgetFromImageFile);
-		MenuBuilder.EndSection();
+		{
+			FToolMenuSection& ImportFromImageFileSection = ToolMenu->AddSection(
+				TEXT("ImportFromImageFile"),
+				LOCTEXT("ImportFromImageFileSectionName", "Import From Image File")
+			);
+			ImportFromImageFileSection.AddMenuEntry(This->RestoreWidgetFromImageFile);
+		}
 #endif
-		
-		MenuBuilder.BeginSection(NAME_None, LOCTEXT("OtherSectionName", "Other"));
-		MenuBuilder.AddMenuEntry(This->OpenExportDestinationFolder);
-		MenuBuilder.AddSubMenu(
-			LOCTEXT("OpenPluginSettingsSubMenuTitle", "Open Plugin Settings"),
-			LOCTEXT("OpenPluginSettingsSubMenuTooltip", "Open the Graph Printer settings screen in the editor preferences."),
-			FNewMenuDelegate::CreateStatic(&FGraphPrinterCommands::OnExtendOpenSettingsSubMenu),
-			false,
-			FSlateIcon(
+		{
+			FToolMenuSection& OtherSection = ToolMenu->AddSection(
+				TEXT("Other"),
+				LOCTEXT("OtherSectionName", "Other")
+			);
+			OtherSection.AddMenuEntry(This->OpenExportDestinationFolder);
+			OtherSection.AddSubMenu(
+				TEXT("OpenPluginSettings"),
+				LOCTEXT("OpenPluginSettingsSubMenuTitle", "Open Plugin Settings"),
+				LOCTEXT("OpenPluginSettingsSubMenuTooltip", "Open the Graph Printer settings screen in the editor preferences."),
+				FNewToolMenuDelegate::CreateStatic(&FGraphPrinterCommands::OnExtendOpenSettingsSubMenu),
+				false,
+				FSlateIcon(
 #if UE_5_00_OR_LATER
-				FAppStyle::GetAppStyleSetName(),
+					FAppStyle::GetAppStyleSetName(),
 #else
-				FEditorStyle::GetStyleSetName(),
+					FEditorStyle::GetStyleSetName(),
 #endif
-				TEXT("Icons.Settings")
-			)
-		);
-		MenuBuilder.EndSection();
+					TEXT("Icons.Settings")
+				)
+			);
+#if WITH_STREAM_DECK
+			if (FStreamDeckUtils::IsStreamDeckInstalled())
+			{
+				OtherSection.AddMenuEntry(
+					TEXT("StreamDeck"),
+					LOCTEXT("InstallPluginTitle", "Install Stream Deck Plugin"),
+					LOCTEXT("InstallPluginTooltip", "Install the Stream Deck plugin that works with this plugin on the Stream Deck.\nIf this item fails to run, it is already installed.\nIf you don't see the Graph Printer item in the Stream Deck application, restart the Stream Deck application."),
+					FSlateIcon(
+#if UE_5_00_OR_LATER
+						FAppStyle::GetAppStyleSetName(),
+#else
+						FEditorStyle::GetStyleSetName(),
+#endif
+						TEXT("Icons.Download")
+					),
+					FUIAction(
+						FExecuteAction::CreateStatic(&FStreamDeckUtils::InstallStreamDeckPlugin),
+						FCanExecuteAction::CreateLambda(
+							[]() -> bool
+							{
+								return !FStreamDeckUtils::IsInstalledStreamDeckPlugin();
+							}
+						)
+					)
+				);
+			}
+#endif
+		}
 	}
 
 	TSharedPtr<FUICommandInfo> FGraphPrinterCommands::FindCommandByName(const FName& CommandName) const
@@ -197,12 +248,20 @@ namespace GraphPrinter
 		);
 	}
 
-	void FGraphPrinterCommands::OnExtendOpenSettingsSubMenu(FMenuBuilder& MenuBuilder)
+	void FGraphPrinterCommands::OnExtendOpenSettingsSubMenu(UToolMenu* ToolMenu)
 	{
+		if (!IsValid(ToolMenu))
+		{
+			return;
+		}
+
+		FToolMenuSection& SettingsSection = ToolMenu->AddSection(TEXT("Settings"));
+		
 		const TArray<UGraphPrinterSettings::FSettingsInfo>& AllSettings = UGraphPrinterSettings::GetAllSettings();
 		for (const auto& Setting : AllSettings)
 		{
-			MenuBuilder.AddMenuEntry(
+			SettingsSection.AddMenuEntry(
+				Setting.SectionName,
 				Setting.DisplayName,
 				Setting.Description,
 				FSlateIcon(),

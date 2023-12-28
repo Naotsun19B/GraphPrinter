@@ -7,7 +7,7 @@
 #include "Framework/Commands/UICommandList.h"
 #include "Framework/Commands/UICommandInfo.h"
 
-class FMenuBuilder;
+class UToolMenu;
 
 namespace GraphPrinter
 {
@@ -31,7 +31,7 @@ namespace GraphPrinter
 		static void Bind();
 
 		// Fills the menu builder with the commands of this plugin.
-		static void FillMenuBuilder(FMenuBuilder& MenuBuilder);
+		static void FillMenuBuilder(UToolMenu* ToolMenu);
 
 		// Returns commands with names matching the specified name.
 		TSharedPtr<FUICommandInfo> FindCommandByName(const FName& CommandName) const;
@@ -42,7 +42,7 @@ namespace GraphPrinter
 
 	private:
 		// Called when a submenu that opens plugin settings is built.
-		static void OnExtendOpenSettingsSubMenu(FMenuBuilder& MenuBuilder);
+		static void OnExtendOpenSettingsSubMenu(UToolMenu* ToolMenu);
 		
 	public:
 		// The list of shortcut keys used by this plugin.

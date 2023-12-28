@@ -1,109 +1,51 @@
 // Copyright 2020-2023 Naotsun. All Rights Reserved.
 
-#include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtender.h"
+#include "CoreMinimal.h"
+#include "GraphPrinterEditorExtension/UIExtensions/AutoToolMenuExtender.h"
+#include "GraphPrinterEditorExtension/UIExtensions/ToolMenuExtensionConstants.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
+#include "GraphPrinterEditorExtension/Utilities/GraphPrinterEditorExtensionSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#include "GraphPrinterStreamDeck/UIExtensions/StreamDeckMenu.h"
-#include "Toolkits/AssetEditorToolkit.h"
-#include "Modules/ModuleManager.h"
-#include "LevelEditor.h"
-#include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "Framework/MultiBox/MultiBoxExtender.h"
 
 #define LOCTEXT_NAMESPACE "ToolMenuExtender"
 
 namespace GraphPrinter
 {
-	namespace LevelEditor
+	class FToolMenuExtension : public FAutoToolMenuExtender
 	{
-		static TSharedPtr<FExtensibilityManager> GetMenuExtensibilityManager()
+	private:
+		// FAutoToolMenuExtender interface.
+		virtual void ExtendToolMenu() override
 		{
-			auto& LevelEditor = FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor"));
-			return LevelEditor.GetMenuExtensibilityManager();
-		}
-	}
-	
-	void FToolMenuExtender::Register()
-	{
-		if (Extender.IsValid())
-		{
-			return;
-		}
-		
-		Extender = MakeShared<FExtender>();
-		check(Extender.IsValid());
-	
-		const TSharedPtr<FUICommandList>& CommandBindings = FGraphPrinterCommands::Get().CommandBindings;
-
-		const FName ExtensionHook =
-#if UE_5_00_OR_LATER
-			TEXT("Tools");
-#else
-			TEXT("GraphEditor");
-#endif
-		
-		Extender->AddMenuExtension(
-			ExtensionHook,
-			EExtensionHook::After,
-			CommandBindings,
-			FMenuExtensionDelegate::CreateStatic(&FToolMenuExtender::OnExtendToolMenu)
-		);
-
-		const TArray<TSharedPtr<FExtensibilityManager>, TInlineAllocator<2>> ExtensibilityManagers = {
-			FAssetEditorToolkit::GetSharedMenuExtensibilityManager(),
-			LevelEditor::GetMenuExtensibilityManager()
-		};
-		for (const auto& ExtensibilityManager : ExtensibilityManagers)
-		{
-			if (ExtensibilityManager.IsValid())
+			if (!UGraphPrinterEditorExtensionSettings::Get().bShowSubMenuInToolMenu)
 			{
-				ExtensibilityManager->AddExtender(Extender);
+				return;
 			}
-		}
-	}
-
-	void FToolMenuExtender::Unregister()
-	{
-		const TArray<TSharedPtr<FExtensibilityManager>, TInlineAllocator<2>> ExtensibilityManagers = {
-			FAssetEditorToolkit::GetSharedMenuExtensibilityManager(),
-			LevelEditor::GetMenuExtensibilityManager()
-		};
-		for (const auto& ExtensibilityManager : ExtensibilityManagers)
-		{
-			if (ExtensibilityManager.IsValid())
+			
+			auto* ToolMenus = UToolMenus::Get();
+			check(IsValid(ToolMenus));
+			
+			UToolMenu* ToolsMenu = ToolMenus->ExtendMenu(TEXT("MainFrame.MainMenu.Tools"));
+			if (!IsValid(ToolsMenu))
 			{
-				ExtensibilityManager->RemoveExtender(Extender);
+				return;
 			}
+
+			FToolMenuSection& ToolsSection = ToolsMenu->FindOrAddSection(TEXT("Tools"));
+			ToolsSection.AddSubMenu(
+				Global::PluginName,
+				ToolMenuExtensionConstants::ToolMenuLabel,
+				ToolMenuExtensionConstants::ToolMenuTooltip,
+				FNewToolMenuDelegate::CreateStatic(&FGraphPrinterCommands::FillMenuBuilder),
+				false,
+				FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
+			)
+			.SetCommandList(FGraphPrinterCommands::Get().CommandBindings);
 		}
-	}
-
-	void FToolMenuExtender::OnExtendToolMenu(FMenuBuilder& MenuBuilder)
-	{
-#if !UE_5_00_OR_LATER
-		MenuBuilder.BeginSection(NAME_None, LOCTEXT("ToolsSectionTitle", "Tools"));
-#endif
-		MenuBuilder.AddSubMenu(
-			LOCTEXT("SubMenuTitle", "Graph Printer"),
-			LOCTEXT("SubMenuDescription", "You can perform the functions of Gprah Printer from here."),
-			FNewMenuDelegate::CreateStatic(&FToolMenuExtender::OnExtendSubMenu),
-			false,
-			FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
-		);
-#if !UE_5_00_OR_LATER
-		MenuBuilder.EndSection();
-#endif
-	}
-
-	void FToolMenuExtender::OnExtendSubMenu(FMenuBuilder& MenuBuilder)
-	{
-		FGraphPrinterCommands::FillMenuBuilder(MenuBuilder);
-#ifdef WITH_STREAM_DECK
-		FStreamDeckMenu::FillMenuBuilder(MenuBuilder);
-#endif
-	}
-
-	TSharedPtr<FExtender> FToolMenuExtender::Extender = nullptr;
+		// End of FAutoToolMenuExtender interface.
+	};
+	static FToolMenuExtension Instance;
 }
 	
 #undef LOCTEXT_NAMESPACE

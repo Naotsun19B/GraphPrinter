@@ -15,9 +15,17 @@ class UGraphPrinterEditorExtensionSettings : public UGraphPrinterSettings
 	GENERATED_BODY()
 
 public:
-	// Whether to hide the combo button that performs the function of the plugin in the toolbar of the asset editor.
+	// Whether to display submenus that perform plugin functions in the editor's tools menu.
 	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))
-	bool bHideToolbarComboButton;
+	bool bShowSubMenuInToolMenu;
+	
+	// Whether to show the combo button that performs the function of the plugin in the toolbar of the asset editor.
+	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))
+	bool bShowComboButtonInToolbar;
+
+	// Whether to show the combo button that performs the function of the plugin in the editor's status bar.
+	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))
+	bool bShowComboButtonInStatusBar;
 
 public:
 	// Constructor.
@@ -26,6 +34,10 @@ public:
 	// Returns reference of this settings.
 	static const UGraphPrinterEditorExtensionSettings& Get();
 	
+	// UObject interface.
+    virtual bool CanEditChange(const FProperty* InProperty) const override;
+    // End of UObject interface.
+
 	// UGraphPrinterSettings interface.
 	virtual FSettingsInfo GetSettingsInfo() const override;
 	// End of UGraphPrinterSettings interface.
