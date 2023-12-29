@@ -7,7 +7,7 @@ public class DetailsPanelPrinter : ModuleRules
 {
     public DetailsPanelPrinter(ReadOnlyTargetRules Target) : base(Target)
     {
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 #if UE_5_2_OR_LATER
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 #endif
