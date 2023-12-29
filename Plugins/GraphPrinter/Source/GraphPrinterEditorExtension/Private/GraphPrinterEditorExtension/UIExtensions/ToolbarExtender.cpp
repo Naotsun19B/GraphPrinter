@@ -26,13 +26,13 @@ namespace GraphPrinter
 			auto* ToolMenus = UToolMenus::Get();
 			check(IsValid(ToolMenus));
 			
-			UToolMenu* ToolsMenu = ToolMenus->ExtendMenu(TEXT("AssetEditorToolbar.CommonActions"));
-			if (!IsValid(ToolsMenu))
+			UToolMenu* AssetEditorToolbarMenu = ToolMenus->ExtendMenu(TEXT("AssetEditor.DefaultToolBar"));
+			if (!IsValid(AssetEditorToolbarMenu))
 			{
 				return;
 			}
-			
-			FToolMenuSection& AssetSection = ToolsMenu->FindOrAddSection(TEXT("Asset"));
+
+			FToolMenuSection& AssetSection = AssetEditorToolbarMenu->FindOrAddSection(TEXT("Asset"));
 			AssetSection.AddEntry(
 				FToolMenuEntry::InitComboButton(
 					Global::PluginName,
@@ -44,12 +44,11 @@ namespace GraphPrinter
 					ToolMenuExtensionConstants::ToolMenuTooltip,
 					FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
 				)
-			)
-			.SetCommandList(FGraphPrinterCommands::Get().CommandBindings);
+			);
 		}
 		// End of FAutoToolMenuExtender interface.
 	};
-	static FToolbarExtension Instance;
+	static FToolbarExtension ToolbarExtension;
 }
 	
 #undef LOCTEXT_NAMESPACE

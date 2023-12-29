@@ -40,12 +40,11 @@ namespace GraphPrinter
 				FNewToolMenuDelegate::CreateStatic(&FGraphPrinterCommands::FillMenuBuilder),
 				false,
 				FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
-			)
-			.SetCommandList(FGraphPrinterCommands::Get().CommandBindings);
+			);
 		}
 		// End of FAutoToolMenuExtender interface.
 	};
-	static FToolMenuExtension Instance;
+	static FToolMenuExtension ToolMenuExtension;
 }
 	
 #undef LOCTEXT_NAMESPACE
