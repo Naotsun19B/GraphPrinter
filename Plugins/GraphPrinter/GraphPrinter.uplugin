@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 2,
-	"VersionName": "2.5",
+	"VersionName": "2.6",
 	"FriendlyName": "GraphPrinter",
 	"Description": "It is a plugin that adds a shortcut to output the graph editor to the image file and a shortcut to restore the node from the image file.",
 	"Category": "Editor",
