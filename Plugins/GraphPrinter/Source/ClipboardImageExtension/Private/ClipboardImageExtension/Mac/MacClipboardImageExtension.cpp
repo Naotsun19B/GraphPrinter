@@ -22,7 +22,7 @@ namespace ClipboardImageExtension
 		{
 			NSPasteboard* Pasteboard = [NSPasteboard generalPasteboard];
 			[Pasteboard clearContents];
-			[Pasteboard writeObjects:@[image]];
+			[Pasteboard writeObjects:@[Image]];
 		}
 
 		[Image release];

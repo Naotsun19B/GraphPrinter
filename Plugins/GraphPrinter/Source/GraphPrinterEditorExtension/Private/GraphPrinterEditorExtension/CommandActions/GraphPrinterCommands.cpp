@@ -3,7 +3,7 @@
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
-#if WITH_STREAM_DECK
+#ifdef WITH_STREAM_DECK
 #include "GraphPrinterStreamDeck/HAL/StreamDeckUtils.h"
 #endif
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
@@ -119,7 +119,7 @@ namespace GraphPrinter
 					TEXT("Icons.Settings")
 				)
 			);
-#if WITH_STREAM_DECK
+#ifdef WITH_STREAM_DECK
 			if (FStreamDeckUtils::IsStreamDeckInstalled())
 			{
 				OtherSection.AddMenuEntry(
