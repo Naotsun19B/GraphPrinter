@@ -22,7 +22,7 @@ namespace GraphPrinter
 		virtual ~IWidgetPrinterRegistry() = default;
 		
 		// Returns a widget printer that meets the criteria.
-		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const = 0;
+		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions* Options) const = 0;
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const = 0;
 	};
 }

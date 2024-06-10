@@ -5,7 +5,6 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "UObject/Class.h"
 #include "UObject/UObjectIterator.h"
-
 #if !UE_5_00_OR_LATER
 #include "Misc/HotReloadInterface.h"
 #endif

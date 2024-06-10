@@ -18,20 +18,20 @@ namespace GraphPrinter
 
 	void FGraphPrinterEditorExtensionModule::StartupModule()
 	{
-		// Register style set.
+		// Registers style set.
 		FGraphPrinterStyle::Register();
 		
-		// Register command actions.
+		// Registers command actions.
 		FGraphPrinterCommands::Register();
 		FGraphPrinterCommands::Bind();
 	}
 
 	void FGraphPrinterEditorExtensionModule::ShutdownModule()
 	{
-		// Unregister command actions.
+		// Unregisters command actions.
 		FGraphPrinterCommands::Unregister();
 
-		// Unregister style set.
+		// Unregisters style set.
 		FGraphPrinterStyle::Unregister();
 	}
 }

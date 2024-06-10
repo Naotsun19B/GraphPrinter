@@ -20,13 +20,13 @@ namespace GraphPrinter
 
 	void FGraphPrinterGlobalsModule::StartupModule()
 	{
-		// Register settings.
+		// Registers settings.
 		UGraphPrinterSettings::Register();
 	}
 
 	void FGraphPrinterGlobalsModule::ShutdownModule()
 	{
-		// Unregister settings.
+		// Unregisters settings.
 		UGraphPrinterSettings::Unregister();
 	}
 }

@@ -17,13 +17,13 @@ namespace GraphPrinter
 
 	void FGraphPrinterRemoteControlModule::StartupModule()
 	{
-		// Register remote control receiver.
+		// Registers remote control receiver.
 		FGraphPrinterRemoteControlReceiver::Register();
 	}
 
 	void FGraphPrinterRemoteControlModule::ShutdownModule()
 	{
-		// Unregister remote control receiver.
+		// Unregisters remote control receiver.
 		FGraphPrinterRemoteControlReceiver::Unregister();
 	}
 }
