@@ -26,6 +26,11 @@ int32 UDetailsPanelPrinter::GetPriority() const
 	return DetailsPanelPrinterPriority;
 }
 
+FString UDetailsPanelPrinter::GetSupportedWidgetTypeName() const
+{
+	return GraphPrinter::FDetailsPanelPrinter::GetSupportedWidgetTypeName();
+}
+
 UPrintWidgetOptions* UDetailsPanelPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,
 	const UPrintWidgetOptions::EExportMethod ExportMethod

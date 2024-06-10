@@ -15,6 +15,11 @@ int32 UGenericGraphPrinter::GetPriority() const
 	return GenericGraphPrinterPriority;
 }
 
+FString UGenericGraphPrinter::GetSupportedWidgetTypeName() const
+{
+	return GraphPrinter::FGenericGraphPrinter::GetSupportedWidgetTypeName();
+}
+
 UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,
 	const UPrintWidgetOptions::EExportMethod ExportMethod

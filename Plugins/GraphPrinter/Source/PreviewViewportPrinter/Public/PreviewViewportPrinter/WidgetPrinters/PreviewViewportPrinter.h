@@ -21,6 +21,7 @@ public:
 public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
+	virtual FString GetSupportedWidgetTypeName() const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	// End of UWidgetPrinter interface.

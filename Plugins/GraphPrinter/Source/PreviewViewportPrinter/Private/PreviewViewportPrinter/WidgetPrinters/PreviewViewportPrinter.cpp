@@ -13,6 +13,11 @@ int32 UPreviewViewportPrinter::GetPriority() const
 	return PreviewViewportPrinterPriority;
 }
 
+FString UPreviewViewportPrinter::GetSupportedWidgetTypeName() const
+{
+	return GraphPrinter::FPreviewViewportPrinter::GetSupportedWidgetTypeName();
+}
+
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UPreviewViewportPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FPreviewViewportPrinter>(

@@ -19,22 +19,24 @@ namespace GraphPrinter
 	
 	TSharedPtr<SGraphEditorImpl> FGenericGraphPrinterUtils::FindNearestChildGraphEditor(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		TSharedPtr<SGraphEditorImpl> FoundGraphEditor = nullptr;
-		
-		FWidgetPrinterUtils::EnumerateChildWidgets(
-			SearchTarget,
-			[&FoundGraphEditor](const TSharedPtr<SWidget> ChildWidget) -> bool
-			{
-				const TSharedPtr<SGraphEditorImpl> GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, ChildWidget);
-				if (GraphEditor.IsValid())
+		TSharedPtr<SGraphEditorImpl> FoundGraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, SearchTarget);
+		if (!FoundGraphEditor.IsValid())
+		{
+			FWidgetPrinterUtils::EnumerateChildWidgets(
+				SearchTarget,
+				[&FoundGraphEditor](const TSharedPtr<SWidget> ChildWidget) -> bool
 				{
-					FoundGraphEditor = GraphEditor;
-					return false;
-				}
+					const TSharedPtr<SGraphEditorImpl> GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, ChildWidget);
+					if (GraphEditor.IsValid())
+					{
+						FoundGraphEditor = GraphEditor;
+						return false;
+					}
 
-				return true;
-			}
-		);
+					return true;
+				}
+			);
+		}
 
 		return FoundGraphEditor;
 	}
@@ -67,25 +69,30 @@ namespace GraphPrinter
 
 	TSharedPtr<SWidget> FGenericGraphPrinterUtils::FindNearestChildMinimap(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		TSharedPtr<SWidget> FoundMinimap = nullptr;
-		
-		FWidgetPrinterUtils::EnumerateChildWidgets(
+		TSharedPtr<SWidget> FoundMinimap = Private::CastSlateWidget<SWidget>(
 			SearchTarget,
-			[&FoundMinimap](const TSharedPtr<SWidget>& ChildWidget) -> bool
-			{
-				const TSharedPtr<SWidget> Minimap = Private::CastSlateWidget<SWidget>(
-					ChildWidget,
-					GenericGraphPrinterUtilsConstant::GraphMinimapClassName
-				);
-				if (Minimap.IsValid())
-				{
-					FoundMinimap = Minimap;
-					return false;
-				}
-
-				return true;
-			}
+			GenericGraphPrinterUtilsConstant::GraphMinimapClassName
 		);
+		if (!FoundMinimap.IsValid())
+		{
+			FWidgetPrinterUtils::EnumerateChildWidgets(
+				SearchTarget,
+				[&FoundMinimap](const TSharedPtr<SWidget>& ChildWidget) -> bool
+				{
+					const TSharedPtr<SWidget> Minimap = Private::CastSlateWidget<SWidget>(
+						ChildWidget,
+						GenericGraphPrinterUtilsConstant::GraphMinimapClassName
+					);
+					if (Minimap.IsValid())
+					{
+						FoundMinimap = Minimap;
+						return false;
+					}
+
+					return true;
+				}
+			);
+		}
 
 		return FoundMinimap;
 	}

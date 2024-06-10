@@ -20,6 +20,7 @@
 #include "EdGraph/EdGraph.h"
 #include "Misc/Paths.h"
 #include "Widgets/SWidget.h"
+#include <typeinfo>
 
 #define LOCTEXT_NAMESPACE "InnerPrinter"
 
@@ -100,6 +101,17 @@ namespace GraphPrinter
 		static_assert(TIsDerivedFrom<TRestoreOptions, URestoreWidgetOptions>::IsDerived, "This implementation wasn't tested for a filter that isn't a child of URestoreWidgetOptions.");
 	
 	public:
+		// Returns the type names of widgets supported by this printer.
+		static FString GetSupportedWidgetTypeName()
+		{
+			const FString TypeIdName = ANSI_TO_TCHAR(typeid(TWidget).name());
+			
+			FString SupportedWidgetTypeName;
+			TypeIdName.Split(TEXT(" "), nullptr, &SupportedWidgetTypeName);
+			
+			return SupportedWidgetTypeName;
+		}
+		
 		// Constructor.
 		explicit TInnerWidgetPrinter(
 			UPrintWidgetOptions* InPrintOptions,

@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include "WidgetPrinter/IWidgetPrinterRegistry.h"
-#include "WidgetPrinter/ISupportedWidgetHolder.h"
+#include "WidgetPrinter/ISupportedWidgetRegistry.h"
 
 namespace GraphPrinter
 {
@@ -21,14 +21,14 @@ namespace GraphPrinter
 		// Registers widget printer registry.
 		IWidgetPrinterRegistry::Register();
 
-		// Registers supported widget holder.
-		ISupportedWidgetHolder::Register();
+		// Registers supported widget registry.
+		ISupportedWidgetRegistry::Register();
 	}
 
 	void FWidgetPrinterModule::ShutdownModule()
 	{
-		// Unregisters supported widget holder.
-		ISupportedWidgetHolder::Unregister();
+		// Unregisters supported widget registry.
+		ISupportedWidgetRegistry::Unregister();
 		
 		// Unregisters widget printer registry.
 		IWidgetPrinterRegistry::Unregister();

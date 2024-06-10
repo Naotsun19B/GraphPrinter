@@ -24,6 +24,11 @@ int32 UActorDetailsPanelPrinter::GetPriority() const
 }
 
 #ifdef WITH_DETAILS_PANEL_PRINTER
+FString UActorDetailsPanelPrinter::GetSupportedWidgetTypeName() const
+{
+	return GraphPrinter::FActorDetailsPanelPrinter::GetSupportedWidgetTypeName();
+}
+
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UActorDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FActorDetailsPanelPrinter>(

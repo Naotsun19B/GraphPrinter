@@ -23,6 +23,7 @@ namespace GraphPrinter
 		// IWidgetPrinterRegistry interface.
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const override;
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const override;
+		virtual bool IsSupportedWidget(const TSharedRef<SWidget>& TestWidget) const override;
 		// End of IWidgetPrinterRegistry interface.
 	
 	private:
@@ -109,6 +110,32 @@ namespace GraphPrinter
 		}
 
 		return nullptr;
+	}
+
+	bool FWidgetPrinterRegistryImpl::IsSupportedWidget(const TSharedRef<SWidget>& TestWidget) const
+	{
+		for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
+		{
+			if (!IsValid(WidgetPrinterClass))
+			{
+				continue;
+			}
+
+			const UWidgetPrinter* WidgetPrinter = WidgetPrinterClass->GetDefaultObject<UWidgetPrinter>();
+			if (!IsValid(WidgetPrinter))
+			{
+				continue;
+			}
+			
+			if (TestWidget->GetTypeAsString() != WidgetPrinter->GetSupportedWidgetTypeName())
+			{
+				continue;
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	void FWidgetPrinterRegistryImpl::HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow)

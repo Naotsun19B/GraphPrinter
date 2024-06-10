@@ -84,6 +84,12 @@ int32 UWidgetPrinter::GetPriority(const TSubclassOf<UWidgetPrinter>& Class)
 	return TNumericLimits<int32>::Min();
 }
 
+FString UWidgetPrinter::GetSupportedWidgetTypeName() const
+{
+	unimplemented();
+	return GraphPrinter::FWidgetPrinter::GetSupportedWidgetTypeName();
+}
+
 UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,
 	const UPrintWidgetOptions::EExportMethod ExportMethod

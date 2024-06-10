@@ -2,6 +2,7 @@
 
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
+#include "WidgetPrinter/ISupportedWidgetRegistry.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Docking/SDockingTabStack.h"
 #include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
@@ -68,66 +69,72 @@ namespace GraphPrinter
 
 	TSharedPtr<SWidget> FWidgetPrinterUtils::FindNearestParentDockingTabStack(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		TSharedPtr<SDockingTabStack> FoundDockingTabStack = nullptr;
-		
-		EnumerateParentWidgets(
-			SearchTarget,
-			[&FoundDockingTabStack](const TSharedPtr<SWidget>& ParentWidget) -> bool
-			{
-				const TSharedPtr<SDockingTabStack> DockingTabStack = GP_CAST_SLATE_WIDGET(SDockingTabStack, ParentWidget);
-				if (DockingTabStack.IsValid())
+		TSharedPtr<SDockingTabStack> FoundDockingTabStack = GP_CAST_SLATE_WIDGET(SDockingTabStack, SearchTarget);
+		if (!FoundDockingTabStack.IsValid())
+		{
+			EnumerateParentWidgets(
+				SearchTarget,
+				[&FoundDockingTabStack](const TSharedPtr<SWidget>& ParentWidget) -> bool
 				{
-					FoundDockingTabStack = DockingTabStack;
-					return false;
-				}
+					const TSharedPtr<SDockingTabStack> DockingTabStack = GP_CAST_SLATE_WIDGET(SDockingTabStack, ParentWidget);
+					if (DockingTabStack.IsValid())
+					{
+						FoundDockingTabStack = DockingTabStack;
+						return false;
+					}
 
-				return true;
-			}
-		);
+					return true;
+				}
+			);
+		}
 
 		return FoundDockingTabStack;
 	}
 
 	TSharedPtr<SStandaloneAssetEditorToolkitHost> FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		TSharedPtr<SStandaloneAssetEditorToolkitHost> FoundStandaloneAssetEditorToolkitHost = nullptr;
-		
-		EnumerateParentWidgets(
-			SearchTarget,
-			[&FoundStandaloneAssetEditorToolkitHost](const TSharedPtr<SWidget>& ParentWidget) -> bool
-			{
-				const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = GP_CAST_SLATE_WIDGET(SStandaloneAssetEditorToolkitHost, ParentWidget);
-				if (StandaloneAssetEditorToolkitHost.IsValid())
+		TSharedPtr<SStandaloneAssetEditorToolkitHost> FoundStandaloneAssetEditorToolkitHost = GP_CAST_SLATE_WIDGET(SStandaloneAssetEditorToolkitHost, SearchTarget);
+		if (!FoundStandaloneAssetEditorToolkitHost.IsValid())
+		{
+			EnumerateParentWidgets(
+				SearchTarget,
+				[&FoundStandaloneAssetEditorToolkitHost](const TSharedPtr<SWidget>& ParentWidget) -> bool
 				{
-					FoundStandaloneAssetEditorToolkitHost = StandaloneAssetEditorToolkitHost;
-					return false;
-				}
+					const TSharedPtr<SStandaloneAssetEditorToolkitHost> StandaloneAssetEditorToolkitHost = GP_CAST_SLATE_WIDGET(SStandaloneAssetEditorToolkitHost, ParentWidget);
+					if (StandaloneAssetEditorToolkitHost.IsValid())
+					{
+						FoundStandaloneAssetEditorToolkitHost = StandaloneAssetEditorToolkitHost;
+						return false;
+					}
 
-				return true;
-			}
-		);
+					return true;
+				}
+			);
+		}
 
 		return FoundStandaloneAssetEditorToolkitHost;
 	}
 	
 	TSharedPtr<SOverlay> FWidgetPrinterUtils::FindNearestChildOverlay(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		TSharedPtr<SOverlay> FoundOverlay = nullptr;
-		
-		EnumerateChildWidgets(
-			SearchTarget,
-			[&FoundOverlay](const TSharedPtr<SWidget>& ChildWidget) -> bool
-			{
-				const TSharedPtr<SOverlay> Overlay = GP_CAST_SLATE_WIDGET(SOverlay, ChildWidget);
-				if (Overlay.IsValid())
+		TSharedPtr<SOverlay> FoundOverlay = GP_CAST_SLATE_WIDGET(SOverlay, SearchTarget);
+		if (!FoundOverlay.IsValid())
+		{
+			EnumerateChildWidgets(
+				SearchTarget,
+				[&FoundOverlay](const TSharedPtr<SWidget>& ChildWidget) -> bool
 				{
-					FoundOverlay = Overlay;
-					return false;
-				}
+					const TSharedPtr<SOverlay> Overlay = GP_CAST_SLATE_WIDGET(SOverlay, ChildWidget);
+					if (Overlay.IsValid())
+					{
+						FoundOverlay = Overlay;
+						return false;
+					}
 
-				return true;
-			}
-		);
+					return true;
+				}
+			);
+		}
 
 		return FoundOverlay;
 	}
@@ -162,11 +169,13 @@ namespace GraphPrinter
 		);
 		if (WidgetsUnderCursor.IsValid())
 		{
-			const FArrangedChildren& Widgets = WidgetsUnderCursor.Widgets;
-			if ((Widgets.Num() > 0) && !IsMenuStackWindow(WidgetsUnderCursor.GetWindow()))
+			if (IsMenuStackWindow(WidgetsUnderCursor.GetWindow()))
 			{
-				return FindNearestParentDockingTabStack(Widgets.Last().Widget);
+				return ISupportedWidgetRegistry::Get().GetSelectedWidget();
 			}
+			
+			const FArrangedChildren& Widgets = WidgetsUnderCursor.Widgets;
+			return Widgets.Last().Widget;
 		}
 
 		return nullptr;
