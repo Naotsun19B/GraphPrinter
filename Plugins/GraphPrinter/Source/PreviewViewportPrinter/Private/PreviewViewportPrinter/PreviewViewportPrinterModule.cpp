@@ -1,4 +1,4 @@
-// Copyright 2020-2023 Naotsun. All Rights Reserved.
+// Copyright 2020-2024 Naotsun. All Rights Reserved.
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
