@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WidgetPrinter/Types/SupportedWidget.h"
 
 namespace GraphPrinter
 {
@@ -21,12 +22,12 @@ namespace GraphPrinter
 		virtual ~ISupportedWidgetRegistry() = default;
 
 		// Returns a list of widgets currently available and supported by any printer.
-		virtual TArray<TSharedRef<SWidget>> GetSupportedWidgets() const = 0;
+		virtual const TArray<FSupportedWidget>& GetSupportedWidgets() const = 0;
 
 		// Returns the widget selected from the menu.
-		virtual TSharedPtr<SWidget> GetSelectedWidget() const = 0;
+		virtual TOptional<FSupportedWidget> GetSelectedWidget() const = 0;
 
 		// Selects the widget specified by index from the supported widgets.
-		virtual void SetSelectedWidget(const int32 Index) = 0;
+		virtual void SetSelectedWidget(const FGuid Identifier) = 0;
 	};
 }

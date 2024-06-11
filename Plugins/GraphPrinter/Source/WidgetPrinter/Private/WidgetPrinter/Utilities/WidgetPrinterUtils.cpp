@@ -10,12 +10,6 @@
 
 namespace GraphPrinter
 {
-	namespace WidgetPrinterUtilsConstant
-	{
-		// The name of the SMenuContentWrapper.
-		static const FName MenuContentWrapperClassName = TEXT("SMenuContentWrapper");
-	}
-	
 	void FWidgetPrinterUtils::EnumerateChildWidgets(
 		const TSharedPtr<SWidget>& SearchTarget,
 		const TFunction<bool(const TSharedPtr<SWidget>& ChildWidget)>& Predicate
@@ -139,41 +133,24 @@ namespace GraphPrinter
 		return FoundOverlay;
 	}
 
-	bool FWidgetPrinterUtils::IsMenuStackWindow(const TSharedPtr<SWindow>& TestWindow)
-	{
-		bool bIsMenuStackWindow = false;
-		
-		EnumerateChildWidgets(
-			TestWindow,
-			[&](const TSharedPtr<SWidget>& Widget) -> bool
-			{
-				const TSharedPtr<SWidget> CastedWidget = Private::CastSlateWidget<SWidget, SWidget>(Widget, WidgetPrinterUtilsConstant::MenuContentWrapperClassName);
-				if (CastedWidget.IsValid())
-				{
-					bIsMenuStackWindow = true;
-					return false;
-				}
-
-				return true;
-			}
-		);
-
-		return bIsMenuStackWindow;
-	}
-
 	TSharedPtr<SWidget> FWidgetPrinterUtils::GetMostSuitableSearchTarget()
 	{
 		FSlateApplication& SlateApplication = FSlateApplication::Get();
+
+		if (SlateApplication.AnyMenusVisible())
+		{
+			const TOptional<FSupportedWidget>& SelectedWidget = ISupportedWidgetRegistry::Get().GetSelectedWidget();
+			if (SelectedWidget.IsSet() && SelectedWidget->IsValid())
+			{
+				return SelectedWidget->GetWidget();
+			}
+		}
+		
 		const FWidgetPath WidgetsUnderCursor = SlateApplication.LocateWindowUnderMouse(
 			SlateApplication.GetCursorPos(), SlateApplication.GetInteractiveTopLevelWindows()
 		);
 		if (WidgetsUnderCursor.IsValid())
 		{
-			if (IsMenuStackWindow(WidgetsUnderCursor.GetWindow()))
-			{
-				return ISupportedWidgetRegistry::Get().GetSelectedWidget();
-			}
-			
 			const FArrangedChildren& Widgets = WidgetsUnderCursor.Widgets;
 			return Widgets.Last().Widget;
 		}

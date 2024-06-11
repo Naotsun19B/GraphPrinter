@@ -6,6 +6,7 @@
 #include "DetailsPanelPrinter/Types/RestoreDetailsPanelOptions.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "WidgetPrinter/Utilities/CastSlateWidget.h"
 
 #if UE_5_01_OR_LATER
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DetailsPanelPrinter)
@@ -26,10 +27,18 @@ int32 UDetailsPanelPrinter::GetPriority() const
 	return DetailsPanelPrinterPriority;
 }
 
+#ifdef WITH_DETAILS_PANEL_PRINTER
 FString UDetailsPanelPrinter::GetSupportedWidgetTypeName() const
 {
 	return GraphPrinter::FDetailsPanelPrinter::GetSupportedWidgetTypeName();
 }
+
+FText UDetailsPanelPrinter::GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const
+{
+	const TSharedPtr<SDetailsView> DetailsPanel = GP_CAST_SLATE_WIDGET(SDetailsView, TSharedPtr<SWidget>(Widget));
+	return FText::FromString(GraphPrinter::FDetailsPanelPrinter::GetEditingObjectName(DetailsPanel));
+}
+#endif
 
 UPrintWidgetOptions* UDetailsPanelPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,

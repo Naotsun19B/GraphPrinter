@@ -9,6 +9,8 @@ class SWidget;
 
 namespace GraphPrinter
 {
+	struct FSupportedWidget;
+	
 	/**
 	 * A class that allows you to collect and search widget printers.
 	 */
@@ -27,7 +29,7 @@ namespace GraphPrinter
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions* Options) const = 0;
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const = 0;
 
-		// Returns whether the specified widget is supported by any printer.
-		virtual bool IsSupportedWidget(const TSharedRef<SWidget>& TestWidget) const = 0;
+		// Returns a data structure if the specified widget is supported by any printer.
+		virtual TOptional<FSupportedWidget> CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const = 0;
 	};
 }

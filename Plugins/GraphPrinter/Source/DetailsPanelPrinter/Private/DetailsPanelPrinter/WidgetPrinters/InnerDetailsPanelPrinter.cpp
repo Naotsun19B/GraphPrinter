@@ -177,8 +177,8 @@ namespace GraphPrinter
 		// There is a difference in the height of the drawing size, so adjusts by adding the height of one item.
 		TOptional<float> ItemHeight;
 		{
-			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
-			const FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree(DetailsPanelPrinterParams.DetailsView);
+			const FDetailNodeList& RootTreeNodes = GetRootTreeNodes(DetailsPanelPrinterParams.DetailsView);
 			if (RootTreeNodes.IsValidIndex(0))
 			{
 				const TSharedPtr<ITableRow> TableRow = DetailsTree->WidgetFromItem(RootTreeNodes[0]);
@@ -198,6 +198,11 @@ namespace GraphPrinter
 		return false;
 	}
 
+	FString FDetailsPanelPrinter::GetWidgetTitle()
+	{
+		return GetEditingObjectName(DetailsPanelPrinterParams.DetailsView);
+	}
+
 	TSharedPtr<SDetailsView> FDetailsPanelPrinter::FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const
 	{
 		return GP_CAST_SLATE_WIDGET(SDetailsView, SearchTarget);
@@ -207,10 +212,46 @@ namespace GraphPrinter
 	{
 		if (IsValid(EditingObjectClass))
 		{
+			if (EditingObjectClass->IsChildOf<AWorldSettings>())
+			{
+				return true;
+			}
+			
+			if (EditingObjectClass->IsChildOf<AActor>())
+			{
+				return false;
+			}
+			
 			return EditingObjectClass->IsChildOf<UObject>();
 		}
 
 		return false;
+	}
+
+	FString FDetailsPanelPrinter::GetEditingObjectName(const TSharedPtr<SDetailsView>& DetailsPanel)
+	{
+		UObject* EditingObject = GetSingleEditingObject(DetailsPanel);
+		if (!IsValid(EditingObject))
+		{
+			return TEXT("EmptyDetailsPanel");
+		}
+			
+		// For default objects uses the class name to remove the suffix.
+		FString EditingObjectName = EditingObject->GetName();
+		if (EditingObject->HasAnyFlags(RF_ClassDefaultObject))
+		{
+			if (const UClass* SelectedObjectClass = EditingObject->GetClass())
+			{
+				FString SelectedObjectClassName = SelectedObjectClass->GetName();
+				if (SelectedObjectClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint))
+				{
+					SelectedObjectClassName.RemoveFromEnd(TEXT("_C"));
+				}
+				EditingObjectName = SelectedObjectClassName;
+			}
+		}
+							
+		return FString::Printf(TEXT("%s-Details"), *EditingObjectName);
 	}
 
 	FActorDetailsPanelPrinter::FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
@@ -294,6 +335,32 @@ namespace GraphPrinter
 		return false;
 	}
 
+	bool FActorDetailsPanelPrinter::CalculateDrawSize(FVector2D& DrawSize)
+	{
+		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
+
+		// Since the actor detail panel has a different structure than other detail panels,
+		// adds the difference between the displayed size of subobject instance editor and details view and the actual size.
+		const TSharedPtr<SWidget> SubobjectInstanceEditor = FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(Widget);
+		if (!SubobjectInstanceEditor.IsValid())
+		{
+			return false;
+		}
+		DrawSize.Y += FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(SubobjectInstanceEditor).Y;
+		
+		// #TODO: It is necessary to investigate the reason why the accurate size cannot be measured.
+		// If don't apply a fixed scale here, the image will be too large.
+		static constexpr float DetailsViewDifferenceScale = 0.3f;
+		DrawSize.Y += FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(DetailsPanelPrinterParams.DetailsView).Y * DetailsViewDifferenceScale;
+		
+		return bSuperResult;
+	}
+
+	FString FActorDetailsPanelPrinter::GetWidgetTitle()
+	{
+		return GetEditingActorName(DetailsPanelPrinterParams.DetailsView);
+	}
+
 	TSharedPtr<SActorDetails> FActorDetailsPanelPrinter::FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const
 	{
 		if (SearchTarget.IsValid())
@@ -328,25 +395,22 @@ namespace GraphPrinter
 		return false;
 	}
 
-	bool FActorDetailsPanelPrinter::CalculateDrawSize(FVector2D& DrawSize)
+	FString FActorDetailsPanelPrinter::GetEditingActorName(const TSharedPtr<SDetailsView>& DetailsPanel)
 	{
-		const bool bSuperResult = Super::CalculateDrawSize(DrawSize);
-
-		// Since the actor detail panel has a different structure than other detail panels,
-		// adds the difference between the displayed size of subobject instance editor and details view and the actual size.
-		const TSharedPtr<SWidget> SubobjectInstanceEditor = FDetailsPanelPrinterUtils::FindNearestChildSubobjectInstanceEditor(Widget);
-		if (!SubobjectInstanceEditor.IsValid())
+		UObject* EditingObject = GetSingleEditingObject(DetailsPanel);
+		if (!IsValid(EditingObject))
 		{
-			return false;
+			return TEXT("EmptyActorDetailsPanel");
 		}
-		DrawSize.Y += FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(SubobjectInstanceEditor).Y;
 		
-		// #TODO: It is necessary to investigate the reason why the accurate size cannot be measured.
-		// If don't apply a fixed scale here, the image will be too large.
-		static constexpr float DetailsViewDifferenceScale = 0.3f;
-		DrawSize.Y += FDetailsPanelPrinterUtils::GetDifferenceBetweenWidgetLocalSizeAndDesiredSize(DetailsPanelPrinterParams.DetailsView).Y * DetailsViewDifferenceScale;
+		// For actors, returns the label displayed in the outliner instead of the name of the object.
+		FString EditingActorName = EditingObject->GetName();
+		if (const auto* SelectedActor = Cast<AActor>(EditingObject))
+		{
+			EditingActorName = SelectedActor->GetActorLabel();
+		}
 		
-		return bSuperResult;
+		return FString::Printf(TEXT("%s-Details"), *EditingActorName);
 	}
 }
 

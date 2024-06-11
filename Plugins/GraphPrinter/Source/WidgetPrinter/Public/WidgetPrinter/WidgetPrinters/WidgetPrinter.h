@@ -66,10 +66,12 @@ public:
 	// Checks if the printer can be executed from the one with the highest priority.
 	virtual int32 GetPriority() const;
 	static int32 GetPriority(const TSubclassOf<UWidgetPrinter>& Class);
-
+	
 	// Returns the type names of widgets supported by this printer.
-	// !!!CAUTION!!! Be sure to override it.
-	virtual FString GetSupportedWidgetTypeName() const;
+	virtual FString GetSupportedWidgetTypeName() const PURE_VIRTUAL(UWidgetPrinter::GetSupportedWidgetTypeName, return {};)
+
+	// Returns the name displayed on the editor UI of the widget handled by this printer.
+	virtual FText GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const;
 	
 	// Generates and returns an option class with the default settings applied.
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(

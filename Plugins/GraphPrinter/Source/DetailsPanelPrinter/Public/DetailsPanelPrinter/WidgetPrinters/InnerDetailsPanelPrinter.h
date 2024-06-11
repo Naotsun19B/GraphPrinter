@@ -75,13 +75,14 @@ namespace GraphPrinter
 			, DetailsPanelPrinterParams()
 		{
 		}
-		
+
+	protected:
 		// TInnerWidgetPrinter interface.
 		virtual void PreCalculateDrawSize() override
 		{
 			DetailsPanelPrinterParams.PreCalculateDetailsViewWidth = Widget->GetDesiredSize().X;
 			
-			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree(DetailsPanelPrinterParams.DetailsView);
 
 			// Caches the expanded state of each item if necessary.
 			if (PrintOptions->bIsIncludeExpansionStateInImageFile)
@@ -106,7 +107,7 @@ namespace GraphPrinter
 						}
 					};
 
-				FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+				FDetailNodeList& RootTreeNodes = GetRootTreeNodes(DetailsPanelPrinterParams.DetailsView);
 				CacheExpansionStateRecursive(RootTreeNodes, TEXT(""));
 			}
 			
@@ -137,45 +138,15 @@ namespace GraphPrinter
 		virtual void PostDrawWidget() override
 		{
 			// Restores the position of the scrollbar to its state before it was drawn.
-			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+			const TSharedRef<SDetailTree> DetailsTree = GetDetailTree(DetailsPanelPrinterParams.DetailsView);
 			DetailsTree->SetScrollOffset(DetailsPanelPrinterParams.ScrollOffset);
-		}
-		virtual FString GetWidgetTitle() override
-		{
-			UObject* EditingObject = GetSingleEditingObject();
-			if (!IsValid(EditingObject))
-			{
-				return TEXT("EmptyDetailsPanel");
-			}
-			
-			// For default objects uses the class name to remove the suffix.
-			if (EditingObject->HasAnyFlags(RF_ClassDefaultObject))
-			{
-				if (const UClass* SelectedObjectClass = EditingObject->GetClass())
-				{
-					FString SelectedObjectClassName = SelectedObjectClass->GetName();
-					if (SelectedObjectClass->HasAnyClassFlags(CLASS_CompiledFromBlueprint))
-					{
-						SelectedObjectClassName.RemoveFromEnd(TEXT("_C"));
-					}
-					return SelectedObjectClassName;
-				}
-			}
-
-			// For actors, returns the label displayed in the outliner instead of the name of the object.
-			if (const auto* SelectedActor = Cast<AActor>(EditingObject))
-			{
-				return SelectedActor->GetActorLabel();
-			}
-							
-			return EditingObject->GetName();
 		}
 		virtual bool WriteWidgetInfoToTextChunk() override
 		{
 #ifdef WITH_TEXT_CHUNK_HELPER
 			TMap<FString, FString> MapToWrite;
 			{
-				UObject* EditingObject = GetSingleEditingObject();
+				UObject* EditingObject = GetSingleEditingObject(DetailsPanelPrinterParams.DetailsView);
 				if (!IsValid(EditingObject))
 				{
 					return false;
@@ -248,7 +219,7 @@ namespace GraphPrinter
 					PropertiesJsonString.Len() - PropertiesInfoHeaderLength
 				);
 
-				UObject* EditingObject = GetSingleEditingObject();
+				UObject* EditingObject = GetSingleEditingObject(DetailsPanelPrinterParams.DetailsView);
 				if (!IsValid(EditingObject))
 				{
 					return false;
@@ -295,7 +266,7 @@ namespace GraphPrinter
 					DetailsPanelPrinterParams.ExpansionStateMap.Add(PropertyNodePath, bIsExpanded);
 				}
 
-				const TSharedRef<SDetailTree> DetailsTree = GetDetailTree();
+				const TSharedRef<SDetailTree> DetailsTree = GetDetailTree(DetailsPanelPrinterParams.DetailsView);
 				TFunction<void(FDetailNodeList&, const FString&)> ApplyExpansionStateRecursive =
 					[&](FDetailNodeList& Nodes, const FString& ParentNodeName)
 					{
@@ -319,7 +290,7 @@ namespace GraphPrinter
 						}
 					};
 
-				FDetailNodeList& RootTreeNodes = GetRootTreeNodes();
+				FDetailNodeList& RootTreeNodes = GetRootTreeNodes(DetailsPanelPrinterParams.DetailsView);
 				ApplyExpansionStateRecursive(RootTreeNodes, TEXT(""));
 
 				DetailsTree->RequestTreeRefresh();
@@ -335,8 +306,7 @@ namespace GraphPrinter
 			return true;
 		}
 		// End of TInnerWidgetPrinter interface.
-
-	protected:
+		
 		// Finds and returns SDetailsView from the searched widget.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const
 		{
@@ -350,13 +320,12 @@ namespace GraphPrinter
 		}
 		
 		// Returns one object that the details view is editing.
-		UObject* GetSingleEditingObject(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
+		static UObject* GetSingleEditingObject(const TSharedPtr<SDetailsViewBase>& DetailsViewBase)
 		{
 			if (!DetailsViewBase.IsValid())
 			{
-				DetailsViewBase = DetailsPanelPrinterParams.DetailsView;
+				return nullptr;
 			}
-			check(DetailsViewBase.IsValid());
 			
 			// Do special handling if it contains multiple objects, such as editor preferences.
 			if (DetailsViewBase->ContainsMultipleTopLevelObjects())
@@ -380,29 +349,19 @@ namespace GraphPrinter
 		}
 		
 		// Functions that access protected properties of the DetailsView.
-		TSharedRef<SDetailTree> GetDetailTree(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
+		static TSharedRef<SDetailTree> GetDetailTree(const TSharedPtr<SDetailsViewBase>& DetailsViewBase)
 		{
-			if (!DetailsViewBase.IsValid())
-			{
-				DetailsViewBase = DetailsPanelPrinterParams.DetailsView;
-			}
 			check(DetailsViewBase.IsValid());
-			
 			const TSharedPtr<SDetailTree> DetailTree = ExtractDetailTree(DetailsViewBase.ToSharedRef());
 			check(DetailTree.IsValid());
 			return DetailTree.ToSharedRef();
 		}
-		FDetailNodeList& GetRootTreeNodes(TSharedPtr<SDetailsViewBase> DetailsViewBase = nullptr) const
+		static FDetailNodeList& GetRootTreeNodes(const TSharedPtr<SDetailsViewBase>& DetailsViewBase)
 		{
-			if (!DetailsViewBase.IsValid())
-			{
-				DetailsViewBase = DetailsPanelPrinterParams.DetailsView;
-			}
 			check(DetailsViewBase.IsValid());
-			
 			return ExtractRootTreeNodes(DetailsViewBase.ToSharedRef());
 		}
-		TArray<UObject*> GetRootObjectSet(const TSharedPtr<SDetailsViewBase>& DetailsViewBase = nullptr) const
+		static TArray<UObject*> GetRootObjectSet(const TSharedPtr<SDetailsViewBase>& DetailsViewBase)
 		{
 			TArray<UObject*> RootObjectSet;
 			
@@ -427,7 +386,7 @@ namespace GraphPrinter
 			// The details view to print.
 			TSharedPtr<SDetailsView> DetailsView;
 
-			// The width before pre calculate draw size.
+			// The width before pre-calculate draw size.
 			float PreCalculateDetailsViewWidth = 0.f;
 			
 			// The details view scrollbar position.
@@ -462,12 +421,16 @@ namespace GraphPrinter
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
 		virtual bool CalculateDrawSize(FVector2D& DrawSize) override;
+		virtual FString GetWidgetTitle() override;
 		// End of TInnerWidgetPrinter interface.
 
 		// TDetailsPanelPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
 		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const override;
 		// End of TDetailsPanelPrinter interface.
+
+		// Returns the name of the object being edited.
+		static FString GetEditingObjectName(const TSharedPtr<SDetailsView>& DetailsPanel);
 	};
 	
 	/**
@@ -493,12 +456,16 @@ namespace GraphPrinter
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SActorDetails> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
 		virtual bool CalculateDrawSize(FVector2D& DrawSize) override;
+		virtual FString GetWidgetTitle() override;
 		// End of TInnerWidgetPrinter interface.
 
 		// TDetailsPanelPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
 		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const override;
 		// End of TDetailsPanelPrinter interface.
+
+		// Returns the name of the actor being edited.
+		static FString GetEditingActorName(const TSharedPtr<SDetailsView>& DetailsPanel);
 	};
 }
 #endif

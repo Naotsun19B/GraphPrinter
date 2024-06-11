@@ -94,7 +94,8 @@ namespace GraphPrinter
 			return GraphEditor.IsValid();
 		}
 		// End of IInnerWidgetPrinter interface.
-		
+
+	protected:
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SGraphEditorImpl> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override
 		{
@@ -203,15 +204,7 @@ namespace GraphPrinter
 		}
 		virtual FString GetWidgetTitle() override
 		{
-			if (const UEdGraph* Graph = Widget->GetCurrentGraph())
-			{
-				if (const UObject* Outer = Graph->GetOuter())
-				{
-					return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
-				}
-			}
-			
-			return TEXT("InvalidGraphEditor");
+			return GetGraphEditorTitle(Widget);
 		}
 		virtual bool WriteWidgetInfoToTextChunk() override
 		{
@@ -281,6 +274,24 @@ namespace GraphPrinter
 		}
 		// End of TInnerWidgetPrinter interface.
 
+	public:
+		// Returns the title from the graph editor in the format "[asset name]-[graph title]".
+		static FString GetGraphEditorTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor)
+		{
+			if (GraphEditor.IsValid())
+			{
+				if (const UEdGraph* Graph = GraphEditor->GetCurrentGraph())
+				{
+					if (const UObject* Outer = Graph->GetOuter())
+					{
+						return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
+					}
+				}
+			}
+			
+			return TEXT("InvalidGraphEditor");
+		}
+		
 	protected:
 		// Calculates the range and view location to use when drawing the graph editor.
 		virtual bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation)

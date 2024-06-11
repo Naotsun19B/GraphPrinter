@@ -16,37 +16,34 @@ namespace GraphPrinter
 		virtual ~FSupportedWidgetRegistryImpl() override;
 		
 		// ISupportedWidgetRegistry interface.
-		virtual TArray<TSharedRef<SWidget>> GetSupportedWidgets() const override;
-		virtual TSharedPtr<SWidget> GetSelectedWidget() const override;
-		virtual void SetSelectedWidget(const int32 Index) override;
+		virtual const TArray<FSupportedWidget>& GetSupportedWidgets() const override;
+		virtual TOptional<FSupportedWidget> GetSelectedWidget() const override;
+		virtual void SetSelectedWidget(const FGuid Identifier) override;
 		// End of ISupportedWidgetRegistry interface.
 
 	private:
-		// Called when the focused widget changes.
-		void HandleOnFocusChanging(
-			const FFocusEvent& FocusEvent,
-			const FWeakWidgetPath& OldFocusedWidgetPath,
-			const TSharedPtr<SWidget>& OldFocusedWidget,
-			const FWidgetPath& NewFocusedWidgetPath,
-			const TSharedPtr<SWidget>& NewFocusedWidget
-		);
+		// Called when before slate application ticks.
+		void HandleOnPreTick(const float DeltaTime);
 
 	private:
 		// The list of widgets supported by either printer.
-		TArray<TWeakPtr<SWidget>> RegisteredWidgets;
-
-		// The window containing the last focused widget.
-		TWeakPtr<SWindow> LastFocusedWindow;
+		TArray<FSupportedWidget> RegisteredWidgets;
 
 		// The widget selected in a menu from RegisteredWidgets.
-		TWeakPtr<SWidget> SelectedWidget;
+		FGuid SelectedWidgetIdentifier;
+
+		// The lambda function that compares widget information by unique ID.
+		TFunction<bool(const FSupportedWidget& RegisteredWidget)> EqualsByIdentifier = [&](const FSupportedWidget& RegisteredWidget) -> bool
+		{
+			return (RegisteredWidget.GetIdentifier() == SelectedWidgetIdentifier);
+		};
 	};
 
 	FSupportedWidgetRegistryImpl::FSupportedWidgetRegistryImpl()
 	{
 		if (FSlateApplication::IsInitialized())
 		{
-			FSlateApplication::Get().OnFocusChanging().AddRaw(this, &FSupportedWidgetRegistryImpl::HandleOnFocusChanging);
+			FSlateApplication::Get().OnPreTick().AddRaw(this, &FSupportedWidgetRegistryImpl::HandleOnPreTick);
 		}
 	}
 
@@ -54,113 +51,73 @@ namespace GraphPrinter
 	{
 		if (FSlateApplication::IsInitialized())
 		{
-			FSlateApplication::Get().OnFocusChanging().RemoveAll(this);
+			FSlateApplication::Get().OnPreTick().RemoveAll(this);
 		}
 	}
 
-	TArray<TSharedRef<SWidget>> FSupportedWidgetRegistryImpl::GetSupportedWidgets() const
+	const TArray<FSupportedWidget>& FSupportedWidgetRegistryImpl::GetSupportedWidgets() const
 	{
-		TArray<TSharedRef<SWidget>> SupportedWidgets;
+		return RegisteredWidgets;
+	}
 
-		for (const auto& RegisteredWidget : RegisteredWidgets)
+	TOptional<FSupportedWidget> FSupportedWidgetRegistryImpl::GetSelectedWidget() const
+	{
+		if (const FSupportedWidget* FoundRegisteredWidget = RegisteredWidgets.FindByPredicate(EqualsByIdentifier))
 		{
-			if (RegisteredWidget.IsValid())
-			{
-				SupportedWidgets.Add(RegisteredWidget.Pin().ToSharedRef());
-			}
+			return *FoundRegisteredWidget;
 		}
-
-		return SupportedWidgets;
+		
+		return {};
 	}
 
-	TSharedPtr<SWidget> FSupportedWidgetRegistryImpl::GetSelectedWidget() const
+	void FSupportedWidgetRegistryImpl::SetSelectedWidget(const FGuid Identifier)
 	{
-		return SelectedWidget.Pin();
-	}
-
-	void FSupportedWidgetRegistryImpl::SetSelectedWidget(const int32 Index)
-	{
-		if (RegisteredWidgets.IsValidIndex(Index))
+		if (RegisteredWidgets.ContainsByPredicate(EqualsByIdentifier))
 		{
-			SelectedWidget = RegisteredWidgets[Index];
+			SelectedWidgetIdentifier = Identifier;
 		}
 	}
 
-	void FSupportedWidgetRegistryImpl::HandleOnFocusChanging(
-		const FFocusEvent& FocusEvent,
-		const FWeakWidgetPath& OldFocusedWidgetPath,
-		const TSharedPtr<SWidget>& OldFocusedWidget,
-		const FWidgetPath& NewFocusedWidgetPath,
-		const TSharedPtr<SWidget>& NewFocusedWidget
-	)
+	void FSupportedWidgetRegistryImpl::HandleOnPreTick(const float DeltaTime)
 	{
 		RegisteredWidgets.RemoveAll(
-			[](const TWeakPtr<SWidget>& RegisteredWidget) -> bool
+			[](const FSupportedWidget& RegisteredWidget) -> bool
 			{
-				if (!RegisteredWidget.IsValid())
-				{
-					return true;
-				}
-
-				auto& SlateApplication = FSlateApplication::Get();
-				
-				FWidgetPath WidgetPath;
-				if (!SlateApplication.FindPathToWidget(RegisteredWidget.Pin().ToSharedRef(), WidgetPath, EVisibility::All))
-				{
-					return true;
-				}
-
-				if (WidgetPath.GetWindow() != SlateApplication.GetActiveTopLevelWindow())
-				{
-					return true;
-				}
-
-				return !WidgetPath.IsValid();
+				return !RegisteredWidget.IsValid();
 			}
 		);
 
-		if (!NewFocusedWidgetPath.IsValid())
+		if (!SelectedWidgetIdentifier.IsValid() || !RegisteredWidgets.ContainsByPredicate(EqualsByIdentifier))
 		{
-			return;
+			if (!RegisteredWidgets.IsEmpty())
+			{
+				SelectedWidgetIdentifier = RegisteredWidgets[0].GetIdentifier();
+			}
 		}
-		
-		TWeakPtr<SWindow> NewFocusedWindow = NewFocusedWidgetPath.GetWindow();
-		if (LastFocusedWindow.IsValid() && (NewFocusedWindow == LastFocusedWindow))
-		{
-			return;
-		}
-		
-		LastFocusedWindow = NewFocusedWindow;
 
+		GEngine->AddOnScreenDebugMessage(
+			0,
+			(DeltaTime + SMALL_NUMBER),
+			FColor::Green,
+			(GetSelectedWidget().IsSet() ? GetSelectedWidget()->GetDisplayName().ToString() : TEXT("Unset")) 
+		);
+		
 		FWidgetPrinterUtils::EnumerateChildWidgets(
-			LastFocusedWindow.Pin(),
+			FSlateApplication::Get().GetActiveTopLevelWindow(),
 			[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
-				if (ChildWidget.IsValid() && IWidgetPrinterRegistry::Get().IsSupportedWidget(ChildWidget.ToSharedRef()))
+				if (ChildWidget.IsValid())
 				{
-					auto ContainsPredicate = [&ChildWidget](const TWeakPtr<SWidget>& RegisteredWidget) -> bool
+					const TOptional<FSupportedWidget>& SupportedWidget = IWidgetPrinterRegistry::Get().CheckIfSupported(ChildWidget.ToSharedRef());
+					if (SupportedWidget.IsSet())
 					{
-						return (RegisteredWidget.IsValid() && (ChildWidget->GetId() == RegisteredWidget.Pin()->GetId()));
-					};
-					if (!RegisteredWidgets.ContainsByPredicate(ContainsPredicate))
-					{
-						RegisteredWidgets.Add(ChildWidget);
+						RegisteredWidgets.AddUnique(SupportedWidget.GetValue());
 					}
 				}
 
 				return true;
 			}
 		);
-
-		for (const auto& RegisteredWidget : RegisteredWidgets)
-		{
-			if (!RegisteredWidget.IsValid())
-			{
-				continue;
-			}
-			
-			UE_LOG(LogGraphPrinter, Warning, TEXT("%s"), *RegisteredWidget.Pin()->ToString());
-		}
 	}
 
 	namespace SupportedWidgetHolder

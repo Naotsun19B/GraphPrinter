@@ -5,6 +5,7 @@
 #include "GenericGraphPrinter/Utilities/GenericGraphPrinterSettings.h"
 #include "GenericGraphPrinter/WidgetPrinters/InnerGenericGraphPrinter.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "WidgetPrinter/Utilities/CastSlateWidget.h"
 
 #if UE_5_01_OR_LATER
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GenericGraphPrinter)
@@ -18,6 +19,12 @@ int32 UGenericGraphPrinter::GetPriority() const
 FString UGenericGraphPrinter::GetSupportedWidgetTypeName() const
 {
 	return GraphPrinter::FGenericGraphPrinter::GetSupportedWidgetTypeName();
+}
+
+FText UGenericGraphPrinter::GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const
+{
+	const TSharedPtr<SGraphEditorImpl> GraphEditor = GP_CAST_SLATE_WIDGET(SGraphEditorImpl, TSharedPtr<SWidget>(Widget));
+	return FText::FromString(GraphPrinter::FGenericGraphPrinter::GetGraphEditorTitle(GraphEditor));
 }
 
 UPrintWidgetOptions* UGenericGraphPrinter::CreateDefaultPrintOptions(

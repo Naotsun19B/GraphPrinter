@@ -22,6 +22,7 @@ public:
 	virtual int32 GetPriority() const override;
 #ifdef WITH_DETAILS_PANEL_PRINTER
 	virtual FString GetSupportedWidgetTypeName() const override;
+	virtual FText GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 #endif

@@ -1,6 +1,7 @@
 // Copyright 2020-2024 Naotsun. All Rights Reserved.
 
 #include "WidgetPrinter/IWidgetPrinterRegistry.h"
+#include "WidgetPrinter/Types/SupportedWidget.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "UObject/Class.h"
@@ -23,7 +24,7 @@ namespace GraphPrinter
 		// IWidgetPrinterRegistry interface.
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(UPrintWidgetOptions*  Options) const override;
 		virtual UWidgetPrinter* FindAvailableWidgetPrinter(URestoreWidgetOptions* Options) const override;
-		virtual bool IsSupportedWidget(const TSharedRef<SWidget>& TestWidget) const override;
+		virtual TOptional<FSupportedWidget> CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const override;
 		// End of IWidgetPrinterRegistry interface.
 	
 	private:
@@ -44,7 +45,7 @@ namespace GraphPrinter
 		// The list of all existing classes that inherits from UWidgetPrinters.
 		TArray<TSubclassOf<UWidgetPrinter>> WidgetPrinterClasses;
 	};
-	
+
 	FWidgetPrinterRegistryImpl::FWidgetPrinterRegistryImpl()
 	{
 		// Collects widget printers and try to recollect them at hot reload.
@@ -112,7 +113,7 @@ namespace GraphPrinter
 		return nullptr;
 	}
 
-	bool FWidgetPrinterRegistryImpl::IsSupportedWidget(const TSharedRef<SWidget>& TestWidget) const
+	TOptional<FSupportedWidget> FWidgetPrinterRegistryImpl::CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const
 	{
 		for (const auto& WidgetPrinterClass : WidgetPrinterClasses)
 		{
@@ -132,10 +133,10 @@ namespace GraphPrinter
 				continue;
 			}
 
-			return true;
+			return FSupportedWidget(TestWidget, *WidgetPrinter);
 		}
 
-		return false;
+		return {};
 	}
 
 	void FWidgetPrinterRegistryImpl::HandleOnMainFrameCreationFinished(TSharedPtr<SWindow> InRootWindow, bool bIsNewProjectWindow)

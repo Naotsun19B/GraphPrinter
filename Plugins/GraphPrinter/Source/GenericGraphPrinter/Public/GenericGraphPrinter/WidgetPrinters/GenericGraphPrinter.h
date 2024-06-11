@@ -22,6 +22,7 @@ public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
 	virtual FString GetSupportedWidgetTypeName() const override;
+	virtual FText GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const override;
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(
 		const UPrintWidgetOptions::EPrintScope PrintScope,
 		const UPrintWidgetOptions::EExportMethod ExportMethod

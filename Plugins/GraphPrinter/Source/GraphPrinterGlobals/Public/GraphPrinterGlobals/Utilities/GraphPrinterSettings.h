@@ -53,7 +53,7 @@ public:
 	static void OpenSettings(const FName SectionName);
 
 	// Returns the section name to register in the editor preference.
-	virtual FSettingsInfo GetSettingsInfo() const PURE_VIRTUAL(UGraphPrinterSettings::GetSectionName, { return FSettingsInfo(NAME_None); });
+	virtual FSettingsInfo GetSettingsInfo() const PURE_VIRTUAL(UGraphPrinterSettings::GetSectionName, return FSettingsInfo(NAME_None);)
 	
 private:
 	// Called when the end of UEngine::Init, right before loading PostEngineInit modules for both normal execution and commandlets

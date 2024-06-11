@@ -3,6 +3,7 @@
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
+#include "WidgetPrinter/ISupportedWidgetRegistry.h"
 #ifdef WITH_STREAM_DECK
 #include "GraphPrinterStreamDeck/HAL/StreamDeckUtils.h"
 #endif
@@ -70,6 +71,38 @@ namespace GraphPrinter
 		check(This.IsValid());
 
 		ToolMenu->Context.AppendCommandList(This->CommandBindings);
+
+		{
+			FToolMenuSection& TargetSection = ToolMenu->AddSection(
+				TEXT("Target"),
+				LOCTEXT("TargetSectionName", "Target")
+			);
+			
+			const TArray<FSupportedWidget>& SupportedWidgets = ISupportedWidgetRegistry::Get().GetSupportedWidgets();
+			for (const auto& SupportedWidget : SupportedWidgets)
+			{
+				TargetSection.AddMenuEntry(
+					*SupportedWidget.GetIdentifier().ToString(),
+					SupportedWidget.GetDisplayName(),
+					FText::GetEmpty(),
+					FSlateIcon(),
+					FToolUIActionChoice(
+						FUIAction(
+							FExecuteAction::CreateRaw(&ISupportedWidgetRegistry::Get(), &ISupportedWidgetRegistry::SetSelectedWidget, SupportedWidget.GetIdentifier()),
+							FCanExecuteAction(),
+							FIsActionChecked::CreateLambda(
+								[&SupportedWidget]() -> bool
+								{
+									const TOptional<FSupportedWidget>& SelectedWidget = ISupportedWidgetRegistry::Get().GetSelectedWidget();
+									return (SelectedWidget.IsSet() && (SelectedWidget.GetValue() == SupportedWidget));
+								}
+							)
+						)
+					),
+					EUserInterfaceActionType::ToggleButton
+				);
+			}
+		}
 		
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		{

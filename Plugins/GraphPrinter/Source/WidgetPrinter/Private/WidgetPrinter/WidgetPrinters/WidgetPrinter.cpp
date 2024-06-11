@@ -84,10 +84,9 @@ int32 UWidgetPrinter::GetPriority(const TSubclassOf<UWidgetPrinter>& Class)
 	return TNumericLimits<int32>::Min();
 }
 
-FString UWidgetPrinter::GetSupportedWidgetTypeName() const
+FText UWidgetPrinter::GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const
 {
-	unimplemented();
-	return GraphPrinter::FWidgetPrinter::GetSupportedWidgetTypeName();
+	return FText::FromName(Widget->GetType());
 }
 
 UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
