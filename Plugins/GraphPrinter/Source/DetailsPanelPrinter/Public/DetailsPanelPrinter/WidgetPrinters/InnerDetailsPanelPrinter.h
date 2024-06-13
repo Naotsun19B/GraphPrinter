@@ -76,6 +76,76 @@ namespace GraphPrinter
 		{
 		}
 
+		// IInnerWidgetPrinter interface.
+		virtual void PrintWidget() override
+		{
+			if (!IsValid(PrintOptions))
+			{
+				return;
+			}
+			
+			DetailsPanelPrinterParams.DetailsView = FindDetailsView(this->FindTargetWidget(PrintOptions->SearchTarget));
+			if (DetailsPanelPrinterParams.DetailsView.IsValid())
+			{
+				Super::PrintWidget();
+			}
+		}
+		virtual bool CanPrintWidget() const override
+		{
+			if (Super::CanPrintWidget() && IsValid(PrintOptions))
+			{
+				const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(this->FindTargetWidget(PrintOptions->SearchTarget));
+				if (DetailsView.IsValid())
+				{
+					if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+					{
+						if (const UClass* EditingObjectClass = EditingObject->GetClass())
+						{
+							return SupportsEditingObjectClass(EditingObjectClass);
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+		virtual void RestoreWidget() override
+		{
+			if (!IsValid(RestoreOptions))
+			{
+				return;
+			}
+			
+			DetailsPanelPrinterParams.DetailsView = FindDetailsView(this->FindTargetWidget(RestoreOptions->SearchTarget));
+			if (DetailsPanelPrinterParams.DetailsView.IsValid())
+			{
+				Super::RestoreWidget();
+			}
+		}
+		virtual bool CanRestoreWidget() const override
+		{
+			if (IsValid(RestoreOptions))
+			{
+				const TSharedPtr<SDetailsView> DetailsView = FindDetailsView(this->FindTargetWidget(RestoreOptions->SearchTarget));
+				if (DetailsView.IsValid())
+				{
+					if (const UObject* EditingObject = GetSingleEditingObject(DetailsView))
+					{
+						if (const UClass* EditingObjectClass = EditingObject->GetClass())
+						{
+							if (SupportsEditingObjectClass(EditingObjectClass))
+							{
+								return DetailsView->IsPropertyEditingEnabled();
+							}
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+		// End of IInnerWidgetPrinter interface.
+
 	protected:
 		// TInnerWidgetPrinter interface.
 		virtual void PreCalculateDrawSize() override
@@ -410,13 +480,6 @@ namespace GraphPrinter
 		// Constructor.
 		FDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
 		FDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
-
-		// IInnerWidgetPrinter interface.
-		virtual void PrintWidget() override;
-		virtual bool CanPrintWidget() const override;
-		virtual void RestoreWidget() override;
-		virtual bool CanRestoreWidget() const override;
-		// End of IInnerWidgetPrinter interface.
 		
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SDetailsView> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
@@ -445,13 +508,6 @@ namespace GraphPrinter
 		// Constructor.
 		FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
 		FActorDetailsPanelPrinter(URestoreWidgetOptions* InRestoreOptions, const FSimpleDelegate& InOnPrinterProcessingFinished);
-
-		// IInnerWidgetPrinter interface.
-		virtual void PrintWidget() override;
-		virtual bool CanPrintWidget() const override;
-		virtual void RestoreWidget() override;
-		virtual bool CanRestoreWidget() const override;
-		// End of IInnerWidgetPrinter interface.
 		
 		// TInnerWidgetPrinter interface.
 		virtual TSharedPtr<SActorDetails> FindTargetWidget(const TSharedPtr<SWidget>& SearchTarget) const override;
