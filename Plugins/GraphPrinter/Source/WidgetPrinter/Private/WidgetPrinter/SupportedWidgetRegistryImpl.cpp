@@ -17,6 +17,7 @@ namespace GraphPrinter
 		virtual ~FSupportedWidgetRegistryImpl() override;
 		
 		// ISupportedWidgetRegistry interface.
+		virtual void CollectSupportedWidget() override;
 		virtual const TArray<FSupportedWidget>& GetSupportedWidgets() const override;
 		virtual TOptional<FSupportedWidget> GetSelectedWidget() const override;
 		virtual void SetSelectedWidget(const FGuid Identifier) override;
@@ -24,14 +25,8 @@ namespace GraphPrinter
 		// End of ISupportedWidgetRegistry interface.
 
 	private:
-		// Called when the focused widget changes.
-		void HandleOnFocusChanging(
-			const FFocusEvent& FocusEvent,
-			const FWeakWidgetPath& OldFocusedWidgetPath,
-			const TSharedPtr<SWidget>& OldFocusedWidget,
-			const FWidgetPath& NewFocusedWidgetPath,
-			const TSharedPtr<SWidget>& NewFocusedWidget
-		);
+		// Called when before slate application ticks.
+		void HandleOnPreTick(const float DeltaTime);
 
 	private:
 		// The list of widgets supported by either printer.
@@ -55,7 +50,7 @@ namespace GraphPrinter
 	{
 		if (FSlateApplication::IsInitialized())
 		{
-			FSlateApplication::Get().OnFocusChanging().AddRaw(this, &FSupportedWidgetRegistryImpl::HandleOnFocusChanging);
+			FSlateApplication::Get().OnPreTick().AddRaw(this, &FSupportedWidgetRegistryImpl::HandleOnPreTick);
 		}
 	}
 
@@ -65,6 +60,28 @@ namespace GraphPrinter
 		{
 			FSlateApplication::Get().OnPreTick().RemoveAll(this);
 		}
+	}
+
+	void FSupportedWidgetRegistryImpl::CollectSupportedWidget()
+	{
+		RegisteredWidgets.Empty();
+		
+		FWidgetPrinterUtils::EnumerateChildWidgets(
+			FSlateApplication::Get().GetActiveTopLevelWindow(),
+			[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
+			{
+				if (ChildWidget.IsValid())
+				{
+					const TOptional<FSupportedWidget>& SupportedWidget = IWidgetPrinterRegistry::Get().CheckIfSupported(ChildWidget.ToSharedRef());
+					if (SupportedWidget.IsSet())
+					{
+						RegisteredWidgets.AddUnique(SupportedWidget.GetValue());
+					}
+				}
+
+				return true;
+			}
+		);
 	}
 
 	const TArray<FSupportedWidget>& FSupportedWidgetRegistryImpl::GetSupportedWidgets() const
@@ -95,13 +112,7 @@ namespace GraphPrinter
 		return bWasAnyMenuVisibleInPreviousFrame;
 	}
 
-	void FSupportedWidgetRegistryImpl::HandleOnFocusChanging(
-		const FFocusEvent& FocusEvent,
-		const FWeakWidgetPath& OldFocusedWidgetPath,
-		const TSharedPtr<SWidget>& OldFocusedWidget,
-		const FWidgetPath& NewFocusedWidgetPath,
-		const TSharedPtr<SWidget>& NewFocusedWidget
-	)
+	void FSupportedWidgetRegistryImpl::HandleOnPreTick(const float DeltaTime)
 	{
 		RegisteredWidgets.RemoveAll(
 			[](const FSupportedWidget& RegisteredWidget) -> bool
@@ -117,27 +128,8 @@ namespace GraphPrinter
 				SelectedWidgetIdentifier = RegisteredWidgets[0].GetIdentifier();
 			}
 		}
-
-		const auto& SlateApplication = FSlateApplication::Get();
 		
-		FWidgetPrinterUtils::EnumerateChildWidgets(
-			SlateApplication.GetActiveTopLevelWindow(),
-			[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
-			{
-				if (ChildWidget.IsValid())
-				{
-					const TOptional<FSupportedWidget>& SupportedWidget = IWidgetPrinterRegistry::Get().CheckIfSupported(ChildWidget.ToSharedRef());
-					if (SupportedWidget.IsSet())
-					{
-						RegisteredWidgets.AddUnique(SupportedWidget.GetValue());
-					}
-				}
-
-				return true;
-			}
-		);
-
-		bWasAnyMenuVisibleInPreviousFrame = SlateApplication.AnyMenusVisible();
+		bWasAnyMenuVisibleInPreviousFrame = FSlateApplication::Get().AnyMenusVisible();
 	}
 
 	namespace SupportedWidgetHolder

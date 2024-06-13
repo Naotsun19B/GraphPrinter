@@ -27,6 +27,10 @@ public:
 	UPROPERTY(EditAnywhere, Config, Category = "UI", meta = (ConfigRestartRequired = true))
 	bool bShowComboButtonInStatusBar;
 
+	// Whether to automatically collect the target widgets when opening any type of menu.
+	UPROPERTY(EditAnywhere, Config, Category = "UI")
+	bool bCollectTargetWidgetsAutomatically;
+
 public:
 	// Constructor.
 	UGraphPrinterEditorExtensionSettings();

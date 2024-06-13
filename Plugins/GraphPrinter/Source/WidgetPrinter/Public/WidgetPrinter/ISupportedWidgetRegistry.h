@@ -21,6 +21,9 @@ namespace GraphPrinter
 		// Destructor.
 		virtual ~ISupportedWidgetRegistry() = default;
 
+		// Collects supported widgets from the currently displayed screen.
+		virtual void CollectSupportedWidget() = 0;
+
 		// Returns a list of widgets currently available and supported by any printer.
 		virtual const TArray<FSupportedWidget>& GetSupportedWidgets() const = 0;
 

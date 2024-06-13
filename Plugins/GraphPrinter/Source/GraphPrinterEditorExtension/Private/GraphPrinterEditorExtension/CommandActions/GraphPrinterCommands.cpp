@@ -3,6 +3,7 @@
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommands.h"
 #include "GraphPrinterEditorExtension/CommandActions/GraphPrinterCommandActions.h"
 #include "GraphPrinterEditorExtension/Utilities/GraphPrinterStyle.h"
+#include "GraphPrinterEditorExtension/Utilities/GraphPrinterEditorExtensionSettings.h"
 #include "WidgetPrinter/ISupportedWidgetRegistry.h"
 #ifdef WITH_STREAM_DECK
 #include "GraphPrinterStreamDeck/HAL/StreamDeckUtils.h"
@@ -36,6 +37,7 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommands::RegisterCommands()
 	{
+		UI_COMMAND(CollectTargetWidgets, "Collect Target Widgets", "Collects widgets supported by any printer from the currently displayed screen,", EUserInterfaceActionType::Button, FInputChord(EKeys::F6, EModifierKey::Control));
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		UI_COMMAND(CopyAllAreaOfWidgetToClipboard, "Copies All Area Of Widget To Clipboard", "Copy the entire target widget as an image to the clipboard.", EUserInterfaceActionType::Button, FInputChord(EKeys::F7, EModifierKey::Control));
 		UI_COMMAND(CopySelectedAreaOfWidgetToClipboard, "Copies Selected Area Of Widget To Clipboard", "Copy the selected area of the target widget to the clipboard as an image.", EUserInterfaceActionType::Button, FInputChord(EKeys::F8, EModifierKey::Control));
@@ -71,14 +73,23 @@ namespace GraphPrinter
 		check(This.IsValid());
 
 		ToolMenu->Context.AppendCommandList(This->CommandBindings);
-
+		
 		{
 			FToolMenuSection& TargetSection = ToolMenu->AddSection(
 				TEXT("Target"),
 				LOCTEXT("TargetSectionName", "Target")
 			);
+
+			auto& SupportedWidgetRegistry = ISupportedWidgetRegistry::Get();
 			
-			const TArray<FSupportedWidget>& SupportedWidgets = ISupportedWidgetRegistry::Get().GetSupportedWidgets();
+			if (UGraphPrinterEditorExtensionSettings::Get().bCollectTargetWidgetsAutomatically)
+			{
+				SupportedWidgetRegistry.CollectSupportedWidget();
+			}
+
+			TargetSection.AddMenuEntry(This->CollectTargetWidgets);
+			
+			const TArray<FSupportedWidget>& SupportedWidgets = SupportedWidgetRegistry.GetSupportedWidgets();
 			for (const auto& SupportedWidget : SupportedWidgets)
 			{
 				TargetSection.AddMenuEntry(
@@ -239,6 +250,11 @@ namespace GraphPrinter
 		
 		const TSharedRef<FUICommandList>& MainFrameCommandBindings = IMainFrameModule::Get().GetMainFrameCommandBindings();
 		MainFrameCommandBindings->Append(CommandBindings);
+
+		CommandBindings->MapAction(
+			CollectTargetWidgets,
+			FExecuteAction::CreateRaw(&ISupportedWidgetRegistry::Get(), &ISupportedWidgetRegistry::CollectSupportedWidget)
+		);
 
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		CommandBindings->MapAction(

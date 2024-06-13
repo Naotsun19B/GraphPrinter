@@ -11,6 +11,7 @@ UGraphPrinterEditorExtensionSettings::UGraphPrinterEditorExtensionSettings()
 	: bShowSubMenuInToolMenu(true)
 	, bShowComboButtonInToolbar(true)
 	, bShowComboButtonInStatusBar(true)
+	, bCollectTargetWidgetsAutomatically(false)
 {
 }
 

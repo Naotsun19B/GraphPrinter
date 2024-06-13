@@ -33,13 +33,21 @@ namespace GraphPrinter
 			}
 
 			FToolMenuSection& ToolsSection = ToolsMenu->FindOrAddSection(TEXT("Tools"));
-			ToolsSection.AddSubMenu(
+			ToolsSection.AddDynamicEntry(
 				Global::PluginName,
-				ToolMenuExtensionConstants::ToolMenuLabel,
-				ToolMenuExtensionConstants::ToolMenuTooltip,
-				FNewToolMenuDelegate::CreateStatic(&FGraphPrinterCommands::FillMenuBuilder),
-				false,
-				FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
+				FNewToolMenuSectionDelegate::CreateLambda(
+					[](FToolMenuSection& Section)
+					{
+						Section.AddSubMenu(
+							Global::PluginName,
+							ToolMenuExtensionConstants::ToolMenuLabel,
+							ToolMenuExtensionConstants::ToolMenuTooltip,
+							FNewToolMenuDelegate::CreateStatic(&FGraphPrinterCommands::FillMenuBuilder),
+							false,
+							FGraphPrinterStyle::GetSlateIconFromIconType(EGraphPrinterStyleIconType::PluginIcon)
+						);
+					}
+				)
 			);
 		}
 		// End of FAutoToolMenuExtender interface.

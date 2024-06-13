@@ -49,6 +49,7 @@ namespace GraphPrinter
 		TSharedRef<FUICommandList> CommandBindings;
 		
 		// Instances of bound commands.
+		TSharedPtr<FUICommandInfo> CollectTargetWidgets;
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 		TSharedPtr<FUICommandInfo> CopyAllAreaOfWidgetToClipboard;
 		TSharedPtr<FUICommandInfo> CopySelectedAreaOfWidgetToClipboard;
