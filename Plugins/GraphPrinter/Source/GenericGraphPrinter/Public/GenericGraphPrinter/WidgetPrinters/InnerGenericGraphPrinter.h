@@ -101,7 +101,8 @@ namespace GraphPrinter
 		{
 			if (SearchTarget.IsValid())
 			{
-				return FGenericGraphPrinterUtils::FindNearestChildGraphEditor(SearchTarget);
+				const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
+				return FGenericGraphPrinterUtils::FindNearestChildGraphEditor(DockingTabStack);
 			}
 	
 			return FGenericGraphPrinterUtils::GetActiveGraphEditor();

@@ -253,7 +253,7 @@ namespace GraphPrinter
 				return false;
 			}
 			
-			if (ShouldAlwaysPrintAll() && PrintOptions->PrintScope == UPrintWidgetOptions::EPrintScope::Selected)
+			if (ShouldAlwaysPrintAll() && (PrintOptions->PrintScope != UPrintWidgetOptions::EPrintScope::All))
 			{
 				return false;
 			}
