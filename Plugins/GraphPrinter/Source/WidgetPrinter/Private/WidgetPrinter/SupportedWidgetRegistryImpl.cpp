@@ -3,6 +3,7 @@
 #include "WidgetPrinter/ISupportedWidgetRegistry.h"
 #include "WidgetPrinter/IWidgetPrinterRegistry.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
+#include "Framework/Application/SlateApplication.h"
 
 namespace GraphPrinter
 {
@@ -19,6 +20,7 @@ namespace GraphPrinter
 		virtual const TArray<FSupportedWidget>& GetSupportedWidgets() const override;
 		virtual TOptional<FSupportedWidget> GetSelectedWidget() const override;
 		virtual void SetSelectedWidget(const FGuid Identifier) override;
+		virtual bool WasAnyMenuVisibleInPreviousFrame() const override;
 		// End of ISupportedWidgetRegistry interface.
 
 	private:
@@ -32,6 +34,9 @@ namespace GraphPrinter
 		// The widget selected in a menu from RegisteredWidgets.
 		FGuid SelectedWidgetIdentifier;
 
+		// Whether menus such as the tools menu and toolbar were visible in the previous frame.
+		bool bWasAnyMenuVisibleInPreviousFrame;
+
 		// The lambda function that compares widget information by unique ID.
 		TFunction<bool(const FSupportedWidget& RegisteredWidget)> EqualsByIdentifier = [&](const FSupportedWidget& RegisteredWidget) -> bool
 		{
@@ -40,6 +45,7 @@ namespace GraphPrinter
 	};
 
 	FSupportedWidgetRegistryImpl::FSupportedWidgetRegistryImpl()
+		: bWasAnyMenuVisibleInPreviousFrame(false)
 	{
 		if (FSlateApplication::IsInitialized())
 		{
@@ -77,6 +83,11 @@ namespace GraphPrinter
 			SelectedWidgetIdentifier = Identifier;
 		}
 	}
+	
+	bool FSupportedWidgetRegistryImpl::WasAnyMenuVisibleInPreviousFrame() const
+	{
+		return bWasAnyMenuVisibleInPreviousFrame;
+	}
 
 	void FSupportedWidgetRegistryImpl::HandleOnPreTick(const float DeltaTime)
 	{
@@ -101,9 +112,11 @@ namespace GraphPrinter
 			FColor::Green,
 			(GetSelectedWidget().IsSet() ? GetSelectedWidget()->GetDisplayName().ToString() : TEXT("Unset")) 
 		);
+
+		const auto& SlateApplication = FSlateApplication::Get();
 		
 		FWidgetPrinterUtils::EnumerateChildWidgets(
-			FSlateApplication::Get().GetActiveTopLevelWindow(),
+			SlateApplication.GetActiveTopLevelWindow(),
 			[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
 			{
 				if (ChildWidget.IsValid())
@@ -118,6 +131,8 @@ namespace GraphPrinter
 				return true;
 			}
 		);
+
+		bWasAnyMenuVisibleInPreviousFrame = SlateApplication.AnyMenusVisible();
 	}
 
 	namespace SupportedWidgetHolder

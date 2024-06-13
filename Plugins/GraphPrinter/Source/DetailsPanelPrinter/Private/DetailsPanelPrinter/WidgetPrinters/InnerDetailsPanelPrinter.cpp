@@ -2,6 +2,7 @@
 
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
+#include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "DetailMultiTopLevelObjectRootNode.h"
 #include "GameFramework/WorldSettings.h"
@@ -164,7 +165,8 @@ namespace GraphPrinter
 	{
 		if (SearchTarget.IsValid())
 		{
-			return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(SearchTarget);
+			const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
+			return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(DockingTabStack);
 		}
 			
 		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
@@ -212,14 +214,10 @@ namespace GraphPrinter
 	{
 		if (IsValid(EditingObjectClass))
 		{
-			if (EditingObjectClass->IsChildOf<AWorldSettings>())
+			// Applies to classes that inherit AActor if the instance is the default object.
+			if (EditingObjectClass->IsChildOf<AActor>() && EditingObjectClass->IsTemplate())
 			{
 				return true;
-			}
-			
-			if (EditingObjectClass->IsChildOf<AActor>())
-			{
-				return false;
 			}
 			
 			return EditingObjectClass->IsChildOf<UObject>();
@@ -365,7 +363,8 @@ namespace GraphPrinter
 	{
 		if (SearchTarget.IsValid())
 		{
-			return FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(SearchTarget);
+			const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
+			return FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(DockingTabStack);
 		}
 			
 		return FDetailsPanelPrinterUtils::GetActiveActorDetailsView();
@@ -385,11 +384,8 @@ namespace GraphPrinter
 	{
 		if (IsValid(EditingObjectClass))
 		{
-			return (
-				EditingObjectClass->IsChildOf<AActor>() &&
-				// AWorldSettings is a class that inherits from AActor, but excludes it since it will be using the normal details panel.
-				!EditingObjectClass->IsChildOf<AWorldSettings>()
-			);
+			// Applies to objects that inherit the AActor class and whose instance is not the default object.
+			return (EditingObjectClass->IsChildOf<AActor>() && !EditingObjectClass->IsTemplate());
 		}
 
 		return false;

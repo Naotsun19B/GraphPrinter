@@ -29,5 +29,8 @@ namespace GraphPrinter
 
 		// Selects the widget specified by index from the supported widgets.
 		virtual void SetSelectedWidget(const FGuid Identifier) = 0;
+
+		// Returns whether menus such as the tools menu and toolbar were visible in the previous frame.
+		virtual bool WasAnyMenuVisibleInPreviousFrame() const = 0;
 	};
 }

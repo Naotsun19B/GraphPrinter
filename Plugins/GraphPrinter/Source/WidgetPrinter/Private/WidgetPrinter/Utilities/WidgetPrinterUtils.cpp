@@ -137,11 +137,13 @@ namespace GraphPrinter
 	{
 		FSlateApplication& SlateApplication = FSlateApplication::Get();
 
-		if (SlateApplication.AnyMenusVisible())
+		const auto& SupportedWidgetRegistry = ISupportedWidgetRegistry::Get();
+		if (SupportedWidgetRegistry.WasAnyMenuVisibleInPreviousFrame())
 		{
-			const TOptional<FSupportedWidget>& SelectedWidget = ISupportedWidgetRegistry::Get().GetSelectedWidget();
+			const TOptional<FSupportedWidget>& SelectedWidget = SupportedWidgetRegistry.GetSelectedWidget();
 			if (SelectedWidget.IsSet() && SelectedWidget->IsValid())
 			{
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *SelectedWidget->GetWidget()->GetTypeAsString());
 				return SelectedWidget->GetWidget();
 			}
 		}
