@@ -28,5 +28,8 @@ namespace GraphPrinter
 		// TInnerWidgetPrinter interface.
 		virtual FString GetWidgetTitle() override;
 		// End of TInnerWidgetPrinter interface.
+
+		// Returns the title from the reference viewer graph in the format "ReferenceViewer-[package name]".
+		static bool GetReferenceViewerGraphTitle(const TSharedPtr<SGraphEditorImpl>& ReferenceViewerGraphEditor, FString& Title);
 	};
 }

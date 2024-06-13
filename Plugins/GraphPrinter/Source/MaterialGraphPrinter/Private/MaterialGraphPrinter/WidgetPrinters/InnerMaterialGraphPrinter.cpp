@@ -123,28 +123,43 @@ namespace GraphPrinter
 
 	FString FMaterialGraphPrinter::GetWidgetTitle()
 	{
-		if (const auto* MaterialGraph = Cast<UMaterialGraph>(Widget->GetCurrentGraph()))
+		FString Title;
+		GetMaterialGraphTitle(Widget, Title);
+		return Title;
+	}
+
+	bool FMaterialGraphPrinter::GetMaterialGraphTitle(const TSharedPtr<SGraphEditorImpl>& MaterialGraphEditor, FString& Title)
+	{
+		Title = TEXT("InvalidMaterialEditor");
+
+		const auto* MaterialGraph = Cast<UMaterialGraph>(MaterialGraphEditor->GetCurrentGraph());
+		if (!IsValid(MaterialGraph))
 		{
-#if UE_5_00_OR_LATER
-			if (const UMaterial* Material = MaterialGraph->Material.Get())
-#else
-			if (const UMaterial* Material = MaterialGraph->Material)
-#endif
-			{
-				FString GraphName = TEXT("MaterialGraph");
-#if UE_5_00_OR_LATER
-				if (MaterialGraph->RootNode)
-#else
-				if (IsValid(MaterialGraph->RootNode))
-#endif
-				{
-					GraphName = MaterialGraph->GetName();
-				}
-				
-				return FString::Printf(TEXT("%s-%s"), *Material->GetName(), *GraphName);
-			}
+			return false;
 		}
 
-		return TEXT("InvalidMaterialEditor");
+		const UMaterial* Material = 
+#if UE_5_00_OR_LATER
+			MaterialGraph->Material.Get();
+#else
+			MaterialGraph->Material;
+#endif
+		if (!IsValid(Material))
+		{
+			return false;
+		}
+		
+		FString GraphName = TEXT("MaterialGraph");
+#if UE_5_00_OR_LATER
+		if (MaterialGraph->RootNode)
+#else
+		if (IsValid(MaterialGraph->RootNode))
+#endif
+		{
+			GraphName = MaterialGraph->GetName();
+		}
+				
+		Title = FString::Printf(TEXT("%s-%s"), *Material->GetName(), *GraphName);
+		return true;
 	}
 }

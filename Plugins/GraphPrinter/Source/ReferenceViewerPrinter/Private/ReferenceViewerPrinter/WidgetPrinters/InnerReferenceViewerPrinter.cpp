@@ -29,15 +29,28 @@ namespace GraphPrinter
 
 	FString FReferenceViewerPrinter::GetWidgetTitle()
 	{
-		if (const auto* ReferenceViewerGraph = Cast<UEdGraph_ReferenceViewer>(Widget->GetCurrentGraph()))
-		{
-			const TArray<FAssetIdentifier>& Assets = ReferenceViewerGraph->GetCurrentGraphRootIdentifiers();
-			if (Assets.IsValidIndex(0))
-			{
-				return FString::Printf(TEXT("ReferenceViewer_%s"), *FPaths::GetBaseFilename(Assets[0].PackageName.ToString()));
-			}
-		}
+		FString Title;
+		GetReferenceViewerGraphTitle(Widget, Title);
+		return Title;
+	}
 
-		return TEXT("InvalidReferenceViewer");
+	bool FReferenceViewerPrinter::GetReferenceViewerGraphTitle(const TSharedPtr<SGraphEditorImpl>& ReferenceViewerGraphEditor, FString& Title)
+	{
+		Title = TEXT("InvalidReferenceViewer");
+
+		const auto* ReferenceViewerGraph = Cast<UEdGraph_ReferenceViewer>(ReferenceViewerGraphEditor->GetCurrentGraph());
+		if (!IsValid(ReferenceViewerGraph))
+		{
+			return false;
+		}
+		
+		const TArray<FAssetIdentifier>& Assets = ReferenceViewerGraph->GetCurrentGraphRootIdentifiers();
+		if (Assets.IsEmpty())
+		{
+			return false;
+		}
+		
+		Title = FString::Printf(TEXT("ReferenceViewer-%s"), *FPaths::GetBaseFilename(Assets[0].PackageName.ToString()));
+		return true;
 	}
 }

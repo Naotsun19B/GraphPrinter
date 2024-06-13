@@ -8,6 +8,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
 #include "WidgetPrinter/Types/RestoreWidgetOptions.h"
+#include "WidgetPrinter/Types/SupportedWidget.h"
 #include "WidgetPrinter.generated.h"
 
 namespace GraphPrinter
@@ -66,12 +67,9 @@ public:
 	// Checks if the printer can be executed from the one with the highest priority.
 	virtual int32 GetPriority() const;
 	static int32 GetPriority(const TSubclassOf<UWidgetPrinter>& Class);
-	
-	// Returns the type names of widgets supported by this printer.
-	virtual FString GetSupportedWidgetTypeName() const PURE_VIRTUAL(UWidgetPrinter::GetSupportedWidgetTypeName, return {};)
 
-	// Returns the name displayed on the editor UI of the widget handled by this printer.
-	virtual FText GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const;
+	// If the specified widget can be handled by this printer, returns a data structure containing the name to be displayed in the editor UI.
+	virtual TOptional<GraphPrinter::FSupportedWidget> CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const PURE_VIRTUAL(UWidgetPrinter::CheckIfSupported, return {};)
 	
 	// Generates and returns an option class with the default settings applied.
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(

@@ -17,11 +17,12 @@ class REFERENCEVIEWERPRINTER_API UReferenceViewerPrinter : public UGenericGraphP
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 ReferenceViewerPrinterPriority = GenericGraphPrinterPriority + 100;
+	static constexpr int32 ReferenceViewerPrinterPriority = (GenericGraphPrinterPriority + 100);
 	
 public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
+	virtual TOptional<GraphPrinter::FSupportedWidget> CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	virtual TSharedRef<GraphPrinter::IInnerWidgetPrinter> CreateRestoreModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const override;
 	// End of UWidgetPrinter interface.

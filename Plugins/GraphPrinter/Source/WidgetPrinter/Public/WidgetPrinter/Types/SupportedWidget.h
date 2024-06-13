@@ -16,7 +16,7 @@ namespace GraphPrinter
 	{
 	public:
 		// Constructor.
-		FSupportedWidget(const TSharedRef<SWidget>& InWidget, const UWidgetPrinter& InWidgetPrinter);
+		FSupportedWidget(const TSharedRef<SWidget>& InWidget, const FString& InDisplayName, const int32 InPriority);
 
 		// Returns whether the widget that this data has is enabled.
 		bool IsValid() const;

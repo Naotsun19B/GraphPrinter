@@ -94,8 +94,7 @@ namespace GraphPrinter
 	{
 		if (SearchTarget.IsValid())
 		{
-			const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
-			return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(DockingTabStack);
+			return FindTargetWidgetFromSearchTarget(SearchTarget);
 		}
 			
 		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
@@ -153,6 +152,12 @@ namespace GraphPrinter
 		}
 
 		return false;
+	}
+
+	TSharedPtr<SDetailsView> FDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
+	{
+		const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
+		return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(DockingTabStack);
 	}
 
 	FString FDetailsPanelPrinter::GetEditingObjectName(const TSharedPtr<SDetailsView>& DetailsPanel)
@@ -221,8 +226,7 @@ namespace GraphPrinter
 	{
 		if (SearchTarget.IsValid())
 		{
-			const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
-			return FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(DockingTabStack);
+			return FindTargetWidgetFromSearchTarget(SearchTarget);
 		}
 			
 		return FDetailsPanelPrinterUtils::GetActiveActorDetailsView();
@@ -247,6 +251,12 @@ namespace GraphPrinter
 		}
 
 		return false;
+	}
+
+	TSharedPtr<SActorDetails> FActorDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
+	{
+		const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
+		return FDetailsPanelPrinterUtils::FindNearestChildActorDetailsView(DockingTabStack);
 	}
 
 	FString FActorDetailsPanelPrinter::GetEditingActorName(const TSharedPtr<SDetailsView>& DetailsPanel)

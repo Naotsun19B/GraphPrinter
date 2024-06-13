@@ -127,13 +127,14 @@ namespace GraphPrinter
 			{
 				continue;
 			}
-			
-			if (TestWidget->GetTypeAsString() != WidgetPrinter->GetSupportedWidgetTypeName())
+
+			const TOptional<FSupportedWidget>& Result = WidgetPrinter->CheckIfSupported(TestWidget);
+			if (!Result.IsSet())
 			{
 				continue;
 			}
 
-			return FSupportedWidget(TestWidget, *WidgetPrinter);
+			return Result;
 		}
 
 		return {};

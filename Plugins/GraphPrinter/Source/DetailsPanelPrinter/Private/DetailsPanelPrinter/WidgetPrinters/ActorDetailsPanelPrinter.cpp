@@ -3,7 +3,6 @@
 #include "DetailsPanelPrinter/WidgetPrinters/ActorDetailsPanelPrinter.h"
 #include "DetailsPanelPrinter/WidgetPrinters/InnerDetailsPanelPrinter.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#include "WidgetPrinter/Utilities/CastSlateWidget.h"
 
 #if UE_5_01_OR_LATER
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ActorDetailsPanelPrinter)
@@ -25,16 +24,22 @@ int32 UActorDetailsPanelPrinter::GetPriority() const
 }
 
 #ifdef WITH_DETAILS_PANEL_PRINTER
-FString UActorDetailsPanelPrinter::GetSupportedWidgetTypeName() const
+TOptional<GraphPrinter::FSupportedWidget> UActorDetailsPanelPrinter::CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const
 {
-	return GraphPrinter::FActorDetailsPanelPrinter::GetSupportedWidgetTypeName();
-}
+	const TSharedPtr<SActorDetails> ActorDetailsPanel = GraphPrinter::FActorDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(TestWidget);
+	if (!ActorDetailsPanel.IsValid())
+	{
+		return {};
+	}
 
-FText UActorDetailsPanelPrinter::GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const
-{
-	const TSharedPtr<SActorDetails> ActorDetailsPanel = GP_CAST_SLATE_WIDGET(SActorDetails, TSharedPtr<SWidget>(Widget));
 	const TSharedPtr<SDetailsView> DetailsPanel = GraphPrinter::FDetailsPanelPrinterUtils::FindNearestChildDetailsView(ActorDetailsPanel);
-	return FText::FromString(GraphPrinter::FActorDetailsPanelPrinter::GetEditingActorName(DetailsPanel));
+	if (!DetailsPanel.IsValid())
+	{
+		return {};
+	}
+	
+	const FString& EditingActorName = GraphPrinter::FActorDetailsPanelPrinter::GetEditingActorName(DetailsPanel);
+	return GraphPrinter::FSupportedWidget(ActorDetailsPanel.ToSharedRef(), EditingActorName, GetPriority());
 }
 
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UActorDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const

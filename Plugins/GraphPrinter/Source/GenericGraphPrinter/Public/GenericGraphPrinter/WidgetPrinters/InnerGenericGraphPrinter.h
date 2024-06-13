@@ -101,8 +101,7 @@ namespace GraphPrinter
 		{
 			if (SearchTarget.IsValid())
 			{
-				const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
-				return FGenericGraphPrinterUtils::FindNearestChildGraphEditor(DockingTabStack);
+				return FindTargetWidgetFromSearchTarget(SearchTarget);
 			}
 	
 			return FGenericGraphPrinterUtils::GetActiveGraphEditor();
@@ -205,7 +204,9 @@ namespace GraphPrinter
 		}
 		virtual FString GetWidgetTitle() override
 		{
-			return GetGraphEditorTitle(Widget);
+			FString Title;
+			GetGraphTitle(Widget, Title);
+			return Title;
 		}
 		virtual bool WriteWidgetInfoToTextChunk() override
 		{
@@ -276,21 +277,37 @@ namespace GraphPrinter
 		// End of TInnerWidgetPrinter interface.
 
 	public:
-		// Returns the title from the graph editor in the format "[asset name]-[graph title]".
-		static FString GetGraphEditorTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor)
+		// Finds the target widget from the search target.
+		static TSharedPtr<SGraphEditorImpl> FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
 		{
-			if (GraphEditor.IsValid())
-			{
-				if (const UEdGraph* Graph = GraphEditor->GetCurrentGraph())
-				{
-					if (const UObject* Outer = Graph->GetOuter())
-					{
-						return FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
-					}
-				}
-			}
+			const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
+			return FGenericGraphPrinterUtils::FindNearestChildGraphEditor(DockingTabStack);
+		}
+		
+		// Returns the title from the graph in the format "[asset name]-[graph title]".
+		static bool GetGraphTitle(const TSharedPtr<SGraphEditorImpl>& GraphEditor, FString& Title)
+		{
+			Title = TEXT("InvalidGraphEditor");
 			
-			return TEXT("InvalidGraphEditor");
+			if (!GraphEditor.IsValid())
+			{
+				return false;
+			}
+
+			const UEdGraph* Graph = GraphEditor->GetCurrentGraph();
+			if (!IsValid(Graph))
+			{
+				return false;
+			}
+
+			const UObject* Outer = Graph->GetOuter();
+			if (!IsValid(Outer))
+			{
+				return false;
+			}
+
+			Title = FString::Printf(TEXT("%s-%s"), *Outer->GetName(), *Graph->GetName());
+			return true;
 		}
 		
 	protected:

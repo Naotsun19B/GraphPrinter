@@ -17,11 +17,12 @@ class MATERIALGRAPHPRINTER_API UMaterialGraphPrinter : public UGenericGraphPrint
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 MaterialGraphPrinterPriority = GenericGraphPrinterPriority + 50;
+	static constexpr int32 MaterialGraphPrinterPriority = (GenericGraphPrinterPriority + 50);
 	
 public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
+	virtual TOptional<GraphPrinter::FSupportedWidget> CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const override;
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(
 		const UPrintWidgetOptions::EPrintScope PrintScope,
 		const UPrintWidgetOptions::EExportMethod ExportMethod

@@ -491,6 +491,9 @@ namespace GraphPrinter
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
 		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const override;
 		// End of TDetailsPanelPrinter interface.
+		
+		// Finds the target widget from the search target.
+		static TSharedPtr<SDetailsView> FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget);
 
 		// Returns the name of the object being edited.
 		static FString GetEditingObjectName(const TSharedPtr<SDetailsView>& DetailsPanel);
@@ -519,6 +522,9 @@ namespace GraphPrinter
 		virtual TSharedPtr<SDetailsView> FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const override;
 		virtual bool SupportsEditingObjectClass(const UClass* EditingObjectClass) const override;
 		// End of TDetailsPanelPrinter interface.
+
+		// Finds the target widget from the search target.
+		static TSharedPtr<SActorDetails> FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget);
 
 		// Returns the name of the actor being edited.
 		static FString GetEditingActorName(const TSharedPtr<SDetailsView>& DetailsPanel);

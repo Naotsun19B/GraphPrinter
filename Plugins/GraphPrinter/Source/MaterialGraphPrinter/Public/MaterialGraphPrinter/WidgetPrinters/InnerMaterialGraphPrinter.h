@@ -32,5 +32,8 @@ namespace GraphPrinter
 		virtual UTextureRenderTarget2D* DrawWidgetToRenderTarget() override;
 		virtual FString GetWidgetTitle() override;
 		// End of TInnerWidgetPrinter interface.
+		
+		// Returns the title from the material graph in the format "[material name]-[graph title]".
+		static bool GetMaterialGraphTitle(const TSharedPtr<SGraphEditorImpl>& MaterialGraphEditor, FString& Title);
 	};
 }

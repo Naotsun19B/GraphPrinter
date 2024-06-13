@@ -24,8 +24,14 @@ namespace GraphPrinter
 		// End of ISupportedWidgetRegistry interface.
 
 	private:
-		// Called when before slate application ticks.
-		void HandleOnPreTick(const float DeltaTime);
+		// Called when the focused widget changes.
+		void HandleOnFocusChanging(
+			const FFocusEvent& FocusEvent,
+			const FWeakWidgetPath& OldFocusedWidgetPath,
+			const TSharedPtr<SWidget>& OldFocusedWidget,
+			const FWidgetPath& NewFocusedWidgetPath,
+			const TSharedPtr<SWidget>& NewFocusedWidget
+		);
 
 	private:
 		// The list of widgets supported by either printer.
@@ -49,7 +55,7 @@ namespace GraphPrinter
 	{
 		if (FSlateApplication::IsInitialized())
 		{
-			FSlateApplication::Get().OnPreTick().AddRaw(this, &FSupportedWidgetRegistryImpl::HandleOnPreTick);
+			FSlateApplication::Get().OnFocusChanging().AddRaw(this, &FSupportedWidgetRegistryImpl::HandleOnFocusChanging);
 		}
 	}
 
@@ -89,7 +95,13 @@ namespace GraphPrinter
 		return bWasAnyMenuVisibleInPreviousFrame;
 	}
 
-	void FSupportedWidgetRegistryImpl::HandleOnPreTick(const float DeltaTime)
+	void FSupportedWidgetRegistryImpl::HandleOnFocusChanging(
+		const FFocusEvent& FocusEvent,
+		const FWeakWidgetPath& OldFocusedWidgetPath,
+		const TSharedPtr<SWidget>& OldFocusedWidget,
+		const FWidgetPath& NewFocusedWidgetPath,
+		const TSharedPtr<SWidget>& NewFocusedWidget
+	)
 	{
 		RegisteredWidgets.RemoveAll(
 			[](const FSupportedWidget& RegisteredWidget) -> bool
@@ -105,13 +117,6 @@ namespace GraphPrinter
 				SelectedWidgetIdentifier = RegisteredWidgets[0].GetIdentifier();
 			}
 		}
-
-		GEngine->AddOnScreenDebugMessage(
-			0,
-			(DeltaTime + SMALL_NUMBER),
-			FColor::Green,
-			(GetSelectedWidget().IsSet() ? GetSelectedWidget()->GetDisplayName().ToString() : TEXT("Unset")) 
-		);
 
 		const auto& SlateApplication = FSlateApplication::Get();
 		

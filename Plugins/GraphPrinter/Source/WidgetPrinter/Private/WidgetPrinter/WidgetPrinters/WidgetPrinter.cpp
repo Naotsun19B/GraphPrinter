@@ -84,11 +84,6 @@ int32 UWidgetPrinter::GetPriority(const TSubclassOf<UWidgetPrinter>& Class)
 	return TNumericLimits<int32>::Min();
 }
 
-FText UWidgetPrinter::GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const
-{
-	return FText::FromName(Widget->GetType());
-}
-
 UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,
 	const UPrintWidgetOptions::EExportMethod ExportMethod

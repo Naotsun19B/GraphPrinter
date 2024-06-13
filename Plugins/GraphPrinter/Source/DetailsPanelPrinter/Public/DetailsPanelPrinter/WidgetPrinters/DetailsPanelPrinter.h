@@ -25,8 +25,7 @@ public:
 	// UWidgetPrinter interface.
 	virtual int32 GetPriority() const override;
 #ifdef WITH_DETAILS_PANEL_PRINTER
-	virtual FString GetSupportedWidgetTypeName() const override;
-	virtual FText GetWidgetDisplayName(const TSharedRef<SWidget>& Widget) const override;
+	virtual TOptional<GraphPrinter::FSupportedWidget> CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const override;
 #endif
 	virtual UPrintWidgetOptions* CreateDefaultPrintOptions(
 		const UPrintWidgetOptions::EPrintScope PrintScope,

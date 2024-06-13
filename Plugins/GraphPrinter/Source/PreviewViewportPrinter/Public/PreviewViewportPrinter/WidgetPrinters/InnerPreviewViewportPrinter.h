@@ -29,6 +29,12 @@ namespace GraphPrinter
 		virtual FString GetWidgetTitle() override;
 		// End of TInnerWidgetPrinter interface.
 
+		// Finds the target widget from the search target.
+		static TSharedPtr<SGlobalPlayWorldActions> FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget);
+		
+		// Returns the title from the preview viewport in the format "PreviewViewport-[tab title]".
+		static bool GetPreviewViewportTitle(const TSharedPtr<SGlobalPlayWorldActions>& PreviewViewport, FString& Title);
+
 	protected:
 		// A group of parameters that must be retained for processing.
 		struct FPreviewViewportPrinterParams

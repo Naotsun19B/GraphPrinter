@@ -6,11 +6,11 @@
 
 namespace GraphPrinter
 {
-	FSupportedWidget::FSupportedWidget(const TSharedRef<SWidget>& InWidget, const UWidgetPrinter& InWidgetPrinter)
+	FSupportedWidget::FSupportedWidget(const TSharedRef<SWidget>& InWidget, const FString& InDisplayName, const int32 InPriority)
 		: Identifier(FGuid::NewGuid())
 		, Widget(InWidget)
-		, DisplayName(InWidgetPrinter.GetWidgetDisplayName(InWidget))
-		, Priority(InWidgetPrinter.GetPriority())
+		, DisplayName(FText::FromString(InDisplayName))
+		, Priority(InPriority)
 	{
 	}
 

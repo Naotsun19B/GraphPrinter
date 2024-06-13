@@ -15,6 +15,23 @@ int32 UMaterialGraphPrinter::GetPriority() const
 	return MaterialGraphPrinterPriority;
 }
 
+TOptional<GraphPrinter::FSupportedWidget> UMaterialGraphPrinter::CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const
+{
+	const TSharedPtr<SGraphEditorImpl> MaterialGraphEditor = GraphPrinter::FMaterialGraphPrinter::FindTargetWidgetFromSearchTarget(TestWidget);
+	if (!MaterialGraphEditor.IsValid())
+	{
+		return {};
+	}
+
+	FString MaterialGraphTitle;
+	if (!GraphPrinter::FMaterialGraphPrinter::GetMaterialGraphTitle(MaterialGraphEditor, MaterialGraphTitle))
+	{
+		return {};
+	}
+	
+	return GraphPrinter::FSupportedWidget(MaterialGraphEditor.ToSharedRef(), MaterialGraphTitle, GetPriority());
+}
+
 UPrintWidgetOptions* UMaterialGraphPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,
 	const UPrintWidgetOptions::EExportMethod ExportMethod

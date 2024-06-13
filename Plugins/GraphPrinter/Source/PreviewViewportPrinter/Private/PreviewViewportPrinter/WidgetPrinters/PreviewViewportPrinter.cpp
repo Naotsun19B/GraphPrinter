@@ -13,9 +13,21 @@ int32 UPreviewViewportPrinter::GetPriority() const
 	return PreviewViewportPrinterPriority;
 }
 
-FString UPreviewViewportPrinter::GetSupportedWidgetTypeName() const
+TOptional<GraphPrinter::FSupportedWidget> UPreviewViewportPrinter::CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const
 {
-	return GraphPrinter::FPreviewViewportPrinter::GetSupportedWidgetTypeName();
+	const TSharedPtr<SGlobalPlayWorldActions> PreviewViewport = GraphPrinter::FPreviewViewportPrinter::FindTargetWidgetFromSearchTarget(TestWidget);
+	if (!PreviewViewport.IsValid())
+	{
+		return {};
+	}
+
+	FString PreviewViewportTitle;
+	if (!GraphPrinter::FPreviewViewportPrinter::GetPreviewViewportTitle(PreviewViewport, PreviewViewportTitle))
+	{
+		// return {};
+	}
+	
+	return GraphPrinter::FSupportedWidget(PreviewViewport.ToSharedRef(), PreviewViewportTitle, GetPriority());
 }
 
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UPreviewViewportPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
