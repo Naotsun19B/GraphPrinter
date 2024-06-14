@@ -63,22 +63,25 @@ namespace GraphPrinter
 
 	TSharedPtr<SViewport> FViewportPrinter::FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		TSharedPtr<SViewport> FoundViewport = nullptr;
-		FWidgetPrinterUtils::EnumerateChildWidgets(
-			SearchTarget,
-			[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
-			{
-				const TSharedPtr<SViewport> Viewport = GP_CAST_SLATE_WIDGET(SViewport, ChildWidget);
-				if (Viewport.IsValid())
+		TSharedPtr<SViewport> FoundViewport = GP_CAST_SLATE_WIDGET(SViewport, SearchTarget);
+		if (!FoundViewport.IsValid())
+		{
+			FWidgetPrinterUtils::EnumerateChildWidgets(
+				SearchTarget,
+				[&](const TSharedPtr<SWidget>& ChildWidget) -> bool
 				{
-					FoundViewport = Viewport;
-					return false;
+					const TSharedPtr<SViewport> Viewport = GP_CAST_SLATE_WIDGET(SViewport, ChildWidget);
+					if (Viewport.IsValid())
+					{
+						FoundViewport = Viewport;
+						return false;
+					}
+
+					return true;
 				}
-
-				return true;
-			}
-		);
-
+			);
+		}
+		
 		return FoundViewport;
 	}
 
