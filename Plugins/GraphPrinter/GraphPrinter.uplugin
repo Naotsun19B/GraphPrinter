@@ -61,7 +61,7 @@
 			]
 		},
 		{
-			"Name": "PreviewViewportPrinter",
+			"Name": "ViewportPrinter",
 			"Type": "EditorNoCommandlet",
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [

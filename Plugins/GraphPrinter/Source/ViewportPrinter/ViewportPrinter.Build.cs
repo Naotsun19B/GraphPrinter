@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class PreviewViewportPrinter : ModuleRules
+public class ViewportPrinter : ModuleRules
 {
-	public PreviewViewportPrinter(ReadOnlyTargetRules Target) : base(Target)
+	public ViewportPrinter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 #if UE_5_2_OR_LATER
@@ -34,9 +34,6 @@ public class PreviewViewportPrinter : ModuleRules
 				"WidgetPrinter",
 				"TextChunkHelper",
 				"ClipboardImageExtension",
-				
-				// #TODO: Need a graph editor to get the asset name in the preview viewport.
-				"GenericGraphPrinter"
 			}
 		);
 	}

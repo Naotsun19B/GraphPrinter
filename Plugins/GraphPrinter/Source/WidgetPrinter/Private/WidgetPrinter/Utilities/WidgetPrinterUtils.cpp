@@ -85,7 +85,7 @@ namespace GraphPrinter
 		return FoundDockingTabStack;
 	}
 
-	TSharedPtr<SStandaloneAssetEditorToolkitHost> FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(const TSharedPtr<SWidget>& SearchTarget)
+	TSharedPtr<SWidget> FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(const TSharedPtr<SWidget>& SearchTarget)
 	{
 		TSharedPtr<SStandaloneAssetEditorToolkitHost> FoundStandaloneAssetEditorToolkitHost = GP_CAST_SLATE_WIDGET(SStandaloneAssetEditorToolkitHost, SearchTarget);
 		if (!FoundStandaloneAssetEditorToolkitHost.IsValid())

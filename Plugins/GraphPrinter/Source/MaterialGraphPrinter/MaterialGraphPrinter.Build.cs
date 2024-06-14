@@ -33,7 +33,7 @@ public class MaterialGraphPrinter : ModuleRules
 				"GraphPrinterGlobals",
 				"WidgetPrinter",
 				"GenericGraphPrinter",
-				"PreviewViewportPrinter",
+				"ViewportPrinter",
 				"TextChunkHelper",
 				"ClipboardImageExtension",
 			}

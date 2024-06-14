@@ -5,7 +5,7 @@
 
 namespace GraphPrinter
 {
-	class FPreviewViewportPrinterModule : public IModuleInterface
+	class FViewportPrinterModule : public IModuleInterface
 	{
 	public:
 		// IModuleInterface interface.
@@ -14,13 +14,13 @@ namespace GraphPrinter
 		// End of IModuleInterface interface.
 	};
 
-	void FPreviewViewportPrinterModule::StartupModule()
+	void FViewportPrinterModule::StartupModule()
 	{
 	}
 
-	void FPreviewViewportPrinterModule::ShutdownModule()
+	void FViewportPrinterModule::ShutdownModule()
 	{
 	}
 }
 
-IMPLEMENT_MODULE(GraphPrinter::FPreviewViewportPrinterModule, PreviewViewportPrinter)
+IMPLEMENT_MODULE(GraphPrinter::FViewportPrinterModule, ViewportPrinter)

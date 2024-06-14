@@ -7,7 +7,6 @@
 class SWidget;
 class SWindow;
 class SOverlay;
-class SStandaloneAssetEditorToolkitHost;
 
 namespace GraphPrinter
 {
@@ -35,7 +34,7 @@ namespace GraphPrinter
 		static TSharedPtr<SWidget> FindNearestParentDockingTabStack(const TSharedPtr<SWidget>& SearchTarget);
 		
 		// Returns the toolkit host of the Asset Editor that contains the specified tab.
-		static TSharedPtr<SStandaloneAssetEditorToolkitHost> FindNearestParentStandaloneAssetEditorToolkitHost(const TSharedPtr<SWidget>& SearchTarget);
+		static TSharedPtr<SWidget> FindNearestParentStandaloneAssetEditorToolkitHost(const TSharedPtr<SWidget>& SearchTarget);
 		
 		// Finds the widget that is the overlay and nearest parent of SearchTarget.
 		static TSharedPtr<SOverlay> FindNearestChildOverlay(const TSharedPtr<SWidget>& SearchTarget);

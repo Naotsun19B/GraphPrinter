@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
-#include "PreviewViewportPrinter.generated.h"
+#include "ViewportPrinter.generated.h"
 
 /**
- * A class of graph printers dedicated to preview viewport in materials, animation blueprints, etc.
+ * A class of graph printers dedicated to viewport in levels, materials, animation blueprints, etc.
  */
 UCLASS()
-class PREVIEWVIEWPORTPRINTER_API UPreviewViewportPrinter : public UWidgetPrinter
+class VIEWPORTPRINTER_API UViewportPrinter : public UWidgetPrinter
 {
 	GENERATED_BODY()
 
 public:
 	// The priority of this widget printer.
-	static constexpr int32 PreviewViewportPrinterPriority = 150;
+	static constexpr int32 ViewportPrinterPriority = 150;
 
 public:
 	// UWidgetPrinter interface.

@@ -1,16 +1,12 @@
 // Copyright 2020-2024 Naotsun. All Rights Reserved.
 
 #include "MaterialGraphPrinter/WidgetPrinters/InnerMaterialGraphPrinter.h"
-#include "PreviewViewportPrinter/WidgetPrinters/PreviewViewportPrinter.h"
+#include "ViewportPrinter/WidgetPrinters/ViewportPrinter.h"
 #include "MaterialGraph/MaterialGraph.h"
 #include "SGraphEditorImpl.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Images/SImage.h"
-#include "Toolkits/SStandaloneAssetEditorToolkitHost.h"
-#if !UE_5_00_OR_LATER
-#include "MaterialGraph/MaterialGraphNode_Root.h"
-#endif
 
 namespace GraphPrinter
 {
@@ -52,7 +48,7 @@ namespace GraphPrinter
 		ToRenderTarget->PrintScope = UPrintWidgetOptions::EPrintScope::All;
 		ToRenderTarget->ExportMethod = UPrintWidgetOptions::EExportMethod::RenderTarget;
 		ToRenderTarget->SearchTarget = FWidgetPrinterUtils::FindNearestParentStandaloneAssetEditorToolkitHost(Widget);;
-		const UWidgetPrinter::FRenderingResult RenderingResult = GetRenderingResult<UPreviewViewportPrinter>(ToRenderTarget);
+		const UWidgetPrinter::FRenderingResult RenderingResult = GetRenderingResult<UViewportPrinter>(ToRenderTarget);
 		if (!RenderingResult.IsValid())
 		{
 			return nullptr;
@@ -138,28 +134,21 @@ namespace GraphPrinter
 			return false;
 		}
 
-		const UMaterial* Material = 
-#if UE_5_00_OR_LATER
-			MaterialGraph->Material.Get();
-#else
-			MaterialGraph->Material;
-#endif
-		if (!IsValid(Material))
+		FString MaterialName;
+		if (const UMaterialFunction* MaterialFunction = MaterialGraph->MaterialFunction)
+		{
+			MaterialName = MaterialFunction->GetName();
+		}
+		else if (const UMaterial* Material = MaterialGraph->Material)
+		{
+			MaterialName = Material->GetName();
+		}
+		else
 		{
 			return false;
 		}
-		
-		FString GraphName = TEXT("MaterialGraph");
-#if UE_5_00_OR_LATER
-		if (MaterialGraph->RootNode)
-#else
-		if (IsValid(MaterialGraph->RootNode))
-#endif
-		{
-			GraphName = MaterialGraph->GetName();
-		}
 				
-		Title = FString::Printf(TEXT("%s-%s"), *Material->GetName(), *GraphName);
+		Title = FString::Printf(TEXT("MaterialGraph-%s"), *MaterialName);
 		return true;
 	}
 }

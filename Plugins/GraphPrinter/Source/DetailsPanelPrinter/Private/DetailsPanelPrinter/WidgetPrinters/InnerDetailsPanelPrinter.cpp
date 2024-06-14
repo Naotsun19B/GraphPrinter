@@ -183,7 +183,7 @@ namespace GraphPrinter
 			}
 		}
 							
-		return FString::Printf(TEXT("%s-Details"), *EditingObjectName);
+		return FString::Printf(TEXT("Details-%s"), *EditingObjectName);
 	}
 
 	FActorDetailsPanelPrinter::FActorDetailsPanelPrinter(UPrintWidgetOptions* InPrintOptions, const FSimpleDelegate& InOnPrinterProcessingFinished)
@@ -274,7 +274,7 @@ namespace GraphPrinter
 			EditingActorName = SelectedActor->GetActorLabel();
 		}
 		
-		return FString::Printf(TEXT("%s-Details"), *EditingActorName);
+		return FString::Printf(TEXT("ActorDetails-%s"), *EditingActorName);
 	}
 }
 
