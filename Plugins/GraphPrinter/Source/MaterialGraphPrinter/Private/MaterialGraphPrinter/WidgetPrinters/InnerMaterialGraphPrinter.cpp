@@ -3,6 +3,7 @@
 #include "MaterialGraphPrinter/WidgetPrinters/InnerMaterialGraphPrinter.h"
 #include "ViewportPrinter/WidgetPrinters/ViewportPrinter.h"
 #include "MaterialGraph/MaterialGraph.h"
+#include "Materials/MaterialFunction.h"
 #include "SGraphEditorImpl.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Layout/SBox.h"
