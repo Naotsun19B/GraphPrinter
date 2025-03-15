@@ -497,7 +497,8 @@ namespace TextChunkHelper
 		FPngTextChunk* Context = static_cast<FPngTextChunk*>(png_get_io_ptr(PngPtr));
 		if (Context == nullptr)
 		{
-			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunk, UserReadCompressed));
+			const FString FunctionName = GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunk, UserReadCompressed);
+			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), *FunctionName);
 		}
 
 		if (Context->ReadOffset + static_cast<int64>(Length) <= Context->CompressedData.Num())
@@ -516,7 +517,8 @@ namespace TextChunkHelper
 		FPngTextChunk* Context = static_cast<FPngTextChunk*>(png_get_io_ptr(PngPtr));
 		if (Context == nullptr)
 		{
-			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunk, UserWriteCompressed));
+			const FString FunctionName = GET_FUNCTION_NAME_STRING_CHECKED(FPngTextChunk, UserWriteCompressed);
+			UE_LOG(LogGraphPrinter, Fatal, TEXT("[%s] Context is invalid."), *FunctionName);
 		}
 
 		const int64 Offset = Context->CompressedData.AddUninitialized(Length);
@@ -529,12 +531,14 @@ namespace TextChunkHelper
 
 	void FPngTextChunk::UserError(png_structp PngPtr, png_const_charp ErrorMessage)
 	{
-		UE_LOG(LogGraphPrinter, Error, TEXT("libpng Error : %s"), ANSI_TO_TCHAR(ErrorMessage));
+		const FString ErrorMessageString = ANSI_TO_TCHAR(ErrorMessage);
+		UE_LOG(LogGraphPrinter, Error, TEXT("libpng Error : %s"), *ErrorMessageString);
 	}
 
 	void FPngTextChunk::UserWarning(png_structp PngPtr, png_const_charp WarningMessage)
 	{
-		UE_LOG(LogGraphPrinter, Warning, TEXT("libpng Warning : %s"), ANSI_TO_TCHAR(WarningMessage));
+		const FString WarningMessageString = ANSI_TO_TCHAR(WarningMessage);
+		UE_LOG(LogGraphPrinter, Warning, TEXT("libpng Warning : %s"), *WarningMessageString);
 	}
 
 	void* FPngTextChunk::UserMalloc(png_structp PngPtr, png_size_t Size)

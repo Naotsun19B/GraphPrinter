@@ -2,7 +2,6 @@
 
 #include "ReferenceViewerPrinter/WidgetPrinters/ReferenceViewerPrinter.h"
 #include "ReferenceViewerPrinter/WidgetPrinters/InnerReferenceViewerPrinter.h"
-#include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
 #if UE_5_01_OR_LATER

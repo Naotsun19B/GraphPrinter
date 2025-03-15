@@ -123,7 +123,11 @@ namespace GraphPrinter
 
 		if (!SelectedWidgetIdentifier.IsValid() || !RegisteredWidgets.ContainsByPredicate(EqualsByIdentifier))
 		{
+#if UE_5_00_OR_LATER
 			if (!RegisteredWidgets.IsEmpty())
+#else
+			if (RegisteredWidgets.Num() > 0)
+#endif
 			{
 				SelectedWidgetIdentifier = RegisteredWidgets[0].GetIdentifier();
 			}

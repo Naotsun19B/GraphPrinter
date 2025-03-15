@@ -45,7 +45,11 @@ namespace GraphPrinter
 		}
 		
 		const TArray<FAssetIdentifier>& Assets = ReferenceViewerGraph->GetCurrentGraphRootIdentifiers();
+#if UE_5_00_OR_LATER
 		if (Assets.IsEmpty())
+#else
+		if (Assets.Num() == 0)
+#endif
 		{
 			return false;
 		}
