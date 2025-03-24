@@ -15,17 +15,15 @@
 
 UWidgetPrinter::UWidgetPrinter()
 {
-	if (!IsTemplate())
-	{
-		// Temporarily excludes the instance from garbage collection to prevent the instance from being destroyed during printer processing.
-		AddToRoot();
-	}
 }
 
 void UWidgetPrinter::PrintWidget(UPrintWidgetOptions* Options)
 {
 	check(IsValid(Options));
 	CachedPrintOptions = Options;
+
+	// Temporarily excludes the instance from garbage collection to prevent the instance from being destroyed during printer processing.
+	AddToRoot();
 
 	InnerPrinter = CreatePrintModeInnerPrinter(
 		FSimpleDelegate::CreateUObject(this, &UWidgetPrinter::CleanupPrinter)
