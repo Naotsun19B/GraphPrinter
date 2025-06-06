@@ -15,13 +15,6 @@ UGraphPrinterEditorExtensionSettings::UGraphPrinterEditorExtensionSettings()
 {
 }
 
-const UGraphPrinterEditorExtensionSettings& UGraphPrinterEditorExtensionSettings::Get()
-{
-	const auto* Settings = GetDefault<UGraphPrinterEditorExtensionSettings>();
-	check(IsValid(Settings));
-	return *Settings;
-}
-
 bool UGraphPrinterEditorExtensionSettings::CanEditChange(const FProperty* InProperty) const
 {
 	bool bCanEditChange = true;
@@ -38,7 +31,7 @@ bool UGraphPrinterEditorExtensionSettings::CanEditChange(const FProperty* InProp
 	return (Super::CanEditChange(InProperty) && bCanEditChange);
 }
 
-UGraphPrinterSettings::FSettingsInfo UGraphPrinterEditorExtensionSettings::GetSettingsInfo() const
+FString UGraphPrinterEditorExtensionSettings::GetSettingsName() const
 {
-	return FSettingsInfo(TEXT("EditorExtension"));
+	return TEXT("EditorExtension");
 }

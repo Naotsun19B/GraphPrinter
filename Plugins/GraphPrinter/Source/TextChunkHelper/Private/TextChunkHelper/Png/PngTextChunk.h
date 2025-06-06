@@ -4,15 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "TextChunkHelper/ITextChunk.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 
 #if WITH_UNREALPNG
 
 THIRD_PARTY_INCLUDES_START
 // Make sure no other versions of libpng headers are picked up.
 #if WITH_LIBPNG_1_6
+#if UE_5_06_OR_LATER
+#include "ThirdParty/libPNG/libPNG-1.6.44/png.h"
+#include "ThirdParty/libPNG/libPNG-1.6.44/pngstruct.h"
+#include "ThirdParty/libPNG/libPNG-1.6.44/pnginfo.h"
+#else
 #include "ThirdParty/libPNG/libPNG-1.6.37/png.h"
 #include "ThirdParty/libPNG/libPNG-1.6.37/pngstruct.h"
 #include "ThirdParty/libPNG/libPNG-1.6.37/pnginfo.h"
+#endif
 #else
 #include "ThirdParty/libPNG/libPNG-1.5.2/png.h"
 #endif

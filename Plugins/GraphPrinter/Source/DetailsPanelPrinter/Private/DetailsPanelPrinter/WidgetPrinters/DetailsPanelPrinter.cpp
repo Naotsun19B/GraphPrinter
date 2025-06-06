@@ -49,7 +49,7 @@ UPrintWidgetOptions* UDetailsPanelPrinter::CreateDefaultPrintOptions(
 	{
 		if (auto* PrintGraphOptions = PrintWidgetOptions->Duplicate<UPrintDetailsPanelOptions>())
 		{
-			auto& Settings = UDetailsPanelPrinterSettings::Get();
+			const auto& Settings = GraphPrinter::GetSettings<UDetailsPanelPrinterSettings>();
 
 			PrintGraphOptions->Padding = Settings.Padding;
 			PrintGraphOptions->bIsIncludeExpansionStateInImageFile = Settings.bIsIncludeExpansionStateInImageFile;
@@ -67,7 +67,7 @@ URestoreWidgetOptions* UDetailsPanelPrinter::CreateDefaultRestoreOptions() const
 	{
 		if (auto* RestoreDetailsPanelOptions = RestoreWidgetOptions->Duplicate<URestoreDetailsPanelOptions>())
 		{
-			auto& Settings = UDetailsPanelPrinterSettings::Get();
+			const auto& Settings = GraphPrinter::GetSettings<UDetailsPanelPrinterSettings>();
 			
 			RestoreDetailsPanelOptions->bWhetherToAlsoRestoreExpandedStates = Settings.bWhetherToAlsoRestoreExpandedStates;
 

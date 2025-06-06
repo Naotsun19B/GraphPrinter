@@ -27,10 +27,7 @@ public:
 	// Constructor.
 	UGenericGraphPrinterSettings();
 
-	// Returns reference of this settings.
-	static const UGenericGraphPrinterSettings& Get();
-
 	// UGraphPrinterSettings interface.
-	virtual FSettingsInfo GetSettingsInfo() const override;
+	virtual FString GetSettingsName() const override;
 	// End of UGraphPrinterSettings interface.
 };

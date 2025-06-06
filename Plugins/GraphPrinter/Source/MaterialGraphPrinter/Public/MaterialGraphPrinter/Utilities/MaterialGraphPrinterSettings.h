@@ -23,11 +23,8 @@ public:
 public:
 	// Constructor.
 	UMaterialGraphPrinterSettings();
-
-	// Returns reference of this settings.
-	static const UMaterialGraphPrinterSettings& Get();
 	
 	// UGraphPrinterSettings interface.
-	virtual FSettingsInfo GetSettingsInfo() const override;
+	virtual FString GetSettingsName() const override;
 	// End of UGraphPrinterSettings interface.
 };

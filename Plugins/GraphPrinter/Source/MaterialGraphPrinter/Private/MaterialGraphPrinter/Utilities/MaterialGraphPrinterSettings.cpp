@@ -12,14 +12,7 @@ UMaterialGraphPrinterSettings::UMaterialGraphPrinterSettings()
 {
 }
 
-const UMaterialGraphPrinterSettings& UMaterialGraphPrinterSettings::Get()
+FString UMaterialGraphPrinterSettings::GetSettingsName() const
 {
-	const auto* Settings = GetDefault<UMaterialGraphPrinterSettings>();
-	check(IsValid(Settings));
-	return *Settings;
-}
-
-UGraphPrinterSettings::FSettingsInfo UMaterialGraphPrinterSettings::GetSettingsInfo() const
-{
-	return FSettingsInfo(TEXT("MaterialGraphPrinter"));
+	return TEXT("MaterialGraphPrinter");
 }

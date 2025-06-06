@@ -38,14 +38,11 @@ public:
 	// Constructor.
 	UGraphPrinterRemoteControlSettings();
 
-	// Returns reference of this settings.
-	static const UGraphPrinterRemoteControlSettings& Get();
-
 	// UObject interface.
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	// End of UObject interface.
 	
 	// UGraphPrinterSettings interface.
-	virtual FSettingsInfo GetSettingsInfo() const override;
+	virtual FString GetSettingsName() const override;
 	// End of UGraphPrinterSettings interface.
 };

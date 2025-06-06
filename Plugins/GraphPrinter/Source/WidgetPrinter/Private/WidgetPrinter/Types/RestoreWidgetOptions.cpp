@@ -14,10 +14,11 @@
 
 URestoreWidgetOptions::URestoreWidgetOptions()
 	: DialogTitle(TEXT("Select the png file that contains the widget info"))
-	, DefaultPath(UWidgetPrinterSettings::Get().OutputDirectory.Path)
 	, DefaultFile(TEXT(""))
 	, SearchTarget(nullptr)
 {
+	const auto& Settings = GraphPrinter::GetSettings<UWidgetPrinterSettings>();
+	DefaultPath = Settings.OutputDirectory.Path;
 	SetFileTypesFromImageFormat(EDesiredImageFormat::PNG);
 }
 

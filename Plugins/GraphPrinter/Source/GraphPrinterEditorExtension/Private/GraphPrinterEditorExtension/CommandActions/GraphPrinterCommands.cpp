@@ -52,12 +52,19 @@ namespace GraphPrinter
 
 	bool FGraphPrinterCommands::IsBound()
 	{
+#if UE_5_06_OR_LATER
+		const TWeakPtr<FGraphPrinterCommands>& Instance = GetInstance();
+#endif
 		check(Instance.IsValid());
 		return Instance.Pin()->bIsBound;
+
 	}
 
 	void FGraphPrinterCommands::Bind()
 	{
+#if UE_5_06_OR_LATER
+		const TWeakPtr<FGraphPrinterCommands>& Instance = GetInstance();
+#endif
 		check(Instance.Pin().IsValid());
 		Instance.Pin()->BindCommands();
 	}
@@ -68,7 +75,10 @@ namespace GraphPrinter
 		{
 			return;
 		}
-		
+
+#if UE_5_06_OR_LATER
+		const TWeakPtr<FGraphPrinterCommands>& Instance = GetInstance();
+#endif
 		const TSharedPtr<FGraphPrinterCommands> This = Instance.Pin();
 		check(This.IsValid());
 
@@ -81,8 +91,8 @@ namespace GraphPrinter
 			);
 
 			auto& SupportedWidgetRegistry = ISupportedWidgetRegistry::Get();
-			
-			if (UGraphPrinterEditorExtensionSettings::Get().bCollectTargetWidgetsAutomatically)
+			const auto& Settings = GetSettings<UGraphPrinterEditorExtensionSettings>();
+			if (Settings.bCollectTargetWidgetsAutomatically)
 			{
 				SupportedWidgetRegistry.CollectSupportedWidget();
 			}
@@ -306,16 +316,21 @@ namespace GraphPrinter
 
 		FToolMenuSection& SettingsSection = ToolMenu->AddSection(TEXT("Settings"));
 		
-		const TArray<UGraphPrinterSettings::FSettingsInfo>& AllSettings = UGraphPrinterSettings::GetAllSettings();
-		for (const auto& Setting : AllSettings)
+		const TArray<UGraphPrinterSettings*>& AllSettings = UGraphPrinterSettings::GetAllSettings();
+		for (const auto* Setting : AllSettings)
 		{
+			if (!IsValid(Setting))
+			{
+				continue;
+			}
+			
 			SettingsSection.AddMenuEntry(
-				Setting.SectionName,
-				Setting.DisplayName,
-				Setting.Description,
+				Setting->GetSectionName(),
+				Setting->GetDisplayName(),
+				Setting->GetTooltipText(),
 				FSlateIcon(),
 				FUIAction(
-					FExecuteAction::CreateStatic(&UGraphPrinterSettings::OpenSettings, Setting.SectionName)
+					FExecuteAction::CreateStatic(&UGraphPrinterSettings::OpenSettings, Setting->GetSectionName())
 				)
 			);
 		}

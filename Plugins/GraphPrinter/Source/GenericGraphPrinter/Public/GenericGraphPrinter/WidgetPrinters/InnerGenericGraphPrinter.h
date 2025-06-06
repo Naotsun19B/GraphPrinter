@@ -7,6 +7,7 @@
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "GenericGraphPrinter/Utilities/GenericGraphPrinterUtils.h"
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "SGraphEditorImpl.h"
 #include "EdGraphUtilities.h"
 #include "Widgets/Text/STextBlock.h"
@@ -312,7 +313,11 @@ namespace GraphPrinter
 		
 	protected:
 		// Calculates the range and view location to use when drawing the graph editor.
+#if UE_5_06_OR_LATER
+		virtual bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2f& ViewLocation)
+#else
 		virtual bool CalculateGraphDrawSizeAndViewLocation(FVector2D& DrawSize, FVector2D& ViewLocation)
+#endif
 		{
 			const TSet<UObject*>& SelectedNodes = Widget->GetSelectedNodes();
 			if (SelectedNodes.Num() == 0)
@@ -335,16 +340,24 @@ namespace GraphPrinter
 		// A group of parameters that must be retained for processing.
 		struct FGenericGraphPrinterParams
 		{
-			// In order to operate the camera position and zoom magnification for drawing, keep the previous state and restore it.
+			// To operate the camera position and zoom magnification for drawing, keep the previous state and restore it.
 			FGraphPanelSelectionSet PreviousSelectedNodes;
+#if UE_5_06_OR_LATER
+			FVector2f PreviousViewLocation;
+#else
 			FVector2D PreviousViewLocation;
+#endif
 			float PreviousZoomAmount;
 
 			// The nodes to be drawn.
 			FGraphPanelSelectionSet NodesToPrint;
 			
 			// The size of the image to output.
+#if UE_5_06_OR_LATER
+			FVector2f ViewLocation;
+#else
 			FVector2D ViewLocation;
+#endif
 
 			// The minimap widget for graph editors added by the GraphMinimap plugin.
 			TSharedPtr<SWidget> Minimap;

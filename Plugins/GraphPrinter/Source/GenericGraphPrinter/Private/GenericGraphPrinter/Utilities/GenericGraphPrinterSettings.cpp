@@ -13,14 +13,7 @@ UGenericGraphPrinterSettings::UGenericGraphPrinterSettings()
 {
 }
 
-const UGenericGraphPrinterSettings& UGenericGraphPrinterSettings::Get()
+FString UGenericGraphPrinterSettings::GetSettingsName() const
 {
-	const auto* Settings = GetDefault<UGenericGraphPrinterSettings>();
-	check(IsValid(Settings));
-	return *Settings;
-}
-
-UGraphPrinterSettings::FSettingsInfo UGenericGraphPrinterSettings::GetSettingsInfo() const
-{
-	return FSettingsInfo(TEXT("GenericGraphPrinter"));
+	return TEXT("GenericGraphPrinter");
 }

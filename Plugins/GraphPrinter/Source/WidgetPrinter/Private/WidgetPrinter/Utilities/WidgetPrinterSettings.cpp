@@ -40,13 +40,6 @@ UWidgetPrinterSettings::UWidgetPrinterSettings()
 	);
 }
 
-const UWidgetPrinterSettings& UWidgetPrinterSettings::Get()
-{
-	const auto* Settings = GetDefault<UWidgetPrinterSettings>();
-	check(IsValid(Settings));
-	return *Settings;
-}
-
 void UWidgetPrinterSettings::PostInitProperties()
 {
 	Super::PostInitProperties();
@@ -113,9 +106,9 @@ bool UWidgetPrinterSettings::CanEditChange(const UProperty* InProperty) const
 	return Super::CanEditChange(InProperty);
 }
 
-UGraphPrinterSettings::FSettingsInfo UWidgetPrinterSettings::GetSettingsInfo() const
+FString UWidgetPrinterSettings::GetSettingsName() const
 {
-	return FSettingsInfo(TEXT("WidgetPrinter"));
+	return TEXT("WidgetPrinter");
 }
 
 void UWidgetPrinterSettings::ModifyFormat()

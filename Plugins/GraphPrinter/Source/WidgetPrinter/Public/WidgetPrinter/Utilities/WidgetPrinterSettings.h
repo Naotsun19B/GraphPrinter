@@ -70,9 +70,6 @@ public:
 	// Constructor.
 	UWidgetPrinterSettings();
 	
-	// Returns reference of this settings.
-	static const UWidgetPrinterSettings& Get();
-	
 	// UObject interface.
 	virtual void PostInitProperties() override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -84,7 +81,7 @@ public:
 	// End of UObject interface.
 
 	// UGraphPrinterSettings interface.
-	virtual FSettingsInfo GetSettingsInfo() const override;
+	virtual FString GetSettingsName() const override;
 	// End of UGraphPrinterSettings interface.
 
 protected:

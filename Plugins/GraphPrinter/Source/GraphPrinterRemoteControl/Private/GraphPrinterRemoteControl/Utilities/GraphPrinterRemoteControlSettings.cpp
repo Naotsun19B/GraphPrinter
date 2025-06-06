@@ -16,13 +16,6 @@ UGraphPrinterRemoteControlSettings::UGraphPrinterRemoteControlSettings()
 {
 }
 
-const UGraphPrinterRemoteControlSettings& UGraphPrinterRemoteControlSettings::Get()
-{
-	const auto* Settings = GetDefault<UGraphPrinterRemoteControlSettings>();
-	check(IsValid(Settings));
-	return *Settings;
-}
-
 void UGraphPrinterRemoteControlSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -45,7 +38,7 @@ void UGraphPrinterRemoteControlSettings::PostEditChangeProperty(FPropertyChanged
 	}
 }
 
-UGraphPrinterSettings::FSettingsInfo UGraphPrinterRemoteControlSettings::GetSettingsInfo() const
+FString UGraphPrinterRemoteControlSettings::GetSettingsName() const
 {
-	return FSettingsInfo(TEXT("RemoteControl"));
+	return TEXT("RemoteControl");
 }

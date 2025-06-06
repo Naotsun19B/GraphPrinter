@@ -18,7 +18,8 @@ namespace GraphPrinter
 		// FAutoToolMenuExtender interface.
 		virtual void ExtendToolMenu() override
 		{
-			if (!UGraphPrinterEditorExtensionSettings::Get().bShowSubMenuInToolMenu)
+			const auto& Settings = GetSettings<UGraphPrinterEditorExtensionSettings>();
+			if (!Settings.bShowSubMenuInToolMenu)
 			{
 				return;
 			}

@@ -26,8 +26,6 @@ namespace GraphPrinter
 
 	void FGraphPrinterGlobalsModule::ShutdownModule()
 	{
-		// Unregisters settings.
-		UGraphPrinterSettings::Unregister();
 	}
 }
 

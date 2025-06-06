@@ -21,13 +21,6 @@ UDetailsPanelPrinterSettings::UDetailsPanelPrinterSettings()
 #endif
 }
 
-const UDetailsPanelPrinterSettings& UDetailsPanelPrinterSettings::Get()
-{
-	const auto* Settings = GetDefault<UDetailsPanelPrinterSettings>();
-	check(IsValid(Settings));
-	return *Settings;
-}
-
 bool UDetailsPanelPrinterSettings::CanEditChange(const FProperty* InProperty) const
 {
 	bool bCanEditChange = true;
@@ -36,7 +29,8 @@ bool UDetailsPanelPrinterSettings::CanEditChange(const FProperty* InProperty) co
 		if ((InProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UDetailsPanelPrinterSettings, bIsIncludeExpansionStateInImageFile)) ||
 			(InProperty->GetFName() == GET_MEMBER_NAME_CHECKED(UDetailsPanelPrinterSettings, bWhetherToAlsoRestoreExpandedStates)))
 		{
-			if (!UWidgetPrinterSettings::Get().bIsIncludeWidgetInfoInImageFile)
+			const auto& Settings = GraphPrinter::GetSettings<UWidgetPrinterSettings>();
+			if (!Settings.bIsIncludeWidgetInfoInImageFile)
 			{
 				bCanEditChange = false;
 			}
@@ -46,7 +40,7 @@ bool UDetailsPanelPrinterSettings::CanEditChange(const FProperty* InProperty) co
 	return (Super::CanEditChange(InProperty) && bCanEditChange);
 }
 
-UGraphPrinterSettings::FSettingsInfo UDetailsPanelPrinterSettings::GetSettingsInfo() const
+FString UDetailsPanelPrinterSettings::GetSettingsName() const
 {
-	return FSettingsInfo(TEXT("DetailsPanelPrinter"));
+	return TEXT("DetailsPanelPrinter");
 }

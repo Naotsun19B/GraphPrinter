@@ -2,8 +2,11 @@
 
 #include "GraphPrinterGlobals/Utilities/GraphPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#include "ISettingsModule.h"
 #include "Modules/ModuleManager.h"
+#include "ISettingsModule.h"
+#include "ISettingsContainer.h"
+#include "ISettingsCategory.h"
+#include "ISettingsSection.h"
 #include "Misc/CoreDelegates.h"
 #include "UObject/UObjectIterator.h"
 
@@ -27,58 +30,31 @@ namespace GraphPrinter
 	}
 }
 
-UGraphPrinterSettings::FSettingsInfo::FSettingsInfo(const FName& InSectionName)
-	: SectionName(InSectionName)
+void UGraphPrinterSettings::Register()
 {
-	DisplayName = FText::FromString(FName::NameToDisplayString(SectionName.ToString(), false));
+	FCoreDelegates::OnPostEngineInit.AddStatic(&UGraphPrinterSettings::HandleOnPostEngineInit);
+	FCoreDelegates::OnEnginePreExit.AddStatic(&UGraphPrinterSettings::HandleOnEnginePreExit);
 }
 
-UGraphPrinterSettings::FSettingsInfo::FSettingsInfo(
-	const FName& InSectionName,
-	const FText& InDisplayName,
-	const FText& InDescription
-)
-	: SectionName(InSectionName)
-	, DisplayName(InDisplayName)
-	, Description(InDescription)
+FName UGraphPrinterSettings::GetSectionName() const
 {
+	return *(GraphPrinter::Global::PluginName.ToString() + GetSettingsName());
 }
 
-FText UGraphPrinterSettings::FSettingsInfo::GetFormattedDisplayName() const
+FText UGraphPrinterSettings::GetDisplayName() const
 {
 	return FText::Format(
 		LOCTEXT("DisplayNameFormat", "{0} - {1}"),
 		FText::FromString(FName::NameToDisplayString(GraphPrinter::Global::PluginName.ToString(), false)),
-		DisplayName
+		FText::FromString(GetSettingsName())
 	);
 }
 
-void UGraphPrinterSettings::Register()
+FText UGraphPrinterSettings::GetTooltipText() const
 {
-	FCoreDelegates::OnPostEngineInit.AddStatic(&UGraphPrinterSettings::HandleOnPostEngineInit);
-}
-
-void UGraphPrinterSettings::Unregister()
-{
-	ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule();
-	if (SettingsModule == nullptr)
-	{
-		return;
-	}
-
-	for (const auto& Settings : AllSettings)
-	{
-		SettingsModule->UnregisterSettings(
-			GraphPrinter::Settings::ContainerName,
-			GraphPrinter::Settings::CategoryName,
-			Settings.SectionName
-		);
-	}
-}
-
-const TArray<UGraphPrinterSettings::FSettingsInfo>& UGraphPrinterSettings::GetAllSettings()
-{
-	return AllSettings;
+	const UClass* SettingsClass = GetClass();
+	check(IsValid(SettingsClass));
+	return SettingsClass->GetToolTipText();
 }
 
 void UGraphPrinterSettings::OpenSettings(const FName SectionName)
@@ -93,6 +69,11 @@ void UGraphPrinterSettings::OpenSettings(const FName SectionName)
 	}
 }
 
+const TArray<UGraphPrinterSettings*>& UGraphPrinterSettings::GetAllSettings()
+{
+	return AllSettings;
+}
+
 void UGraphPrinterSettings::HandleOnPostEngineInit()
 {
 	ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule();
@@ -101,14 +82,14 @@ void UGraphPrinterSettings::HandleOnPostEngineInit()
 		return;
 	}
 	
-	for (auto* GraphPrinterSettings : TObjectRange<UGraphPrinterSettings>(RF_NoFlags))
+	for (auto* Settings : TObjectRange<UGraphPrinterSettings>(RF_NoFlags))
 	{
-		if (!IsValid(GraphPrinterSettings))
+		if (!IsValid(Settings))
 		{
 			continue;
 		}
 
-		const UClass* SettingsClass = GraphPrinterSettings->GetClass();
+		const UClass* SettingsClass = Settings->GetClass();
 		if (!IsValid(SettingsClass))
 		{
 			continue;
@@ -117,24 +98,53 @@ void UGraphPrinterSettings::HandleOnPostEngineInit()
 		{
 			continue;
 		}
-
-		FSettingsInfo SettingsInfo = GraphPrinterSettings->GetSettingsInfo();
-		if (SettingsInfo.Description.IsEmpty())
+		if (!Settings->IsTemplate())
 		{
-			SettingsInfo.Description = SettingsClass->GetToolTipText();
+			continue;
 		}
 		
 		SettingsModule->RegisterSettings(
 			GraphPrinter::Settings::ContainerName,
 			GraphPrinter::Settings::CategoryName,
-			SettingsInfo.SectionName,
-			SettingsInfo.GetFormattedDisplayName(),
-			SettingsInfo.Description,
-			GraphPrinterSettings
+			Settings->GetSectionName(),
+			Settings->GetDisplayName(),
+			Settings->GetTooltipText(),
+			Settings
 		);
 
-		AllSettings.Add(SettingsInfo);
+		Settings->AddToRoot();
+		AllSettings.Add(Settings);
 	}
 }
 
-TArray<UGraphPrinterSettings::FSettingsInfo> UGraphPrinterSettings::AllSettings;
+void UGraphPrinterSettings::HandleOnEnginePreExit()
+{
+	ISettingsModule* SettingsModule = GraphPrinter::Settings::GetSettingsModule();
+	if (SettingsModule == nullptr)
+	{
+		return;
+	}
+
+	for (auto* Settings : AllSettings)
+	{
+		Settings->PreSaveConfig();
+		
+		const TSharedPtr<ISettingsContainer> Container = SettingsModule->GetContainer(GraphPrinter::Settings::ContainerName);
+		check(Container.IsValid());
+		const TSharedPtr<ISettingsCategory> Category = Container->GetCategory(GraphPrinter::Settings::CategoryName);
+		check(Category.IsValid());
+		const TSharedPtr<ISettingsSection> Section = Category->GetSection(Settings->GetSectionName());
+		check(Section.IsValid());
+		Section->Save();
+		
+		SettingsModule->UnregisterSettings(
+			GraphPrinter::Settings::ContainerName,
+			GraphPrinter::Settings::CategoryName,
+			Settings->GetSectionName()
+		);
+
+		Settings->RemoveFromRoot();
+	}
+}
+
+TArray<UGraphPrinterSettings*> UGraphPrinterSettings::AllSettings;

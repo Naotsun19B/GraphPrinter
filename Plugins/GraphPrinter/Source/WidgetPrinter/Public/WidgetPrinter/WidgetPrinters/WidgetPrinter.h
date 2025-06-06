@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "UObject/Object.h"
 #include "UObject/StrongObjectPtr.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "WidgetPrinter/Types/PrintWidgetOptions.h"
@@ -120,7 +120,7 @@ namespace GraphPrinter
 
 		if (const UClass* Class = TPrinterClass::StaticClass())
 		{
-			if (const auto* WidgetPrinter = Cast<UWidgetPrinter>(Class->ClassDefaultObject))
+			if (const auto* WidgetPrinter = Class->GetDefaultObject<UWidgetPrinter>())
 			{
 				return WidgetPrinter->CreateDefaultPrintOptions(PrintScope, ExportMethod);
 			}
@@ -136,7 +136,7 @@ namespace GraphPrinter
 
 		if (const UClass* Class = TPrinterClass::StaticClass())
 		{
-			if (const auto* WidgetPrinter = Cast<UWidgetPrinter>(Class->ClassDefaultObject))
+			if (const auto* WidgetPrinter = Class->GetDefaultObject<UWidgetPrinter>())
 			{
 				return WidgetPrinter->CreateDefaultRestoreOptions();
 			}

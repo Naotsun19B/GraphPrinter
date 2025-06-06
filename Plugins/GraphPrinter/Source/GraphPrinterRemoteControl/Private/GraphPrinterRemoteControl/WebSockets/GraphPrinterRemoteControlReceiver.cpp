@@ -21,7 +21,7 @@ namespace GraphPrinter
 			Instance.Get(), &FGraphPrinterRemoteControlReceiver::DisconnectFromServer
 		);
 
-		const auto& Settings = UGraphPrinterRemoteControlSettings::Get();
+		const auto& Settings = GetSettings<UGraphPrinterRemoteControlSettings>();
 		if (Settings.bEnableRemoteControl)
 		{
 			Instance->ConnectToServer(Settings.ServerURL);

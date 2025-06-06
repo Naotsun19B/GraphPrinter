@@ -5,6 +5,7 @@
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
+#include "UObject/Package.h"
 #if UE_5_02_OR_LATER
 #include "Engine/TextureDefines.h"
 #endif
@@ -14,6 +15,8 @@
 #endif
 
 UWidgetPrinter::UWidgetPrinter()
+	: CachedPrintOptions(nullptr)
+	, CachedRestoreOptions(nullptr)
 {
 }
 
@@ -73,7 +76,7 @@ int32 UWidgetPrinter::GetPriority(const TSubclassOf<UWidgetPrinter>& Class)
 {
 	if (IsValid(Class))
 	{
-		if (const auto* WidgetPrinter = Cast<UWidgetPrinter>(Class->ClassDefaultObject))
+		if (const auto* WidgetPrinter = Class->GetDefaultObject<UWidgetPrinter>())
 		{
 			return WidgetPrinter->GetPriority();
 		}
@@ -90,7 +93,7 @@ UPrintWidgetOptions* UWidgetPrinter::CreateDefaultPrintOptions(
 	auto* PrintOptions = NewObject<UPrintWidgetOptions>();
 	if (IsValid(PrintOptions))
 	{
-		auto& Settings = UWidgetPrinterSettings::Get();
+		const auto& Settings = GraphPrinter::GetSettings<UWidgetPrinterSettings>();
 
 		PrintOptions->PrintScope = PrintScope;
 		PrintOptions->ExportMethod = ExportMethod;

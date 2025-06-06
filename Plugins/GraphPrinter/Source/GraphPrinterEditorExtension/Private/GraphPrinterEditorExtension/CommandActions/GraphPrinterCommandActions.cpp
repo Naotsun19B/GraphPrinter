@@ -126,13 +126,15 @@ namespace GraphPrinter
 
 	void FGraphPrinterCommandActions::OpenExportDestinationFolder()
 	{
+		const auto& Settings = GraphPrinter::GetSettings<UWidgetPrinterSettings>();
 		FGraphPrinterUtils::OpenFolderWithExplorer(
-			UWidgetPrinterSettings::Get().OutputDirectory.Path
+			Settings.OutputDirectory.Path
 		);
 	}
 
 	bool FGraphPrinterCommandActions::CanOpenExportDestinationFolder()
 	{
-		return FPaths::DirectoryExists(UWidgetPrinterSettings::Get().OutputDirectory.Path);
+		const auto& Settings = GraphPrinter::GetSettings<UWidgetPrinterSettings>();
+		return FPaths::DirectoryExists(Settings.OutputDirectory.Path);
 	}
 }

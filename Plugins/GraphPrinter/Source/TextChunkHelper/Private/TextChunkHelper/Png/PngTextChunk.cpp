@@ -310,7 +310,11 @@ namespace TextChunkHelper
 			if (KeyLength > 0)
 			{
 				auto* const KeyBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(KeyLength));
+#if UE_5_06_OR_LATER
+				TCString<ANSICHAR>::Strncpy(KeyBuffer, Key.Get(), KeyLength);
+#else
 				TCString<ANSICHAR>::Strcpy(KeyBuffer, KeyLength, Key.Get());
+#endif
 				Text.key = KeyBuffer;
 			}
 		
@@ -319,7 +323,11 @@ namespace TextChunkHelper
 			if (ValueLength > 0)
 			{
 				auto* const ValueBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(ValueLength));
+#if UE_5_06_OR_LATER
+				TCString<ANSICHAR>::Strncpy(ValueBuffer, Key.Get(), KeyLength);
+#else
 				TCString<ANSICHAR>::Strcpy(ValueBuffer, ValueLength, Value.Get());
+#endif
 				Text.text = ValueBuffer;
 			}
 

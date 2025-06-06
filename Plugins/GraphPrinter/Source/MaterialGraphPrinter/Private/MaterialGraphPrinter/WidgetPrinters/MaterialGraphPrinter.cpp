@@ -41,7 +41,7 @@ UPrintWidgetOptions* UMaterialGraphPrinter::CreateDefaultPrintOptions(
 	{
 		if (auto* PrintMaterialGraphOptions = PrintWidgetOptions->Duplicate<UPrintMaterialGraphOptions>())
 		{
-			auto& Settings = UMaterialGraphPrinterSettings::Get();
+			const auto& Settings = GraphPrinter::GetSettings<UMaterialGraphPrinterSettings>();
 			
 			PrintMaterialGraphOptions->MaterialGraphExportMethod = Settings.MaterialGraphExportMethod;
 

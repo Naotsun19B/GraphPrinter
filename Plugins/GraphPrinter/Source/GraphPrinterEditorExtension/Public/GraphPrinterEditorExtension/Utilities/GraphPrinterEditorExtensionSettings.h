@@ -34,15 +34,12 @@ public:
 public:
 	// Constructor.
 	UGraphPrinterEditorExtensionSettings();
-
-	// Returns reference of this settings.
-	static const UGraphPrinterEditorExtensionSettings& Get();
 	
 	// UObject interface.
     virtual bool CanEditChange(const FProperty* InProperty) const override;
     // End of UObject interface.
 
 	// UGraphPrinterSettings interface.
-	virtual FSettingsInfo GetSettingsInfo() const override;
+	virtual FString GetSettingsName() const override;
 	// End of UGraphPrinterSettings interface.
 };
