@@ -14,7 +14,6 @@
 #include "SActorDetails.h"
 #include "GameFramework/Actor.h"
 
-#ifdef WITH_DETAILS_PANEL_PRINTER
 namespace GraphPrinter
 {
 #ifdef WITH_TEXT_CHUNK_HELPER
@@ -530,4 +529,3 @@ namespace GraphPrinter
 		static FString GetEditingActorName(const TSharedPtr<SDetailsView>& DetailsPanel);
 	};
 }
-#endif

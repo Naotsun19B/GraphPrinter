@@ -4,71 +4,64 @@
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
+#include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "DetailMultiTopLevelObjectRootNode.h"
 #include "GameFramework/WorldSettings.h"
+#if UE_5_05_OR_LATER
+#include "Misc/DefinePrivateMemberPtr.h"
+#else
+#include "Templates/Identity.h"
+#include "HAL/PreprocessorHelpers.h"
+#endif
 
-#ifdef WITH_DETAILS_PANEL_PRINTER
+#ifndef UE_DEFINE_PRIVATE_MEMBER_PTR
+namespace GraphPrinter
+{
+	namespace Private
+	{
+		template <auto Storage, auto PtrToMember>
+		struct TPrivateAccess
+		{
+			TPrivateAccess()
+			{
+				*Storage = PtrToMember;
+			}
 
-#define HACK_INACCESSIBLE_PROPERTY(PropertyType, ClassType, PropertyName) \
-	namespace PropertyName \
-	{ \
-		namespace Inner \
-		{ \
-			static PropertyType ClassType##::* Pointer; \
-			\
-			template<typename Tag, typename Tag::Type Ptr> \
-			struct THacker \
-			{ \
-				struct FFiller \
-				{ \
-					FFiller() \
-					{ \
-						Pointer = Ptr; \
-					} \
-				}; \
-				static FFiller Filler; \
-			}; \
-			\
-			template<typename Tag, typename Tag::Type Ptr> \
-			typename THacker<Tag, Ptr>::FFiller THacker<Tag, Ptr>::Filler; \
-			\
-			struct FTag \
-			{ \
-				typedef PropertyType ClassType##::*Type; \
-			}; \
-			template struct THacker<FTag, &##ClassType##::##PropertyName##>; \
-		} \
-		\
-		static PropertyType& Extract(ClassType& Class) \
-		{ \
-			return Class.*Inner::Pointer; \
-		} \
+			static TPrivateAccess Instance;
+		};
+
+		template <auto Storage, auto PtrToMember>
+		TPrivateAccess<Storage, PtrToMember> TPrivateAccess<Storage, PtrToMember>::Instance;
 	}
+}
+
+#if !UE_5_01_OR_LATER
+template <typename T>
+using TIdentity_T = typename TIdentity<T>::Type;
+#endif
+
+#define UE_DEFINE_PRIVATE_MEMBER_PTR(Type, Name, Class, Member) \
+	TIdentity_T<PREPROCESSOR_REMOVE_OPTIONAL_PARENS(Type)> PREPROCESSOR_REMOVE_OPTIONAL_PARENS(Class)::* Name; \
+	template struct GraphPrinter::Private::TPrivateAccess<&Name, &PREPROCESSOR_REMOVE_OPTIONAL_PARENS(Class)::Member>
+#endif
 
 namespace GraphPrinter
 {
 	namespace Hack
 	{
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:5103)
-#endif
-		HACK_INACCESSIBLE_PROPERTY(TSharedPtr<SDetailTree>, SDetailsViewBase, DetailTree)
-		HACK_INACCESSIBLE_PROPERTY(FDetailNodeList, SDetailsViewBase, RootTreeNodes)
-		HACK_INACCESSIBLE_PROPERTY(FDetailsObjectSet, FDetailMultiTopLevelObjectRootNode, RootObjectSet)
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+		UE_DEFINE_PRIVATE_MEMBER_PTR(TSharedPtr<SDetailTree>, DetailsViewBaseDetailTreePtr, SDetailsViewBase, DetailTree);
+		UE_DEFINE_PRIVATE_MEMBER_PTR(FDetailNodeList, DetailsViewBaseRootTreeNodesPtr, SDetailsViewBase, RootTreeNodes);
+		UE_DEFINE_PRIVATE_MEMBER_PTR(FDetailsObjectSet, DetailMultiTopLevelObjectRootNodeRootObjectSetPtr, FDetailMultiTopLevelObjectRootNode, RootObjectSet);
 	}
 	
 	TSharedPtr<SDetailTree> FDetailsViewBaseAccessor::ExtractDetailTree(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
 	{
-		return Hack::DetailTree::Extract(DetailsViewBase.Get());
+		return DetailsViewBase.Get().*Hack::DetailsViewBaseDetailTreePtr;
 	}
 	
 	FDetailNodeList& FDetailsViewBaseAccessor::ExtractRootTreeNodes(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
 	{
-		return Hack::RootTreeNodes::Extract(DetailsViewBase.Get());
+		return DetailsViewBase.Get().*Hack::DetailsViewBaseRootTreeNodesPtr;
 	}
 
 	TArray<const UObject*>& FDetailsViewBaseAccessor::ExtractRootObjectSet(const TSharedRef<FDetailTreeNode>& DetailTreeNode)
@@ -76,7 +69,7 @@ namespace GraphPrinter
 		check(DetailTreeNode->GetNodeType() == EDetailNodeType::Object);
 
 		const TSharedRef<FDetailMultiTopLevelObjectRootNode> DetailMultiTopLevelObjectRootNode = StaticCastSharedRef<FDetailMultiTopLevelObjectRootNode>(DetailTreeNode);
-		FDetailsObjectSet& DetailsObjects = Hack::RootObjectSet::Extract(DetailMultiTopLevelObjectRootNode.Get());
+		FDetailsObjectSet& DetailsObjects = DetailMultiTopLevelObjectRootNode.Get().*Hack::DetailMultiTopLevelObjectRootNodeRootObjectSetPtr;
 		return DetailsObjects.RootObjects;
 	}
 	
@@ -279,4 +272,3 @@ namespace GraphPrinter
 }
 
 #undef HACK_INACCESSIBLE_PROPERTY
-#endif

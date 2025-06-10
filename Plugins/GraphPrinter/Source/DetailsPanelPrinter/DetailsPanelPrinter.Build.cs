@@ -57,14 +57,5 @@ public class DetailsPanelPrinter : ModuleRules
                 Path.Combine(EngineDirectory, "Source", "Editor", "LevelEditor", "Private"),
             }
         );
-        
-        // #TODO: Allows the use of details panel printer on Mac/Linux and before UE4.27.
-        if (Target.IsInPlatformGroup(UnrealPlatformGroup.Windows))
-        {
-            if (Target.Version.MajorVersion >= 5)
-            {
-                PublicDefinitions.Add("WITH_DETAILS_PANEL_PRINTER");
-            }
-        }
     }
 }

@@ -8,22 +8,11 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ActorDetailsPanelPrinter)
 #endif
 
-UActorDetailsPanelPrinter::UActorDetailsPanelPrinter()
-{
-#ifndef WITH_DETAILS_PANEL_PRINTER
-	if (UClass* Class = GetClass())
-	{
-		Class->ClassFlags |= CLASS_Abstract;
-	}
-#endif
-}
-
 int32 UActorDetailsPanelPrinter::GetPriority() const
 {
 	return DetailsPanelPrinterPriority + 1;
 }
 
-#ifdef WITH_DETAILS_PANEL_PRINTER
 TOptional<GraphPrinter::FSupportedWidget> UActorDetailsPanelPrinter::CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const
 {
 	const TSharedPtr<SActorDetails> ActorDetailsPanel = GraphPrinter::FActorDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(TestWidget);
@@ -57,4 +46,3 @@ TSharedRef<GraphPrinter::IInnerWidgetPrinter> UActorDetailsPanelPrinter::CreateR
 		OnPrinterProcessingFinished
 	);
 }
-#endif

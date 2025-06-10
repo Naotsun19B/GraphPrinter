@@ -11,22 +11,11 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DetailsPanelPrinter)
 #endif
 
-UDetailsPanelPrinter::UDetailsPanelPrinter()
-{
-#ifndef WITH_DETAILS_PANEL_PRINTER
-	if (UClass* Class = GetClass())
-	{
-		Class->ClassFlags |= CLASS_Abstract;
-	}
-#endif
-}
-
 int32 UDetailsPanelPrinter::GetPriority() const
 {
 	return DetailsPanelPrinterPriority;
 }
 
-#ifdef WITH_DETAILS_PANEL_PRINTER
 TOptional<GraphPrinter::FSupportedWidget> UDetailsPanelPrinter::CheckIfSupported(const TSharedRef<SWidget>& TestWidget) const
 {
 	const TSharedPtr<SDetailsView> DetailsPanel = GraphPrinter::FDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(TestWidget);
@@ -38,7 +27,6 @@ TOptional<GraphPrinter::FSupportedWidget> UDetailsPanelPrinter::CheckIfSupported
 	const FString& EditingObjectName = GraphPrinter::FDetailsPanelPrinter::GetEditingObjectName(DetailsPanel);
 	return GraphPrinter::FSupportedWidget(DetailsPanel.ToSharedRef(), EditingObjectName, GetPriority());
 }
-#endif
 
 UPrintWidgetOptions* UDetailsPanelPrinter::CreateDefaultPrintOptions(
 	const UPrintWidgetOptions::EPrintScope PrintScope,
@@ -78,7 +66,6 @@ URestoreWidgetOptions* UDetailsPanelPrinter::CreateDefaultRestoreOptions() const
 	return nullptr;
 }
 
-#ifdef WITH_DETAILS_PANEL_PRINTER
 TSharedRef<GraphPrinter::IInnerWidgetPrinter> UDetailsPanelPrinter::CreatePrintModeInnerPrinter(const FSimpleDelegate& OnPrinterProcessingFinished) const
 {
 	return MakeShared<GraphPrinter::FDetailsPanelPrinter>(
@@ -94,4 +81,3 @@ TSharedRef<GraphPrinter::IInnerWidgetPrinter> UDetailsPanelPrinter::CreateRestor
 		OnPrinterProcessingFinished
 	);
 }
-#endif
