@@ -3,6 +3,7 @@
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterGlobals/Utilities/EditorNotification.h"
 #ifdef WITH_TEXT_CHUNK_HELPER
 #include "TextChunkHelper/ITextChunkHelper.h"
 #endif
@@ -122,10 +123,7 @@ void UWidgetPrinterSettings::ModifyFormat()
 				LOCTEXT("FormatWarningText", "The specified image format ({Extension}) does not support text chunks."),
 				FText::FromString(GraphPrinter::FGraphPrinterUtils::GetImageFileExtension(Format, false))
 			);
-			GraphPrinter::FGraphPrinterUtils::ShowNotification(
-				Message,
-				GraphPrinter::FGraphPrinterUtils::CS_Fail
-			);
+			GraphPrinter::FEditorNotification::Fail(Message);
 			
 			bool bFoundSupportedImageFormat = false;
 			if (const UEnum* DesiredImageFormatEnum = StaticEnum<EDesiredImageFormat>())

@@ -8,6 +8,7 @@
 #include "WidgetPrinter/Types/OneWayBool.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterGlobals/Utilities/EditorNotification.h"
 #ifdef WITH_CLIPBOARD_IMAGE_EXTENSION
 #include "ClipboardImageExtension/HAL/ClipboardImageExtension.h"
 #endif
@@ -158,10 +159,7 @@ namespace GraphPrinter
 
 			if (!CalculateDrawSize(WidgetPrinterParams.DrawSize))
 			{
-				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("NotSelectedError", "No widget is selected."),
-					FGraphPrinterUtils::CS_Fail
-				);
+				FEditorNotification::Fail(LOCTEXT("NotSelectedError", "No widget is selected."));
 				return;
 			}
 
@@ -187,9 +185,8 @@ namespace GraphPrinter
 					FText::FromString(WidgetPrinterParams.DrawSize.ToString()),
 					FText::FromString(PrintOptions->MaxImageSize.ToString())
 				);
-				FGraphPrinterUtils::ShowNotification(
+				FEditorNotification::Fail(
 					Message,
-					FGraphPrinterUtils::CS_Fail,
 					6.f,
 					TArray<FNotificationInteraction>{
 						FNotificationInteraction(
@@ -208,10 +205,7 @@ namespace GraphPrinter
 
 			if (!WidgetPrinterParams.RenderTarget.IsValid())
 			{
-				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("DrawError", "Failed to draw to render target."),
-					FGraphPrinterUtils::CS_Fail
-				);
+				FEditorNotification::Fail(LOCTEXT("DrawError", "Failed to draw to render target."));
 				return;
 			}
 
@@ -305,9 +299,9 @@ namespace GraphPrinter
 			if (RestoreWidgetFromTextChunk())
 			{
 				const FString Filename = WidgetPrinterParams.Filename;
-				FGraphPrinterUtils::ShowNotification(
+				FEditorNotification::Success(
 					LOCTEXT("SucceededRestore", "Restore widget from"),
-					FGraphPrinterUtils::CS_Success, 5.f,
+					5.f,
 					TArray<FNotificationInteraction>{
 						FNotificationInteraction(
 							FText::FromString(Filename),
@@ -321,10 +315,7 @@ namespace GraphPrinter
 			}
 			else
 			{
-				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("FailedRestoreError", "Failed restore widget."),
-					FGraphPrinterUtils::CS_Fail
-				);
+				FEditorNotification::Fail(LOCTEXT("FailedRestoreError", "Failed restore widget."));
 			}
 #endif
 		}
@@ -424,7 +415,7 @@ namespace GraphPrinter
 			FText ValidatePathErrorText;
 			if (!FPaths::ValidatePath(Filename, &ValidatePathErrorText))
 			{
-				FGraphPrinterUtils::ShowNotification(ValidatePathErrorText, FGraphPrinterUtils::CS_Fail);
+				FEditorNotification::Fail(ValidatePathErrorText);
 				return {};
 			}
 
@@ -488,19 +479,16 @@ namespace GraphPrinter
 		{
 			if (!bIsSucceeded)
 			{
-				FGraphPrinterUtils::ShowNotification(
-					LOCTEXT("FailedOutputError", "Failed capture widget."),
-					FGraphPrinterUtils::CS_Fail
-				);
+				FEditorNotification::Fail(LOCTEXT("FailedOutputError", "Failed capture widget."));
 				return;
 			}
 
 			if (PrintOptions->ExportMethod == UPrintWidgetOptions::EExportMethod::ImageFile)
 			{
 				const FString Filename = WidgetPrinterParams.Filename;
-				FGraphPrinterUtils::ShowNotification(
+				FEditorNotification::Success(
 					LOCTEXT("SucceededOutput", "Capture saved as"),
-					FGraphPrinterUtils::CS_Success, 5.f,
+					5.f,
 					TArray<FNotificationInteraction>{
 						FNotificationInteraction(
 							FText::FromString(Filename),
@@ -520,10 +508,7 @@ namespace GraphPrinter
 				{
 					if (!WriteWidgetInfoToTextChunk())
 					{
-						FGraphPrinterUtils::ShowNotification(
-							LOCTEXT("FailedEmbedWidgetInfoError", "Failed to write widget information to image file."),
-							FGraphPrinterUtils::CS_Fail
-						);
+						FEditorNotification::Fail(LOCTEXT("FailedEmbedWidgetInfoError", "Failed to write widget information to image file."));
 					}
 				}
 #endif
@@ -533,17 +518,11 @@ namespace GraphPrinter
 			{
 				if (CopyImageFileToClipboard())
 				{
-					FGraphPrinterUtils::ShowNotification(
-						LOCTEXT("SucceededClipboardCopy", "Succeeded to copy image to clipboard."),
-						FGraphPrinterUtils::CS_Success
-					);
+					FEditorNotification::Success(LOCTEXT("SucceededClipboardCopy", "Succeeded to copy image to clipboard."));
 				}
 				else
 				{
-					FGraphPrinterUtils::ShowNotification(
-						LOCTEXT("FailedClipboardCopy", "Failed to copy image to clipboard."),
-						FGraphPrinterUtils::CS_Fail
-					);
+					FEditorNotification::Fail(LOCTEXT("FailedClipboardCopy", "Failed to copy image to clipboard."));
 				}
 
 				IFileManager::Get().Delete(*WidgetPrinterParams.Filename, false, true);

@@ -1,9 +1,8 @@
 // Copyright 2020-2025 Naotsun. All Rights Reserved.
 
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterGlobals/Utilities/EditorNotification.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#include "Framework/Notifications/NotificationManager.h"
-#include "Widgets/Notifications/SNotificationList.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Misc/Paths.h"
 #include "HAL/PlatformProcess.h"
@@ -11,94 +10,6 @@
 
 namespace GraphPrinter
 {
-	FNotificationHandle::FNotificationHandle(const TSharedPtr<SNotificationItem>& InNotificationItem)
-		: NotificationItem(InNotificationItem)
-	{
-	}
-
-	void FNotificationHandle::Fadeout()
-	{
-		if (NotificationItem.IsValid())
-		{
-			NotificationItem->Fadeout();
-		}
-	}
-
-	FNotificationInteraction::FNotificationInteraction(
-		const EInteractionType InType,
-		const FText& InText,
-		const FText& InTooltip,
-		const FSimpleDelegate& InCallback
-	)
-		: Type(InType), Text(InText), Tooltip(InTooltip), Callback(InCallback)
-	{
-	}
-	
-	FNotificationInteraction::FNotificationInteraction()
-		: FNotificationInteraction(EInteractionType::Hyperlink, {}, {}, {})
-	{
-	}
-
-	FNotificationInteraction::FNotificationInteraction(const FText& InText, const FSimpleDelegate& InCallback)
-		: FNotificationInteraction(EInteractionType::Hyperlink, InText, {}, InCallback)
-	{
-	}
-
-	FNotificationInteraction::FNotificationInteraction(const FText& InText, const FText& InTooltip, const FSimpleDelegate& InCallback)
-		: FNotificationInteraction(EInteractionType::Button, InText, InTooltip, InCallback)
-	{
-	}
-	
-	constexpr FGraphPrinterUtils::ECompletionState FGraphPrinterUtils::CS_Pending	= SNotificationItem::ECompletionState::CS_Pending;
-	constexpr FGraphPrinterUtils::ECompletionState FGraphPrinterUtils::CS_Success	= SNotificationItem::ECompletionState::CS_Success;
-	constexpr FGraphPrinterUtils::ECompletionState FGraphPrinterUtils::CS_Fail		= SNotificationItem::ECompletionState::CS_Fail;
-	
-	FNotificationHandle FGraphPrinterUtils::ShowNotification(
-		const FText& NotificationText,
-		ECompletionState CompletionState,
-		const float ExpireDuration /* = 4.f */,
-		const TArray<FNotificationInteraction>& Interactions /* = TArray<FNotificationInteraction>() */
-	)
-	{
-		FNotificationInfo NotificationInfo(NotificationText);
-		NotificationInfo.bFireAndForget = (ExpireDuration > 0.f);
-		if (NotificationInfo.bFireAndForget)
-		{
-			NotificationInfo.ExpireDuration = ExpireDuration;
-		}
-		NotificationInfo.bUseLargeFont = true;
-
-		const auto StateEnum = static_cast<SNotificationItem::ECompletionState>(CompletionState);
-
-		for (const auto& Interaction : Interactions)
-		{
-			switch (Interaction.Type)
-			{
-			case FNotificationInteraction::EInteractionType::Hyperlink:
-				{
-					NotificationInfo.HyperlinkText = Interaction.Text;
-					NotificationInfo.Hyperlink = Interaction.Callback;
-					break;
-				}
-			case FNotificationInteraction::EInteractionType::Button:
-				{
-					const FNotificationButtonInfo ButtonInfo(Interaction.Text, Interaction.Tooltip, Interaction.Callback, StateEnum);
-					NotificationInfo.ButtonDetails.Add(ButtonInfo);
-					break;
-				}
-			default: break;
-			}
-		}
-
-		const TSharedPtr<SNotificationItem> NotificationItem = FSlateNotificationManager::Get().AddNotification(NotificationInfo);
-		if (NotificationItem.IsValid())
-		{
-			NotificationItem->SetCompletionState(StateEnum);
-		}
-	
-		return FNotificationHandle(NotificationItem);
-	}
-
 	FString FGraphPrinterUtils::GetImageFileExtension(const EDesiredImageFormat ImageFormat, const bool bWithDot /* = true */)
 	{
 		FString Dot;
@@ -138,7 +49,7 @@ namespace GraphPrinter
 		FText ValidatePathErrorText;
 		if (!FPaths::ValidatePath(FullFilename, &ValidatePathErrorText))
 		{
-			ShowNotification(ValidatePathErrorText, CS_Fail);
+			FEditorNotification::Fail(ValidatePathErrorText);
 			return;
 		}
 

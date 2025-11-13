@@ -2,7 +2,7 @@
 
 #include "DetailsPanelPrinter/Utilities/DetailsPanelPrinterUtils.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
-#include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
+#include "GraphPrinterGlobals/Utilities/EditorNotification.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "Framework/Docking/TabManager.h"
@@ -235,13 +235,12 @@ namespace GraphPrinter
 			
 		if (!bIsMatchesClass)
 		{
-			FGraphPrinterUtils::ShowNotification(
+			FEditorNotification::Fail(
 				FText::Format(
-					LOCTEXT("IleagalClassErrorFormat", "The class of the loaded data ({0}) and the class of the target object ({1}) do not match."),
+					LOCTEXT("InvalidClassErrorFormat", "The class of the loaded data ({0}) and the class of the target object ({1}) do not match."),
 					FText::FromString(ClassName),
 					FText::FromString(ObjectClassName)
 				),
-				FGraphPrinterUtils::CS_Fail,
 				7.f
 			);
 			return 0;
