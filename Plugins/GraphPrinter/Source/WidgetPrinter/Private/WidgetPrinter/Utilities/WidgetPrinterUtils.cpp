@@ -143,7 +143,6 @@ namespace GraphPrinter
 			const TOptional<FSupportedWidget>& SelectedWidget = SupportedWidgetRegistry.GetSelectedWidget();
 			if (SelectedWidget.IsSet() && SelectedWidget->IsValid())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *SelectedWidget->GetWidget()->GetTypeAsString());
 				return SelectedWidget->GetWidget();
 			}
 		}

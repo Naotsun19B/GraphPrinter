@@ -11,6 +11,9 @@ public class DetailsPanelPrinter : ModuleRules
 #if UE_5_2_OR_LATER
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 #endif
+#if !UE_5_0_OR_LATER
+        CppStandard = CppStandardVersion.Cpp17;
+#endif
 		
         PublicDependencyModuleNames.AddRange(
             new string[]

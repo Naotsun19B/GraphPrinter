@@ -21,7 +21,7 @@ namespace GraphPrinter
 	namespace Settings
 	{
 		static const FName ContainerName	= TEXT("Editor");
-		static const FName CategoryName		= TEXT("Plugins");
+		static const FName CategoryName		= Global::PluginName;
 
 		ISettingsModule* GetSettingsModule()
 		{
@@ -36,6 +36,11 @@ void UGraphPrinterSettings::Register()
 	FCoreDelegates::OnEnginePreExit.AddStatic(&UGraphPrinterSettings::HandleOnEnginePreExit);
 }
 
+bool UGraphPrinterSettings::ShouldRegisterToSettingsPanel() const
+{
+	return true;
+}
+
 FName UGraphPrinterSettings::GetSectionName() const
 {
 	return *(GraphPrinter::Global::PluginName.ToString() + GetSettingsName());
@@ -43,11 +48,7 @@ FName UGraphPrinterSettings::GetSectionName() const
 
 FText UGraphPrinterSettings::GetDisplayName() const
 {
-	return FText::Format(
-		LOCTEXT("DisplayNameFormat", "{0} - {1}"),
-		FText::FromString(FName::NameToDisplayString(GraphPrinter::Global::PluginName.ToString(), false)),
-		FText::FromString(GetSettingsName())
-	);
+	return FText::FromString(GetSettingsName());
 }
 
 FText UGraphPrinterSettings::GetTooltipText() const
@@ -102,16 +103,19 @@ void UGraphPrinterSettings::HandleOnPostEngineInit()
 		{
 			continue;
 		}
-		
-		SettingsModule->RegisterSettings(
-			GraphPrinter::Settings::ContainerName,
-			GraphPrinter::Settings::CategoryName,
-			Settings->GetSectionName(),
-			Settings->GetDisplayName(),
-			Settings->GetTooltipText(),
-			Settings
-		);
 
+		if (Settings->ShouldRegisterToSettingsPanel())
+		{
+			SettingsModule->RegisterSettings(
+				GraphPrinter::Settings::ContainerName,
+				GraphPrinter::Settings::CategoryName,
+				Settings->GetSectionName(),
+				Settings->GetDisplayName(),
+				Settings->GetTooltipText(),
+				Settings
+			);
+		}
+		
 		Settings->AddToRoot();
 		AllSettings.Add(Settings);
 	}
@@ -127,24 +131,49 @@ void UGraphPrinterSettings::HandleOnEnginePreExit()
 
 	for (auto* Settings : AllSettings)
 	{
+		if (Settings->ShouldRegisterToSettingsPanel())
+		{
+			SettingsModule->UnregisterSettings(
+				GraphPrinter::Settings::ContainerName,
+				GraphPrinter::Settings::CategoryName,
+				Settings->GetSectionName()
+			);
+		}
+		
 		Settings->PreSaveConfig();
 		
-		const TSharedPtr<ISettingsContainer> Container = SettingsModule->GetContainer(GraphPrinter::Settings::ContainerName);
-		check(Container.IsValid());
-		const TSharedPtr<ISettingsCategory> Category = Container->GetCategory(GraphPrinter::Settings::CategoryName);
-		check(Category.IsValid());
-		const TSharedPtr<ISettingsSection> Section = Category->GetSection(Settings->GetSectionName());
-		check(Section.IsValid());
-		Section->Save();
+		const UClass* SettingsClass = Settings->GetClass();
+		check(IsValid(SettingsClass));
+		if (SettingsClass->HasAnyClassFlags(CLASS_DefaultConfig))
+		{
+#if UE_5_00_OR_LATER
+			Settings->TryUpdateDefaultConfigFile();
+#else
+			Settings->UpdateDefaultConfigFile();
+#endif
+		}
+		else if (SettingsClass->HasAnyClassFlags(CLASS_GlobalUserConfig))
+		{
+			Settings->UpdateGlobalUserConfigFile();
+		}
+		else if (SettingsClass->HasAnyClassFlags(CLASS_ProjectUserConfig))
+		{
+			Settings->UpdateProjectUserConfigFile();
+		}
+		else
+		{
+			const FString& ConfigFilename = GetConfigFilename(Settings);
+#if UE_5_00_OR_LATER
+			Settings->TryUpdateDefaultConfigFile(ConfigFilename);
+#else
+			Settings->UpdateDefaultConfigFile(ConfigFilename);
+#endif
+		}
 		
-		SettingsModule->UnregisterSettings(
-			GraphPrinter::Settings::ContainerName,
-			GraphPrinter::Settings::CategoryName,
-			Settings->GetSectionName()
-		);
-
 		Settings->RemoveFromRoot();
 	}
 }
 
 TArray<UGraphPrinterSettings*> UGraphPrinterSettings::AllSettings;
+
+#undef LOCTEXT_NAMESPACE

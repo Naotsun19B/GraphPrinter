@@ -188,8 +188,8 @@ namespace GraphPrinter
 				FEditorNotification::Fail(
 					Message,
 					6.f,
-					TArray<FNotificationInteraction>{
-						FNotificationInteraction(
+					TArray<FEditorNotificationInteraction>{
+						FEditorNotificationInteraction(
 							LOCTEXT("OpenSettingsNavigation", "Jump to the editor preferences."),
 							FSimpleDelegate::CreateLambda(
 								[]()
@@ -302,8 +302,8 @@ namespace GraphPrinter
 				FEditorNotification::Success(
 					LOCTEXT("SucceededRestore", "Restore widget from"),
 					5.f,
-					TArray<FNotificationInteraction>{
-						FNotificationInteraction(
+					TArray<FEditorNotificationInteraction>{
+						FEditorNotificationInteraction(
 							FText::FromString(Filename),
 							FSimpleDelegate::CreateLambda([Filename]()
 							{
@@ -489,8 +489,8 @@ namespace GraphPrinter
 				FEditorNotification::Success(
 					LOCTEXT("SucceededOutput", "Capture saved as"),
 					5.f,
-					TArray<FNotificationInteraction>{
-						FNotificationInteraction(
+					TArray<FEditorNotificationInteraction>{
+						FEditorNotificationInteraction(
 							FText::FromString(Filename),
 							FSimpleDelegate::CreateLambda([Filename]()
 							{
