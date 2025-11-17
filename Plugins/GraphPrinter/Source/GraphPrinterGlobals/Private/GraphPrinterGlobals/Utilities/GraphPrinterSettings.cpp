@@ -48,7 +48,7 @@ FName UGraphPrinterSettings::GetSectionName() const
 
 FText UGraphPrinterSettings::GetDisplayName() const
 {
-	return FText::FromString(GetSettingsName());
+	return FText::FromString(FName::NameToDisplayString(*GetSettingsName(), false));
 }
 
 FText UGraphPrinterSettings::GetTooltipText() const
