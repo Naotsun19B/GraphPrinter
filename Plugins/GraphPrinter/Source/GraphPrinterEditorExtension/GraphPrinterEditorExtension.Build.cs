@@ -1,4 +1,4 @@
-// Copyright 2020-2025 Naotsun. All Rights Reserved.
+// Copyright 2020-2026 Naotsun. All Rights Reserved.
 
 using UnrealBuildTool;
 
