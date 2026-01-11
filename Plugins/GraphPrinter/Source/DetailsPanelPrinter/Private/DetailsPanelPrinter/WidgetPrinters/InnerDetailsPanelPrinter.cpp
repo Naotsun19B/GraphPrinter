@@ -45,23 +45,20 @@ using TIdentity_T = typename TIdentity<T>::Type;
 	template struct GraphPrinter::Private::TPrivateAccess<&Name, &PREPROCESSOR_REMOVE_OPTIONAL_PARENS(Class)::Member>
 #endif
 
+UE_DEFINE_PRIVATE_MEMBER_PTR(TSharedPtr<SDetailTree>, GGraphPrinter_Hack_DetailsViewBaseDetailTreePtr, SDetailsViewBase, DetailTree);
+UE_DEFINE_PRIVATE_MEMBER_PTR(FDetailNodeList, GGraphPrinter_Hack_DetailsViewBaseRootTreeNodesPtr, SDetailsViewBase, RootTreeNodes);
+UE_DEFINE_PRIVATE_MEMBER_PTR(FDetailsObjectSet, GGraphPrinter_Hack_DetailMultiTopLevelObjectRootNodeRootObjectSetPtr, FDetailMultiTopLevelObjectRootNode, RootObjectSet);
+
 namespace GraphPrinter
 {
-	namespace Hack
-	{
-		UE_DEFINE_PRIVATE_MEMBER_PTR(TSharedPtr<SDetailTree>, DetailsViewBaseDetailTreePtr, SDetailsViewBase, DetailTree);
-		UE_DEFINE_PRIVATE_MEMBER_PTR(FDetailNodeList, DetailsViewBaseRootTreeNodesPtr, SDetailsViewBase, RootTreeNodes);
-		UE_DEFINE_PRIVATE_MEMBER_PTR(FDetailsObjectSet, DetailMultiTopLevelObjectRootNodeRootObjectSetPtr, FDetailMultiTopLevelObjectRootNode, RootObjectSet);
-	}
-	
 	TSharedPtr<SDetailTree> FDetailsViewBaseAccessor::ExtractDetailTree(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
 	{
-		return DetailsViewBase.Get().*Hack::DetailsViewBaseDetailTreePtr;
+		return DetailsViewBase.Get().*GGraphPrinter_Hack_DetailsViewBaseDetailTreePtr;
 	}
 	
 	FDetailNodeList& FDetailsViewBaseAccessor::ExtractRootTreeNodes(const TSharedRef<SDetailsViewBase>& DetailsViewBase)
 	{
-		return DetailsViewBase.Get().*Hack::DetailsViewBaseRootTreeNodesPtr;
+		return DetailsViewBase.Get().*GGraphPrinter_Hack_DetailsViewBaseRootTreeNodesPtr;
 	}
 
 	TArray<const UObject*>& FDetailsViewBaseAccessor::ExtractRootObjectSet(const TSharedRef<FDetailTreeNode>& DetailTreeNode)
@@ -69,7 +66,7 @@ namespace GraphPrinter
 		check(DetailTreeNode->GetNodeType() == EDetailNodeType::Object);
 
 		const TSharedRef<FDetailMultiTopLevelObjectRootNode> DetailMultiTopLevelObjectRootNode = StaticCastSharedRef<FDetailMultiTopLevelObjectRootNode>(DetailTreeNode);
-		FDetailsObjectSet& DetailsObjects = DetailMultiTopLevelObjectRootNode.Get().*Hack::DetailMultiTopLevelObjectRootNodeRootObjectSetPtr;
+		FDetailsObjectSet& DetailsObjects = DetailMultiTopLevelObjectRootNode.Get().*GGraphPrinter_Hack_DetailMultiTopLevelObjectRootNodeRootObjectSetPtr;
 		return DetailsObjects.RootObjects;
 	}
 	
