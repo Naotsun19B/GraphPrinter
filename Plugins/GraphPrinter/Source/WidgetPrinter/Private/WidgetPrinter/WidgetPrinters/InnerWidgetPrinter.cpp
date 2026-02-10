@@ -26,34 +26,36 @@ namespace GraphPrinter
 			return nullptr;
 		}
 
-		UTextureRenderTarget2D* RenderTarget = FWidgetRenderer::CreateTargetFor(
-			DrawSize,
-			FilteringMode,
-			bUseGamma
-		);
+		// Creates the render target manually instead of using FWidgetRenderer::CreateTargetFor
+		// to ensure bForceLinearGamma is set BEFORE InitCustomFormat creates the GPU resource.
+		// CreateTargetFor creates the resource with bForceLinearGamma=false (via InitCustomFormat)
+		// and then the code changes it to true afterwards, but UpdateResourceImmediate only clears
+		// the existing resource without recreating it with the new format.
+		// This causes the GPU resource to remain in sRGB format while the shader outputs
+		// gamma-corrected values, resulting in double gamma correction (whitish appearance).
+		UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>();
 		if (!IsValid(RenderTarget))
 		{
 			UE_LOG(LogGraphPrinter, Error, TEXT("Failed to generate RenderTarget."));
 			return nullptr;
 		}
-		if (bUseGamma)
-		{
-			RenderTarget->bForceLinearGamma = true;
-			RenderTarget->UpdateResourceImmediate(true);
-		}
+		RenderTarget->Filter = FilteringMode;
+		RenderTarget->ClearColor = FLinearColor::Transparent;
+		RenderTarget->SRGB = bUseGamma;
+		RenderTarget->bForceLinearGamma = bUseGamma;
+		RenderTarget->TargetGamma = 1.f;
+		RenderTarget->InitCustomFormat(DrawSize.X, DrawSize.Y, PF_B8G8R8A8, bUseGamma);
+		RenderTarget->UpdateResourceImmediate(true);
+		FlushRenderingCommands();
 
-		// Since the drawing result may be corrupted the first time, draws multiple times.
-		for (int32 Count = 0; Count < DrawTimes; Count++)
-		{
-			WidgetRenderer->DrawWidget(
-				RenderTarget,
-				Widget,
-				RenderingScale,
-				DrawSize,
-				0.f
-			);
-			FlushRenderingCommands();
-		}
+		WidgetRenderer->DrawWidget(
+			RenderTarget,
+			Widget,
+			RenderingScale,
+			DrawSize,
+			0.f
+		);
+		FlushRenderingCommands();
 
 		BeginCleanup(WidgetRenderer);
 
@@ -70,31 +72,11 @@ namespace GraphPrinter
 		{
 			return;
 		}
-			
+
 		UImageWriteBlueprintLibrary::ExportToDisk(
 			RenderTarget,
 			Filename,
 			ImageWriteOptions
 		);
-
-		// As a symptomatic treatment for the problem that the first image output after startup is whitish,
-		// the first output is re-outputs as many times as NumberOfRedrawsWhenFirstTime.
-		if (IsFirstOutput.GetValue())
-		{
-			for (int32 Count = 0; Count < NumberOfReOutputWhenFirstTime; Count++)
-			{
-				FImageWriteOptions ForceOverwriteAndQuiet = ImageWriteOptions;
-				ForceOverwriteAndQuiet.bOverwriteFile = true;
-				ForceOverwriteAndQuiet.NativeOnComplete = nullptr;
-				UImageWriteBlueprintLibrary::ExportToDisk(
-					RenderTarget,
-					Filename,
-					ForceOverwriteAndQuiet
-				);
-				IsFirstOutput.Switch();
-			}	
-		}
 	}
-
-	FOneWayBool IInnerWidgetPrinter::IsFirstOutput = true;
 }

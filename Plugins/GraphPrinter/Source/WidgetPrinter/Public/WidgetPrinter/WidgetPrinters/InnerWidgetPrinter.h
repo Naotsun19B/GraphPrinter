@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/WidgetPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterSettings.h"
-#include "WidgetPrinter/Types/OneWayBool.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "GraphPrinterGlobals/Utilities/GraphPrinterUtils.h"
 #include "GraphPrinterGlobals/Utilities/EditorNotification.h"
@@ -78,16 +77,6 @@ namespace GraphPrinter
 	protected:
 		// The event when receiving the drawing result without outputting the render target.
 		FOnRendered OnRendered;
-		
-		// The number of attempts to draw the widget on the render target.
-		// The drawing result may be corrupted once.
-		// Probably if draw twice, the drawing result will not be corrupted.
-		static constexpr int32 DrawTimes = 2;
-
-		// The number of times to re-output as a countermeasure against the whitish image
-		// that is output for the first time after starting the engine.
-		static constexpr int32 NumberOfReOutputWhenFirstTime = 2;
-		static FOneWayBool IsFirstOutput;
 	};
 
 	/**
