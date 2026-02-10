@@ -6,6 +6,9 @@
 *.user
 Plugins/Developer/RiderLink/*
 
+# Claude Code
+.claude/
+
 # Visual Studio database file
 *.VC.db
 

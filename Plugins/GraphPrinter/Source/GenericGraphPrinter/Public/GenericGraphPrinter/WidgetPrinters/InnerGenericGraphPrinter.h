@@ -28,6 +28,9 @@ namespace GraphPrinter
 
 			// The beginning of the node information.
 			static const FString NodeInfoHeader = TEXT("Begin Object");
+
+			// The end of the node information.
+			static const FString NodeInfoFooter = TEXT("End Object");
 		}
 	}
 #endif
@@ -256,7 +259,11 @@ namespace GraphPrinter
 			FString TextToImport = MapToRead[GenericGraphPrinter::TextChunkDefine::PngTextChunkKey];
 
 			// Unnecessary characters may be mixed in at the beginning of the text, so inspects and corrects it.
-			FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(TextToImport, GenericGraphPrinter::TextChunkDefine::NodeInfoHeader);
+			FGraphPrinterUtils::TrimStringToKeywordRange(
+				TextToImport, 
+				GenericGraphPrinter::TextChunkDefine::NodeInfoHeader, 
+				GenericGraphPrinter::TextChunkDefine::NodeInfoFooter
+			);
 
 			if (!FEdGraphUtilities::CanImportNodesFromText(Widget->GetCurrentGraph(), TextToImport))
 			{

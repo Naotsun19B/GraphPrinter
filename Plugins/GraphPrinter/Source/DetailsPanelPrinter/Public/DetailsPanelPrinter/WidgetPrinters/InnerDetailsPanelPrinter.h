@@ -28,6 +28,10 @@ namespace GraphPrinter
 			// The beginning of the widget information.
 			static const FString PropertiesInfoHeader = TEXT("Properties");
 			static const FString ExpansionStatesInfoHeader = TEXT("ExpansionStates");
+
+			// The end of the widget information.
+			static const FString PropertiesInfoFooter = TEXT("}");
+			static const FString ExpansionStatesInfoFooter = TEXT(",");
 		}
 	}
 #endif
@@ -278,9 +282,10 @@ namespace GraphPrinter
 				FString PropertiesJsonString = MapToRead[DetailsPanelPrinter::TextChunkDefine::PropertiesChunkKey];
 
 				// Unnecessary characters may be mixed in at the beginning of the text, so inspects and corrects it.
-				FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(
+				FGraphPrinterUtils::TrimStringToKeywordRange(
 					PropertiesJsonString,
-					DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader
+					DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader,
+					DetailsPanelPrinter::TextChunkDefine::PropertiesInfoFooter
 				);
 				const int32 PropertiesInfoHeaderLength = DetailsPanelPrinter::TextChunkDefine::PropertiesInfoHeader.Len();
 				PropertiesJsonString = PropertiesJsonString.Mid(
@@ -307,9 +312,10 @@ namespace GraphPrinter
 				FString ExpansionStatesString = MapToRead[DetailsPanelPrinter::TextChunkDefine::ExpansionStatesChunkKey];
 				
 				// Unnecessary characters may be mixed in at the beginning of the text, so inspect and correct it.
-				FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(
+				FGraphPrinterUtils::TrimStringToKeywordRange(
 					ExpansionStatesString,
-					DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader
+					DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader,
+					DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoFooter
 				);
 				const int32 ExpansionStatesInfoHeaderLength = DetailsPanelPrinter::TextChunkDefine::ExpansionStatesInfoHeader.Len();
 				ExpansionStatesString = ExpansionStatesString.Mid(

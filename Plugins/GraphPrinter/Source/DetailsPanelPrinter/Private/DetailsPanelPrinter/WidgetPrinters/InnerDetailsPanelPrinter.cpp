@@ -87,7 +87,11 @@ namespace GraphPrinter
 	{
 		if (SearchTarget.IsValid())
 		{
-			return FindTargetWidgetFromSearchTarget(SearchTarget);
+			const TSharedPtr<SDetailsView> FoundDetailsView = FindTargetWidgetFromSearchTarget(SearchTarget);
+			if (FoundDetailsView.IsValid())
+			{
+				return FoundDetailsView;
+			}
 		}
 			
 		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
@@ -219,7 +223,11 @@ namespace GraphPrinter
 	{
 		if (SearchTarget.IsValid())
 		{
-			return FindTargetWidgetFromSearchTarget(SearchTarget);
+			const TSharedPtr<SActorDetails> FoundActorDetailsView = FindTargetWidgetFromSearchTarget(SearchTarget);
+			if (FoundActorDetailsView.IsValid())
+			{
+				return FoundActorDetailsView;
+			}
 		}
 			
 		return FDetailsPanelPrinterUtils::GetActiveActorDetailsView();

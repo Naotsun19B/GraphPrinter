@@ -309,10 +309,11 @@ namespace TextChunkHelper
 			const int32 KeyLength = TCString<ANSICHAR>::Strlen(Key.Get());
 			if (KeyLength > 0)
 			{
-				auto* const KeyBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(KeyLength));
 #if UE_5_06_OR_LATER
-				TCString<ANSICHAR>::Strncpy(KeyBuffer, Key.Get(), KeyLength);
+				auto* const KeyBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(KeyLength + 1));
+				TCString<ANSICHAR>::Strncpy(KeyBuffer, Key.Get(), KeyLength + 1);
 #else
+				auto* const KeyBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(KeyLength));
 				TCString<ANSICHAR>::Strcpy(KeyBuffer, KeyLength, Key.Get());
 #endif
 				Text.key = KeyBuffer;
@@ -322,10 +323,11 @@ namespace TextChunkHelper
 			const int32 ValueLength = TCString<ANSICHAR>::Strlen(Value.Get());
 			if (ValueLength > 0)
 			{
-				auto* const ValueBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(ValueLength));
 #if UE_5_06_OR_LATER
-				TCString<ANSICHAR>::Strncpy(ValueBuffer, Key.Get(), KeyLength);
+				auto* const ValueBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(ValueLength + 1));
+				TCString<ANSICHAR>::Strncpy(ValueBuffer, Value.Get(), ValueLength + 1);
 #else
+				auto* const ValueBuffer = static_cast<ANSICHAR*>(FMemory::Malloc(ValueLength));
 				TCString<ANSICHAR>::Strcpy(ValueBuffer, ValueLength, Value.Get());
 #endif
 				Text.text = ValueBuffer;

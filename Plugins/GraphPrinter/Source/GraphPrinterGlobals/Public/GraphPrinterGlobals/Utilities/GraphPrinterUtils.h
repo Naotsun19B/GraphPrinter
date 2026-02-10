@@ -29,8 +29,8 @@ namespace GraphPrinter
 			const bool bIsMultiple = false
 		);
 
-		// Cuts out unnecessary character strings mixed in at the beginning of sentences.
-		// Returns whether the clipping was actually done.
-		static bool ClearUnnecessaryCharactersFromHead(FString& String, const FString& BeginningOfString);
+		// Trims characters outside the range of the specified start and end keywords.
+		// Returns whether the trimming was actually done.
+		static bool TrimStringToKeywordRange(FString& String, const FString& HeadOfString, const FString& EndOfString);
 	};
 }

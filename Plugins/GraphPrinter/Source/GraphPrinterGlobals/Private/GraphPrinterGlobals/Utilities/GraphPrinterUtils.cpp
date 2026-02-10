@@ -90,17 +90,20 @@ namespace GraphPrinter
 		);
 	}
 
-	bool FGraphPrinterUtils::ClearUnnecessaryCharactersFromHead(FString& String, const FString& BeginningOfString)
+	bool FGraphPrinterUtils::TrimStringToKeywordRange(FString& String, const FString& HeadOfString, const FString& EndOfString)
 	{
-		int32 StartPosition = 0;
+		bool bWasTrimmed = false;
 		const int32 TextLength = String.Len();
-		const int32 HeaderLength = BeginningOfString.Len();
+
+		// Trims from head: finds the first occurrence of BeginningOfString.
+		const int32 HeaderLength = HeadOfString.Len();
+		int32 StartPosition = 0;
 		for (int32 Index = 0; Index < TextLength - HeaderLength; Index++)
 		{
 			bool bIsMatch = true;
 			for (int32 Offset = 0; Offset < HeaderLength; Offset++)
 			{
-				if (String[Index + Offset] != BeginningOfString[Offset])
+				if (String[Index + Offset] != HeadOfString[Offset])
 				{
 					bIsMatch = false;
 				}
@@ -115,9 +118,36 @@ namespace GraphPrinter
 		if (StartPosition > 0)
 		{
 			String = String.Mid(StartPosition, TextLength - StartPosition);
-			return true;
+			bWasTrimmed = true;
 		}
 
-		return false;
+		// Trims from tail: finds the last occurrence of EndOfString.
+		const int32 CurrentLength = String.Len();
+		const int32 FooterLength = EndOfString.Len();
+		int32 EndPosition = INDEX_NONE;
+		for (int32 Index = CurrentLength - FooterLength; Index >= 0; Index--)
+		{
+			bool bIsMatch = true;
+			for (int32 Offset = 0; Offset < FooterLength; Offset++)
+			{
+				if (String[Index + Offset] != EndOfString[Offset])
+				{
+					bIsMatch = false;
+				}
+			}
+
+			if (bIsMatch)
+			{
+				EndPosition = Index + FooterLength;
+				break;
+			}
+		}
+		if (EndPosition != INDEX_NONE && EndPosition < CurrentLength)
+		{
+			String = String.Left(EndPosition);
+			bWasTrimmed = true;
+		}
+
+		return bWasTrimmed;
 	}
 }
