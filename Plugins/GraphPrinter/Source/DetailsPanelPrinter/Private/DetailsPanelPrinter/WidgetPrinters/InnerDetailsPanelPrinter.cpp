@@ -6,7 +6,7 @@
 #include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
 #include "DetailMultiTopLevelObjectRootNode.h"
-#include "GameFramework/WorldSettings.h"
+#include "GameFramework/Info.h"
 #if UE_5_05_OR_LATER
 #include "Misc/DefinePrivateMemberPtr.h"
 #else
@@ -136,12 +136,6 @@ namespace GraphPrinter
 	{
 		if (IsValid(EditingObjectClass))
 		{
-			// Applies to classes that inherit AActor if the instance is the default object.
-			if (EditingObjectClass->IsChildOf<AActor>() && EditingObjectClass->IsTemplate())
-			{
-				return true;
-			}
-			
 			return EditingObjectClass->IsChildOf<UObject>();
 		}
 
@@ -244,6 +238,13 @@ namespace GraphPrinter
 	{
 		if (IsValid(EditingObjectClass))
 		{
+			// Excludes non-physical actors that inherit from AInfo (e.g. AWorldSettings),
+			// as they don't have instance properties and should be handled by FDetailsPanelPrinter.
+			if (EditingObjectClass->IsChildOf<AInfo>())
+			{
+				return false;
+			}
+
 			// Applies to objects that inherit the AActor class and whose instance is not the default object.
 			return (EditingObjectClass->IsChildOf<AActor>() && !EditingObjectClass->IsTemplate());
 		}

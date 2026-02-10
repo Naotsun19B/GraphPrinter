@@ -271,7 +271,7 @@ namespace GraphPrinter
 			{
 				return false;
 			}
-
+			
 			// Applies read property data to object properties.
 			{
 				if (!MapToRead.Contains(DetailsPanelPrinter::TextChunkDefine::PropertiesChunkKey))
