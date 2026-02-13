@@ -264,14 +264,26 @@ namespace GraphPrinter
 				GenericGraphPrinter::TextChunkDefine::NodeInfoHeader, 
 				GenericGraphPrinter::TextChunkDefine::NodeInfoFooter
 			);
+			
+			UEdGraph* CurrentGraph = Widget->GetCurrentGraph();
 
-			if (!FEdGraphUtilities::CanImportNodesFromText(Widget->GetCurrentGraph(), TextToImport))
+			if (!IsValid(CurrentGraph) || !FEdGraphUtilities::CanImportNodesFromText(CurrentGraph, TextToImport))
 			{
 				return false;
 			}
 
-			TSet<UEdGraphNode*> UnuseImportedNodeSet;
-			FEdGraphUtilities::ImportNodesFromText(Widget->GetCurrentGraph(), TextToImport, UnuseImportedNodeSet);
+			TSet<UEdGraphNode*> ImportedNodeSet;
+			FEdGraphUtilities::ImportNodesFromText(CurrentGraph, TextToImport, ImportedNodeSet);
+
+			// Notifies the graph editor that the graph has been modified so that node widgets are rebuilt.
+			CurrentGraph->NotifyGraphChanged();
+
+			// Selects the imported nodes so that they are visible to the user.
+			Widget->ClearSelectionSet();
+			for (UEdGraphNode* ImportedNode : ImportedNodeSet)
+			{
+				Widget->SetNodeSelection(ImportedNode, true);
+			}
 
 			return true;
 #else
