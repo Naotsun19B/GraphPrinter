@@ -112,7 +112,7 @@ namespace GraphPrinter
 							FExecuteAction::CreateRaw(&ISupportedWidgetRegistry::Get(), &ISupportedWidgetRegistry::SetSelectedWidget, SupportedWidget.GetIdentifier()),
 							FCanExecuteAction(),
 							FIsActionChecked::CreateLambda(
-								[&SupportedWidget]() -> bool
+								[SupportedWidget]() -> bool
 								{
 									const TOptional<FSupportedWidget>& SelectedWidget = ISupportedWidgetRegistry::Get().GetSelectedWidget();
 									return (SelectedWidget.IsSet() && (SelectedWidget.GetValue() == SupportedWidget));

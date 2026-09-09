@@ -64,6 +64,7 @@ namespace GraphPrinter
 
 	void FSupportedWidgetRegistryImpl::CollectSupportedWidget()
 	{
+		const TOptional<FSupportedWidget> PreviousSelection = GetSelectedWidget();
 		RegisteredWidgets.Empty();
 		
 		FWidgetPrinterUtils::EnumerateChildWidgets(
@@ -82,6 +83,19 @@ namespace GraphPrinter
 				return true;
 			}
 		);
+		SelectedWidgetIdentifier.Invalidate();
+		for (const FSupportedWidget& RegisteredWidget : RegisteredWidgets)
+		{
+			if (PreviousSelection.IsSet() && RegisteredWidget == PreviousSelection.GetValue())
+			{
+				SelectedWidgetIdentifier = RegisteredWidget.GetIdentifier();
+				break;
+			}
+		}
+		if (!SelectedWidgetIdentifier.IsValid() && RegisteredWidgets.Num() > 0)
+		{
+			SelectedWidgetIdentifier = RegisteredWidgets[0].GetIdentifier();
+		}
 	}
 
 	const TArray<FSupportedWidget>& FSupportedWidgetRegistryImpl::GetSupportedWidgets() const
@@ -101,7 +115,10 @@ namespace GraphPrinter
 
 	void FSupportedWidgetRegistryImpl::SetSelectedWidget(const FGuid Identifier)
 	{
-		if (RegisteredWidgets.ContainsByPredicate(EqualsByIdentifier))
+		if (RegisteredWidgets.ContainsByPredicate([Identifier](const FSupportedWidget& RegisteredWidget)
+		{
+			return RegisteredWidget.GetIdentifier() == Identifier;
+		}))
 		{
 			SelectedWidgetIdentifier = Identifier;
 		}
