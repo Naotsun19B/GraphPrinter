@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WidgetPrinter/WidgetPrinters/InnerWidgetPrinter.h"
 #include "WidgetPrinter/Utilities/WidgetPrinterUtils.h"
+#include "WidgetPrinter/Utilities/CastSlateWidget.h"
 #include "GenericGraphPrinter/Utilities/GenericGraphPrinterUtils.h"
 #include "GenericGraphPrinter/Types/PrintGraphOptions.h"
 #include "GraphPrinterGlobals/GraphPrinterGlobals.h"
@@ -300,8 +301,7 @@ namespace GraphPrinter
 		// Finds the target widget from the search target.
 		static TSharedPtr<SGraphEditorImpl> FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
 		{
-			const TSharedPtr<SWidget> DockingTabStack = FWidgetPrinterUtils::FindNearestParentDockingTabStack(SearchTarget);
-			return FGenericGraphPrinterUtils::FindNearestChildGraphEditor(DockingTabStack);
+			return Private::FindSlateWidgetInParentPath<SGraphEditorImpl>(SearchTarget, TEXT("SGraphEditorImpl"));
 		}
 		
 		// Returns the title from the graph in the format "[asset name]-[graph title]".

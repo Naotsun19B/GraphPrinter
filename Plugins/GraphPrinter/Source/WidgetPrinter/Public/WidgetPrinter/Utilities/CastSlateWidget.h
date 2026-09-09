@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Widgets/SWidget.h"
 
 namespace GraphPrinter
 {
@@ -27,6 +28,22 @@ namespace GraphPrinter
 
 			return nullptr;
 		}
+
+		// Match the widget itself or its ancestors, never an unrelated sibling tab.
+		template<class To>
+		TSharedPtr<To> FindSlateWidgetInParentPath(TSharedPtr<SWidget> Widget, const FName& ClassName)
+		{
+			while (Widget.IsValid())
+			{
+				if (TSharedPtr<To> Match = CastSlateWidget<To>(Widget, ClassName))
+				{
+					return Match;
+				}
+				Widget = Widget->GetParentWidget();
+			}
+			return nullptr;
+		}
+
 	}
 }
 

@@ -15,7 +15,9 @@ namespace GraphPrinter
 		{
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
+				const TSharedPtr<SWidget> SearchTarget = Options->SearchTarget;
 				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::Clipboard);
+				Options->SearchTarget = SearchTarget;
 				WidgetPrinter->PrintWidget(Options);
 			}
 		}
@@ -37,7 +39,9 @@ namespace GraphPrinter
 		{
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
+				const TSharedPtr<SWidget> SearchTarget = Options->SearchTarget;
 				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::Clipboard);
+				Options->SearchTarget = SearchTarget;
 				WidgetPrinter->PrintWidget(Options);
 			}
 		}
@@ -60,7 +64,9 @@ namespace GraphPrinter
 		{
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
+				const TSharedPtr<SWidget> SearchTarget = Options->SearchTarget;
 				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::All, UPrintWidgetOptions::EExportMethod::ImageFile);
+				Options->SearchTarget = SearchTarget;
 				WidgetPrinter->PrintWidget(Options);
 			}
 		}
@@ -82,7 +88,9 @@ namespace GraphPrinter
 		{
 			if (UWidgetPrinter* WidgetPrinter = IWidgetPrinterRegistry::Get().FindAvailableWidgetPrinter(Options))
 			{
+				const TSharedPtr<SWidget> SearchTarget = Options->SearchTarget;
 				Options = WidgetPrinter->CreateDefaultPrintOptions(UPrintWidgetOptions::EPrintScope::Selected, UPrintWidgetOptions::EExportMethod::ImageFile);
+				Options->SearchTarget = SearchTarget;
 				WidgetPrinter->PrintWidget(Options);
 			}
 		}
