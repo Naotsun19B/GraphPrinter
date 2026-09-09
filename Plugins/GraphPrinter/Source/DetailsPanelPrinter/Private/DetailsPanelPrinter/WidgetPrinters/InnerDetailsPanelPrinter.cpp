@@ -140,7 +140,7 @@ namespace GraphPrinter
 
 	TSharedPtr<SDetailsView> FDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		return Private::FindSlateWidgetInParentPath<SDetailsView>(SearchTarget, TEXT("SDetailsView"));
+		return GP_FIND_SLATE_WIDGET_IN_PARENT_PATH(SDetailsView, SearchTarget);
 	}
 
 	FString FDetailsPanelPrinter::GetEditingObjectName(const TSharedPtr<SDetailsView>& DetailsPanel)
@@ -217,12 +217,9 @@ namespace GraphPrinter
 
 	TSharedPtr<SDetailsView> FActorDetailsPanelPrinter::FindDetailsView(const TSharedPtr<SWidget>& SearchTarget) const
 	{
-		if (SearchTarget.IsValid())
-		{
-			return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(SearchTarget);
-		}
-			
-		return FDetailsPanelPrinterUtils::GetActiveDetailsView();
+		// Receives the actor details panel that FindTargetWidget resolved, so returns nothing when that search failed.
+		// Falling back to the active details view here would make CanRestoreWidget report true while RestoreWidget does nothing.
+		return FDetailsPanelPrinterUtils::FindNearestChildDetailsView(SearchTarget);
 	}
 
 	bool FActorDetailsPanelPrinter::SupportsEditingObjectClass(const UClass* EditingObjectClass) const
@@ -245,7 +242,7 @@ namespace GraphPrinter
 
 	TSharedPtr<SActorDetails> FActorDetailsPanelPrinter::FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
 	{
-		return Private::FindSlateWidgetInParentPath<SActorDetails>(SearchTarget, TEXT("SActorDetails"));
+		return GP_FIND_SLATE_WIDGET_IN_PARENT_PATH(SActorDetails, SearchTarget);
 	}
 
 	FString FActorDetailsPanelPrinter::GetEditingActorName(const TSharedPtr<SDetailsView>& DetailsPanel)

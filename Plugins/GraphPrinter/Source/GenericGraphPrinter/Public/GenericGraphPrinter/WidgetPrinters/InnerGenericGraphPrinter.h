@@ -301,7 +301,7 @@ namespace GraphPrinter
 		// Finds the target widget from the search target.
 		static TSharedPtr<SGraphEditorImpl> FindTargetWidgetFromSearchTarget(const TSharedPtr<SWidget>& SearchTarget)
 		{
-			return Private::FindSlateWidgetInParentPath<SGraphEditorImpl>(SearchTarget, TEXT("SGraphEditorImpl"));
+			return GP_FIND_SLATE_WIDGET_IN_PARENT_PATH(SGraphEditorImpl, SearchTarget);
 		}
 		
 		// Returns the title from the graph in the format "[asset name]-[graph title]".

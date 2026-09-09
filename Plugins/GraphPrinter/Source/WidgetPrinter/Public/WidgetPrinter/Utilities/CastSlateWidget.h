@@ -29,22 +29,29 @@ namespace GraphPrinter
 			return nullptr;
 		}
 
-		// Match the widget itself or its ancestors, never an unrelated sibling tab.
+		/**
+		 * Finds a widget of the specified class from the widget itself or its ancestors.
+		 * Never matches a widget that belongs to an unrelated sibling tab.
+		 * Takes the widget by value because it is advanced while walking up the parent path.
+		 */
 		template<class To>
-		TSharedPtr<To> FindSlateWidgetInParentPath(TSharedPtr<SWidget> Widget, const FName& ClassName)
+		TSharedPtr<To> FindSlateWidgetInParentPath(TSharedPtr<SWidget> Widget, const FName& ToClassName)
 		{
 			while (Widget.IsValid())
 			{
-				if (TSharedPtr<To> Match = CastSlateWidget<To>(Widget, ClassName))
+				const TSharedPtr<To> FoundWidget = CastSlateWidget<To>(Widget, ToClassName);
+				if (FoundWidget.IsValid())
 				{
-					return Match;
+					return FoundWidget;
 				}
+
 				Widget = Widget->GetParentWidget();
 			}
+
 			return nullptr;
 		}
-
 	}
 }
 
 #define GP_CAST_SLATE_WIDGET(ToClass, FromPtr) GraphPrinter::Private::CastSlateWidget<ToClass>(FromPtr, #ToClass)
+#define GP_FIND_SLATE_WIDGET_IN_PARENT_PATH(ToClass, FromPtr) GraphPrinter::Private::FindSlateWidgetInParentPath<ToClass>(FromPtr, #ToClass)
