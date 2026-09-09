@@ -7,7 +7,10 @@
 // From UE 5.8, Cocoa/AppKit headers are no longer transitively included via CoreMinimal on Mac,
 // so Objective-C symbols (NSString, NSImage, NSPasteboard, NSArray, nil) must be brought in explicitly.
 // Also, the newly introduced FImage type otherwise gets suggested in place of NSImage.
-#import <Cocoa/Cocoa.h>
+// Mac/MacSystemIncludes.h (instead of a raw #import <Cocoa/Cocoa.h>) applies Engine's
+// FVector/check/verify workarounds so this doesn't conflict when Unity Build merges this
+// translation unit with another .cpp that already includes Unreal's Math/Vector.h.
+#include "Mac/MacSystemIncludes.h"
 #endif
 
 namespace ClipboardImageExtension
